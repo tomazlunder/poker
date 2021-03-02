@@ -1,0 +1,234 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>The HTML5 Herald</title>
+  <meta name="description" content="The HTML5 Herald">
+  <meta name="author" content="SitePoint">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+  <link rel="stylesheet" href="index.css">
+
+</head>
+
+<body>
+
+
+  <div class="userWrapper" id="userWrapper">
+    <div class="userContainer">
+      <table>
+        <tr><td>
+        <b><label class="labelUser" id="home_label_user"></label></b>
+        </td></tr>
+        <tr> <td><img src="images/chip.png" width="21.8" height="21.8"></td>	
+        <td><label class="labelUser" id="home_label_balance"></label>	</td>
+        </tr>	
+      </table>
+    </div>
+  </div>
+
+<!-- The Modal -->
+  <div id="modalBuyIn" class="modal" style="display:none">
+
+    <!-- Modal content -->
+    <div class="modal-content">
+      <span class="close" id = "close">&times;</span>
+      <p>Buy-in size</p>
+      <input type="range"  id="buyInRange" class="sliderBuyIn" name="raise" min="0" max="50" oninput="rangeBuyinChange()" onchange="rangeChange()">
+      <input type="text" id="buyinTextField" style="width: 10%;" disabled></input>
+      <button id="modalButton" class="Button" onclick="modalButtonClicked()">JOIN</button>
+    </div>
+
+  </div>
+  
+
+  <div class="wrapper1" id="mainWrapper">
+    <div class="containerTitle">
+      <div class="containerTitleImage">
+        <img class= "titleImage" src="./images/logo.png">
+      </div>
+    </div>  
+
+    <div class="containerPage" id="welcome">
+      <br>
+      <label class="formLabel">Account Name (Example.1234):</label><br>
+      <input type="text" id=input_welcome_name></input><br>
+      <label class="formLabel" >Password:</label><br>
+      <input type="password" id="input_welcome_password"></input><br><br>
+      <button class ="button" onclick="welcomeLoginButton()">Login</button>
+      <button class ="button" onclick="welcomeRegisterButton()">Register</button><br><br>
+      <label style="display: none" id="error_label_login"><label>
+    </div>  
+
+    <div class="containerPage" id="registration">
+      <br>
+      <label class="formLabel">Account Name (Example.1234):</label><br>
+      <input type="text" id="input_registration_name"></input><br>
+      <label>Password:</label><br>
+      <input type="password" id="input_registration_password"></input><br>
+      <label>API Key:</label><br>
+      <input type="text" id="input_registration_api"></input><br>
+      <label>Email (optional):</label><br>
+      <input type="text" id="input_registration_email"></input><br>
+      <label>Repeat Password:</label><br>
+      <input type="password" id="input_registration_repeat_password"></input><br><br>
+      <button onclick="registrationRegisterButton()">Register</button>
+      <button onclick="registrationBackButton()">Back</button><br><br>
+      <label style="display: none" id="error_label_register"><label>
+    </div>  
+
+    <div class ="containerPage" id="home">
+      <div class="containerNav">
+        <button onclick="homeRefreshButton()" id="homeRefreshButton" >Play</button>
+        <button onclick="homeRefreshButton()" id="homeRefreshButton" >Lottery</button>
+        <button onclick="homeRefreshButton()" id="homeRefreshButton" >Withdraw</button>
+      </div>
+      <div class="containerMain">
+        <div id="roomList">
+          <div class="row" id="roomListTitleRow">
+            <label class="labelTitle">Room List</label>
+            <label id="labelRoomMessage">aa</label>
+            <br>
+            <br>
+          </div>
+          <div class="row" id="roomListContentRow">
+            <div class="containerRooms" id="containerRooms">
+              <div class="room">
+                <div class="col80">
+                  <div class="row50"><label>a</label></div>
+                  <div class="row50"><label>b</label></div>
+                </div>
+                <div class="col20">
+                <button class="buttonJoin">
+                 TEST
+                </button>
+                </div>
+              </div>
+            </div>
+            <br><br>
+          </div>
+          <div class="row" id = "roomListRefreshRow">
+            <button onclick="homeRefreshButton()" style="margin-top:1vh;" id="homeRefreshButton" >Refresh</button>
+           </div>
+          <!--
+          <div class="row" id="roomListTitle" style="text-align: left;">
+            <label class="labelTitle">Room List</label>
+            <br>
+            <br>
+          </div>
+          <div class="row" id="roomButtons">
+          </div>
+          <br>
+        -->
+
+        
+        </div>
+      </div>
+      <div class="containerFoot">
+        <button class="buttonFoot" onclick="tipButton()" id="tipButton" >Tip the house</button>
+      </div>  
+    </div>
+
+    <div class="containerPage" id="game">
+
+      <div id="canvasContainer">
+        <canvas width=1800 height=1200 id="canvas"></canvas>
+      </div>
+
+      <div class = "leaveRoomContainer">	
+        <button class="actionButton" onclick="homeLeaveRoom()" id="homeLeaveRoomButton">Leave Room</button>
+      </div>
+
+      <div id="soundButtonContainer">
+        <label>Sound</label>
+        <label class="switch">
+          <input id="soundCheckbox" type="checkbox" checked onclick="soundCheckboxClicked()">
+          <span class="slider2"></span>
+        </label>
+      </div>
+
+      <div id = "raiseContainer">
+        <input type="text" id="rangeTextField" value="0" style="width:5vmax;"disabled></input>
+        <input type="range"  id="raiseRange" class="slider" name="raise" min="0" max="50" oninput="rangeChange()" onchange="rangeChange()">
+        <button class="actionButton" id="homeRaiseButton" onclick="homeRaiseButton()" disabled>Raise</button>
+      </div>
+
+      <div id = "callFoldContainer">
+      <button class="actionButton" id="homeCallButton" onclick="homeCallButton()" disabled>Check/Call</button>
+      <button class="actionButton" id="homeFoldButton" onclick="homeFoldButton()" disabled>Fold</button>
+      </div>
+
+    </div> 
+  <div>
+
+</body>
+
+
+<img class="res" src="images/table.png" id="img_table">
+<img class="res" src="images/player_border.png" id="img_player_border">
+
+<img class="res" src="images/cards/BACK.png" id="img_back">
+
+<img class="res" src="images/cards/2H.png"  id="img_2h">
+<img class="res"  src="images/cards/3H.png" id="img_3h">
+<img class="res" src="images/cards/4H.png" id="img_4h">
+<img class="res" src="images/cards/5H.png" id="img_5h">
+<img class="res" src="images/cards/6H.png" id="img_6h">
+<img class="res" src="images/cards/7H.png" id="img_7h">
+<img class="res" src="images/cards/8H.png" id="img_8h">
+<img class="res" src="images/cards/9H.png" id="img_9h">
+<img class="res" src="images/cards/10H.png" id="img_Th">
+<img class="res" src="images/cards/JH.png" id="img_Jh">
+<img class="res" src="images/cards/QH.png" id="img_Qh">
+<img class="res" src="images/cards/KH.png" id="img_Kh">
+<img class="res" src="images/cards/AH.png" id="img_Ah">
+
+<img class="res" src="images/cards/2D.png" id="img_2d">
+<img class="res" src="images/cards/3D.png" id="img_3d">
+<img class="res" src="images/cards/4D.png" id="img_4d">
+<img class="res" src="images/cards/5D.png" id="img_5d">
+<img class="res" src="images/cards/6D.png" id="img_6d">
+<img class="res" src="images/cards/7D.png" id="img_7d">
+<img class="res" src="images/cards/8D.png" id="img_8d">
+<img class="res" src="images/cards/9D.png" id="img_9d">
+<img class="res" src="images/cards/10D.png" id="img_Td">
+<img class="res" src="images/cards/JD.png" id="img_Jd">
+<img class="res" src="images/cards/QD.png" id="img_Qd">
+<img class="res" src="images/cards/KD.png" id="img_Kd">
+<img class="res" src="images/cards/AD.png" id="img_Ad">
+
+<img class="res"  src="images/cards/2S.png" id="img_2s">
+<img class="res"  src="images/cards/3S.png" id="img_3s">
+<img class="res" src="images/cards/4S.png" id="img_4s">
+<img class="res" src="images/cards/5S.png" id="img_5s">
+<img class="res" src="images/cards/6S.png" id="img_6s">
+<img class="res" src="images/cards/7S.png" id="img_7s">
+<img class="res" src="images/cards/8S.png" id="img_8s">
+<img class="res" src="images/cards/9S.png" id="img_9s">
+<img class="res" src="images/cards/10S.png" id="img_Ts">
+<img class="res" src="images/cards/JS.png" id="img_Js">
+<img class="res" src="images/cards/QS.png" id="img_Qs">
+<img class="res" src="images/cards/KS.png" id="img_Ks">
+<img class="res" src="images/cards/AS.png" id="img_As">
+
+<img class="res" src="images/cards/2C.png" id="img_2c">
+<img class="res" src="images/cards/3C.png" id="img_3c">
+<img class="res" src="images/cards/4C.png" id="img_4c">
+<img class="res" src="images/cards/5C.png" id="img_5c">
+<img class="res" src="images/cards/6C.png" id="img_6c">
+<img class="res" src="images/cards/7C.png" id="img_7c">
+<img class="res" src="images/cards/8C.png" id="img_8c">
+<img class="res" src="images/cards/9C.png" id="img_9c">
+<img class="res" src="images/cards/10C.png" id="img_Tc">
+<img class="res" src="images/cards/JC.png" id="img_Jc">
+<img class="res" src="images/cards/QC.png" id="img_Qc">
+<img class="res" src="images/cards/KC.png" id="img_Kc">
+<img class="res" src="images/cards/AC.png" id="img_Ac">
+
+
+<script src = "/socket.io/socket.io.js"></script>
+<script src = "/index.js"></script>
+</html>

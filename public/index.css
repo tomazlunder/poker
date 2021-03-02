@@ -1,0 +1,555 @@
+html, body{
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+
+    color: #3E3E3E;
+    background-color: #dddddd;
+    font-family: "Tahoma", Times, serif;
+}
+
+.wrapper1{
+    height: 100%;
+    width:86%;
+    top: 0px;
+    /* background: SkyBlue; */
+
+    padding-left: 7%;
+    padding-right: 7%;
+}
+
+#welcome{
+    display: block;
+}
+
+#registration{
+    display: none;
+}
+
+#home{
+    display: none;
+}
+
+#game{
+    display: none;
+}
+
+.containerTitle{
+    /* background: green; */ 
+    width: 100%;
+    height: 15%;
+    position: relative;
+}
+
+.containerTitleImage{
+    /* background: blue; */
+    height: 70%;
+    width: 50%;
+    padding-left:1%;
+    position: absolute;
+    bottom: 1vh;
+    left: 1vw;
+    float: left;
+    text-align: left;
+}
+
+.titleImage{
+  object-position: left bottom;
+    height: 100%;
+    width: 100%;
+    object-fit: scale-down;
+    float: left;
+    text-align: left;
+}
+
+.containerNav{
+    /*background: rgb(165, 91, 162); */
+    width: 100%;
+    height: 7%;
+}
+
+.containerMain{
+    /*background: yellow; */
+
+    width: 100%;
+    height: 86%;
+}
+
+.containerPage{
+    /*background: yellow;*/
+    width: 100%;
+    height: 85%;
+    position: relative;
+}
+
+.containerFoot{
+    /*background: rgb(165, 91, 162); */
+    width: 100%;
+    height: 7%;
+
+    position:absolute;
+    text-align: right;
+    bottom:0;
+}
+
+/* Labels */
+label{
+  font-family: "Tahoma", Times, serif;
+  color: #3E3E3E;
+}
+
+.formLabel {
+    font-size: 1.3vmax;
+}
+
+.labelTitle{
+  text-align: left;
+  font-size: 1.5vmax;
+  font-weight: bold;
+  margin: 0;
+  display: inline-block;
+
+  position: absolute;
+  top: 50%;
+  left: 0%;
+  transform: translate(0%, -50%);
+}
+
+#labelRoomMessage{
+  text-align: center;
+  font-size: 1.5vmax;
+  margin: 0;
+  display: inline-block;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(0%, -50%);
+}
+
+.labelRoom {
+  font-size: 1.3vmax;
+}
+
+.labelUser{
+  font-size: 1.3vmax;
+}
+
+/* Input fields */
+input{
+  font-family: "Tahoma", Times, serif;
+  font-size: 1.3vmax;
+}
+
+input[type=text] {
+    width: 100%;
+    padding: 1.2vh 1vw;
+    margin: 8px 0;
+    box-sizing: border-box;
+  }
+
+input[type=password] {
+  width: 100%;
+  padding: 1.2vh 1vw;
+  margin: 8px 0;
+  box-sizing: border-box;
+}
+
+/* Buttons */
+button {
+  background-color: #832e7c;
+  border: none;
+  color: white;
+  padding: 1.5vh 3vmin;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 1.5vmax;
+  font-family: "Tahoma", Times, serif;
+}
+  
+.buttonJoin {
+  color: white;
+  padding: 0.3vmax 1.2vmax;
+  font-size: 1.5vmax;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+  
+.buttonFoot {
+  background-color: #afe223;
+  color: #000000;
+}
+  
+button:disabled {
+  background: #6d6d6d;
+}
+
+button:hover {
+  background-color: #fdea5a;
+  color:black;
+}
+
+.col30{
+  width:30%;
+  height:100%;
+  float:left;
+}
+.col70{
+  width:70%;
+  height:100%;
+  float:right;
+}
+
+.col50 {
+    height: 100%;
+    width: 50%;
+    float: left;
+}
+
+.row {
+    width: 100%;
+}
+
+.res{
+    display: none;
+}
+
+.userWrapper{
+    width: 20%;
+    height: 14%;
+    /* background: yellow; */
+
+    position: absolute;
+    bottom: 86%;
+    right: 7%;
+
+    display: none;
+}
+
+.userContainer{
+    position: absolute;
+    bottom: 0px; 
+    right: 0px;
+}
+
+table{
+    text-align: right;
+    bottom: 0px;
+}
+
+td{
+    float: right;
+}
+
+#roomButtons{
+    text-align: left;
+    max-height: 75%;
+}
+
+
+canvas{
+    /*max-width: 1000px;*/
+    padding-left: 0;
+    padding-right: 0;
+    margin: auto;
+    margin-left: auto;
+    margin-right: auto;
+
+    height: 100%;
+    width: 100%;
+    object-fit: scale-down;
+    /*border:1px solid #000000;*/
+}
+
+.sliderBuyIn{
+  -webkit-appearance: none;  /* Override default CSS styles */
+  appearance: none;
+  width: 100%; /* Full-width */
+  height: 4vh;
+  background-color: #ccc;
+}
+
+/* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+.sliderBuyIn::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Override default look */
+  appearance: none;
+  width: 4vh; /* Set a specific slider handle width */
+  height: 4vh; /* Slider handle height */
+  background:  #832e7c; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+
+.sliderBuyIn::-moz-range-thumb {
+  width: 2vh; /* Set a specific slider handle width */
+  height: 2vh; /* Slider handle height */
+  background: #832e7c; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+
+
+#modalButton{
+  width: 15%;
+}
+
+#buyinTextField{
+  width: 15%;
+}
+
+#canvasContainer{
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  height: 100%;
+  width:100%;
+  z-index: 1;
+}
+
+/* The switch - the box around the slider */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+  }
+  
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider2 {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider2:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider2 {
+  background-color: #832e7c;
+}
+
+input:focus + .slider2 {
+  box-shadow: 0 0 1px #832e7c;
+}
+  
+input:checked + .slider2:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+.wrapperRooms{
+  width: 100%;
+  height: 100%;
+  background: 'red';
+}
+
+.containerRooms{
+  background: #dddddd;
+
+  text-align: left;
+
+  overflow-y:none;
+  overflow-x:auto;
+  height:100%;
+  width: 100%;
+  float: left;
+}
+
+.room{
+  background: #dddddd;
+  border-radius: 0.5vw;
+  border: 2px solid #3E3E3E;
+  width: 95%;
+  height: 6vh;
+}
+  
+.col80{
+  width: 80%;
+  height: 100%;
+  float:left;
+}
+
+.col20{
+  width: 20%;
+  height: 100%;
+  float:right;
+  position: relative;
+
+}
+
+.row50{
+  width:100%;
+  height:50%;
+  font-size:1.5vw;
+  margin-left: 2vw;
+
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  flex-direction: column;
+}
+
+
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+  background-color: #fefefe;
+  margin: 20% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 50%; /* Could be more or less, depending on screen size */
+  font-size:1.3vmax;
+  font-family: "Tahoma", Times, serif;
+}
+
+/* The Close Button */
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+
+#roomListTitleRow{
+  vertical-align: middle;
+  position: relative;
+
+  height: 10%;
+}
+
+#roomListContentRow{
+  height: 80%;
+}
+
+#roomListRefreshRow{
+  height: 10%;
+}
+
+#soundButtonContainer
+{
+  position: absolute; 
+
+  right:1vw;
+  top:1vh;
+}
+
+#leaveRoomContainer
+{
+  position: absolute; 
+
+  left:1vw;
+  top:1vh;
+  z-index: 2;
+}
+
+#raiseContainer
+{
+  position: absolute; 
+
+  left:1vw;
+  bottom:1vh;
+}
+
+#callFoldContainer
+{
+  position: absolute; 
+
+  right:1vw;
+  bottom:1vh;
+  text-align: right;
+}
+
+/* Add Animation */
+@keyframes animatetop {
+  from {top: -300px; opacity: 0}
+  to {top: 0; opacity: 1}
+}
+
+@media (max-width: 1280px) {
+
+
+}
+
+@media (max-width: 700px) {
+  .containerTitle{
+    height: 7.5%;
+  }
+  .userWrapper{
+    position: absolute;
+    bottom: 92.5%;
+    right: 7%;
+  }
+
+  .col50{
+    width: 100%;
+  }
+
+  .containerPage{
+    height: 92.5%;
+  }
+
+  #roomListTitleRow{
+    height: 5%;
+  }
+
+  #roomListContentRow{
+    height: 90%;
+  }
+
+  #roomListRefreshRow{
+    height: 5%;
+  }
+
+  .modal-content {
+    width: 80%; /* Could be more or less, depending on screen size */
+  }
+}
