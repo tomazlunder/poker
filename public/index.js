@@ -776,6 +776,8 @@ function drawNumbers(){
 
     var outerRadius = 100;
     var innerRadius = 70;
+    var timer_x = 160;
+    var timer_y = 160;
 
     //Timer
     var percentage = timeToAct/startTime;
@@ -787,8 +789,8 @@ function drawNumbers(){
             
             ctx.beginPath();
             ctx.globalAlpha = 1;
-            ctx.arc(150,150,outerRadius,0,6.283,false);
-            ctx.arc(150,150,innerRadius,6.283,((Math.PI*2)),true);
+            ctx.arc(timer_x,timer_y,outerRadius,0,6.283,false);
+            ctx.arc(timer_x,timer_y,innerRadius,6.283,((Math.PI*2)),true);
             ctx.fillStyle = "#bbb";
             ctx.fill();
             ctx.closePath();
@@ -800,8 +802,8 @@ function drawNumbers(){
             
             ctx.beginPath();
             ctx.globalAlpha = 1;
-            ctx.arc(150,150,outerRadius,-1.57,(-1.57 + window.intAngle),false);
-            ctx.arc(150,150,innerRadius,(-1.57 + window.intAngle),((Math.PI*2) -1.57),true);
+            ctx.arc(timer_x,timer_y,outerRadius,-1.57,(-1.57 + window.intAngle),false);
+            ctx.arc(timer_x,timer_y,innerRadius,(-1.57 + window.intAngle),((Math.PI*2) -1.57),true);
             ctx.fillStyle = "#832e7c"
             ctx.fill();
             ctx.closePath();
@@ -810,7 +812,7 @@ function drawNumbers(){
             // Centre circle
             
             ctx.beginPath();
-            ctx.arc(150,150,innerRadius,0,6.283,false);
+            ctx.arc(timer_x,timer_y,innerRadius,0,6.283,false);
             ctx.fillStyle = "#dddddd";
             ctx.fill();
             ctx.closePath();
@@ -823,7 +825,7 @@ function drawNumbers(){
 
             //var textHeight = ctx.measureText(""+timeToAct).height;
             console.log(textWidth)
-            ctx.fillText(timeToAct, 150 - textWidth/2 , 150 + 25 );
+            ctx.fillText(timeToAct, timer_x - textWidth/2 , timer_y + 25 );
         }
     }
 

@@ -260,7 +260,7 @@ canvas{
     margin: auto;
     margin-left: auto;
     margin-right: auto;
-
+    
     height: 100%;
     width: 100%;
     object-fit: scale-down;
@@ -308,7 +308,6 @@ canvas{
 
   height: 100%;
   width:100%;
-  z-index: 1;
 }
 
 /* The switch - the box around the slider */
@@ -488,7 +487,6 @@ input:checked + .slider2:before {
 
   left:1vw;
   top:1vh;
-  z-index: 2;
 }
 
 #raiseContainer
