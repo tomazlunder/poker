@@ -17,6 +17,8 @@ var playerNames = []
 var playerBets = []
 var playerStacks = []
 var playerAlive = []
+var playerResults = [0,0,0,0,0,0]
+var playerResultReason = [null,null,null,null,null,null]
 
 var buttonRoomMap = new Map()
 
@@ -37,6 +39,9 @@ var span;
 var buyInRange;
 
 var myBalance;
+
+var cur_min_buy_in;
+var cur_max_buy_in;
 
 modalBuyIn = document.getElementById("modalBuyIn");
 span = document.getElementById("close");
@@ -64,18 +69,22 @@ span.onclick = function() {
 
 
 socket.on("registrationFailed", (arg) => {
-  console.log("Registration failed "+ arg); 
-  document.getElementById("error_label_register").innerHTML = "Registration failed: "+ arg+"."
-  document.getElementById("error_label_register").style.display="block"
+    console.log("Received: Registration failed ");
+    console.log(arg) 
+    document.getElementById("error_label_register").innerHTML = "Registration failed: "+ arg+"."
+    document.getElementById("error_label_register").style.display="block"
 });
 
 socket.on("loginFailed", (arg) => {
-  console.log("Login failed "+ arg); 
-  document.getElementById("error_label_login").innerHTML = "Login failed: "+ arg+"."
-  document.getElementById("error_label_login").style.dsisplay="block"
+    console.log("Received: Loing failed ");
+    console.log(arg) 
+    document.getElementById("error_label_login").innerHTML = "Login failed: "+ arg+"."
+    document.getElementById("error_label_login").style.dsisplay="block"
 });
 
 socket.on('loginOk', (arg) => {
+    console.log("Received: Loing OK");
+
     document.getElementById("welcome").style.display = "none";
     document.getElementById("registration").style.display = "none";
     document.getElementById("home").style.display = "block";
@@ -87,28 +96,31 @@ socket.on('loginOk', (arg) => {
     document.getElementById("home_label_user").innerHTML = arg[0]
     document.getElementById("home_label_balance").innerHTML = "Balance: " + arg[1]
 
+    console.log("Emitted: lookingForRooms")
     socket.emit("lookingForRooms");
 });
 
 socket.on('newBalance', (arg) => {
+    console.log("Received: New balance ("+arg+")");
     myBalance = arg;
     document.getElementById("home_label_balance").innerHTML = "Balance: " + arg
 });
 
 socket.on('roomList', (arg) =>{
+    console.log("Received: RoomList");
+    console.log(arg)
+
     var myNode = document.getElementById("containerRooms");
     myNode.innerHTML = '';
 
-    console.log(arg)
     var alreadyInRoom = arg[0];
     document.getElementById("labelRoomMessage").innerHTML= ""
 
     if(alreadyInRoom){
-        document.getElementById("labelRoomMessage").innerHTML= "  Waiting for round to finish."
+        document.getElementById("labelRoomMessage").innerHTML= "  Waiting for previous round to finish."
     }
 
     var room_list = arg[1];
-    var button;
     for(var i in room_list){
         var id = room_list[i][0]
         var sb = room_list[i][1]
@@ -165,6 +177,8 @@ socket.on('roomList', (arg) =>{
             buyInRange.value = actualMax;
 
             var modalButton = document.getElementById("modalButton");
+            modalButton.innerHTML = "Join"
+
             modalButton.room_id = this.room_id;
 
             document.getElementById("buyinTextField").value = actualMax;
@@ -184,10 +198,14 @@ socket.on('roomList', (arg) =>{
 });
 
 socket.on('listOutdated', (arg) => {
+    console.log("Received: Room list outdated");
+    console.log("Emitted: lookingForRooms");
+
     socket.emit("lookingForRooms")    
 })
 
 socket.on('drawnCards', (arg) => {
+    console.log("Received: Drawn Cards ("+arg+")")
     if(!mute){
         audio_deal.play();
     }
@@ -200,8 +218,12 @@ socket.on('drawnCards', (arg) => {
 })
 
 socket.on('roomJoined', (arg) => {
+    console.log("Received: Room Joined ("+arg+")")
+
     var rid = arg[0]
     var seat_id = arg[1]
+    cur_min_buy_in = arg[2]
+    cur_max_buy_in = arg[3]
     document.getElementById("home_label_balance").innerHTML = "Balance: " + arg[2]
 
     room_id = rid
@@ -212,11 +234,8 @@ socket.on('roomJoined', (arg) => {
     document.getElementById("welcome").style.display = "none";
     document.getElementById("registration").style.display = "none";
     document.getElementById("home").style.display = "none";
+
     document.getElementById("game").style.display = "block";
-
-
-
-    console.log("Buttons disabled")
 
     document.getElementById("raiseRange").disabled = true;
     document.getElementById('homeRaiseButton').disabled = true;
@@ -225,31 +244,39 @@ socket.on('roomJoined', (arg) => {
 
     var myNode = document.getElementById("containerRooms");
     myNode.innerHTML = '';
+
+    message = "";
 })
 
 socket.on('waitingForPlayers', (arg) => {
-    console.log('Waiting for players...')
+    state = 0
+    console.log("Received: waitingForPlayers")
     message = "Waiting for players..."
+
+    drawGame()
+} )
+
+socket.on('namesStacks', (arg) => {
+    console.log("Received: namesStacks")
+    console.log(arg)
 
     playerNames = arg[0]
     playerStacks = arg[1]
 
-    console.log(arg)
     playerNames = playerNames.slice(mySeat).concat(playerNames.slice(0,mySeat))
     playerStacks = playerStacks.slice(mySeat).concat(playerStacks.slice(0,mySeat))
-
-    message = "Waiting for players..."
 
     drawGame()
     
 } )
 
 socket.on('roundStarted', (arg) => {
+    console.log("Received: Round started")
+    state = 1;
     if(!mute){
         audio_bridge.play();
     }
 
-    console.log("Round started")
     message = "Starting...";
 } )
 
@@ -258,13 +285,16 @@ socket.on('resetGame', (arg) => {
     pot = 0;
     playerBets = []
     revealedCards = []
+    playerResults = [0,0,0,0,0,0]
+    playerResults = [null,null,null,null,null,null]
+
     this.showdown = []
 
     drawGame();
 } )
 
 socket.on('showdown', (arg) => {
-    console.log("showdown")
+    console.log("Received: Showdown")
     console.log(arg)
 
     timeToAct = 0;
@@ -274,22 +304,27 @@ socket.on('showdown', (arg) => {
     console.log(mySeat)
     this.showdown = showdown.slice(mySeat).concat(showdown.slice(0,mySeat))
     
-    console.log(showdown)
-
     drawGame();
 } )
 
+socket.on('revealedCards', (arg) => {
+    console.log("Received: Revealed cards");
+    console.log(arg)
+
+    revealedCards = arg;
+    drawGame();
+});
+
 socket.on('gameState', (arg) => {
-    console.log("Received game state:")
+    console.log("Received: Game State");
     console.log(arg)
     pot = arg[0]
-    revealedCards = arg[1]
-    playerNames = arg[2]
-    playerBets = arg[3]
-    playerStacks = arg[4]
-    playerAlive = arg[5]
+    //playerNames = arg[1]
+    playerBets = arg[1]
+    playerStacks = arg[2]
+    playerAlive = arg[3]
 
-    playerNames = playerNames.slice(mySeat).concat(playerNames.slice(0,mySeat))
+    //playerNames = playerNames.slice(mySeat).concat(playerNames.slice(0,mySeat))
     playerBets = playerBets.slice(mySeat).concat(playerBets.slice(0,mySeat))
     playerStacks = playerStacks.slice(mySeat).concat(playerStacks.slice(0,mySeat))
     playerAlive = playerAlive.slice(mySeat).concat(playerAlive.slice(0,mySeat))
@@ -298,12 +333,30 @@ socket.on('gameState', (arg) => {
 } )
 
 socket.on('winner', (arg) =>{
+    console.log("Received: Winner")
+    state = 2;
+    console.log(arg)
+
+    var username = arg[0]
+    var result = arg[1]
+    var hand = arg[2]
+    if(!hand){
+        hand = "Uncalled bet"
+    }
+
+    var localIndex = playerNames.indexOf(username)
+    playerResults.splice(localIndex,1,result);
+    playerResultReason.splice(localIndex,1,hand);
+
+    console.log(playerResults)
+
+    drawGame();
+
     if(message == "Your turn!"){
         message = "";
     }
-    console.log("Winner")
-    console.log(arg)
-    this.message += arg;
+    
+    //this.message += arg;
     timeToAct = 0;
 
     //Disable everything, enable when needed
@@ -314,19 +367,23 @@ socket.on('winner', (arg) =>{
 });
 
 socket.on('roomJoinFailed', (arg) => {
-    console.log("Room join failed: " + arg)
+    console.log("Received: Room join failed (" + arg+")")
 });
 
 socket.on('roomKick', (arg) =>{
+    console.log("Received: Room kick")
     document.getElementById("game").style.display = "none";
     document.getElementById("home").style.display = "block";
 
+    console.log("Emitted: lookingForRooms")
     socket.emit("lookingForRooms");
 } )
 
 socket.on('waitingForNewGame', (arg) => {
+    console.log("Received: Waiting for new game")
     timeToAct = arg;
     startTime = timeToAct;
+    state = 3;
 
     if(!intervalId){
         intervalId = window.setInterval(function(){
@@ -343,7 +400,7 @@ socket.on('waitingForNewGame', (arg) => {
 })
 
 socket.on('actionRequired', (arg) => {
-    console.log("Action required; " + arg)
+    console.log("Received: Action required ("+arg+")")
     playerToAct = arg[0]
     timeToAct = arg[1]/1000
     startTime = timeToAct;
@@ -369,11 +426,12 @@ socket.on('actionRequired', (arg) => {
 
     var curBetSize = arg[2]
     if(playerToAct == myName){
+        console.log("Your turn to act")
+
         message = "Your turn!"
         if(!mute){
             audio_notify.play();
         }
-        console.log("That is you...")
 
         var max = playerStacks[0]-(curBetSize-playerBets[0])
         var min = curBetSize;
@@ -388,17 +446,17 @@ socket.on('actionRequired', (arg) => {
             document.getElementById('raiseRange').max = max;
             document.getElementById("raiseRange").disabled = false;
             document.getElementById("homeRaiseButton").disabled = false;
+
         }
 
         document.getElementById('raiseRange').min = min;
         document.getElementById('raiseRange').value = min;
+        document.getElementById("homeRaiseButton").innerHTML =  "Raise ("+min+")";
 
-        console.log(curBetSize)
-        console.log(playerBets[0])
+
         var callsize = curBetSize-playerBets[0]
 
         document.getElementById('homeCallButton').innerHTML = "Check";
-
 
         if(callsize>0){
             document.getElementById('homeCallButton').innerHTML = "Call ("+callsize+")";
@@ -419,11 +477,13 @@ socket.on('actionRequired', (arg) => {
 } );
 
 function modalButtonClicked(){
-
     var modalButton = document.getElementById("modalButton");
     var rangeSlider = document.getElementById("buyInRange");
 
-    if(modalButton.room_id){
+    if(modalButton.rebuy){
+        rebuyRoom(rangeSlider.value)
+    }
+    else if(modalButton.room_id){
         joinRoom(modalButton.room_id,rangeSlider.value)
     }
 
@@ -443,6 +503,7 @@ function homeRefreshButton(){
     var myNode = document.getElementById("containerRooms");
     myNode.innerHTML = '';
 
+    console.log("Emitted: lookingForRooms")
     socket.emit("lookingForRooms")
 }
 
@@ -454,22 +515,25 @@ function welcomeLoginButton() {
     var password = document.getElementById("input_welcome_password").value;
 
     var nameTest = /^([a-zA-Z]{3,}.[0-9]{4,4})$/.test(name)
-    console.log(nameTest)
+
     if(!nameTest){
+        console.log("Test: Account name format FAIL")
         document.getElementById("error_label_login").innerHTML = "Not a valid account name."
         document.getElementById("error_label_login").style.display="block"
         return
     }
-    console.log(password)
+
     if(password.length < 8){
+        console.log("Test: Password length FAIL")
         document.getElementById("error_label_login").innerHTML = "Password must be least 8 symbols long."
         document.getElementById("error_label_login").style.display="block"
         return
     }
 
-    console.log("test OK")
+    console.log("Test: Input format OK")
 
     //SEND STUFF TO SERVER
+    console.log("Emitted: login")
     socket.emit('login',{name,password});
 }
 
@@ -523,12 +587,16 @@ function registrationRegisterButton() {
     }
     console.log(password)
     if(password.length < 8){
+        console.log("Test: Password length FAIL");
+
         document.getElementById("error_label_register").innerHTML = "Password must be least 8 symbols long."
         document.getElementById("error_label_register").style.display="block"
         return
     }
 
     if(password !== repeat_password){
+        console.log("Test: Password matching FAIL");
+
         console.log(repeat_password)
 
         document.getElementById("error_label_register").innerHTML = "Passwords do not match."
@@ -536,9 +604,10 @@ function registrationRegisterButton() {
         return
     }
 
-    console.log("test OK")
+    console.log("Test: Input format OK")
 
     //SEND STUFF TO SERVER
+    console.log("Emitted: registration")
     socket.emit('registration',{name,password,api,email});
 }
 
@@ -548,29 +617,53 @@ function registrationBackButton() {
 }
 
 function joinRoom(id, buyin) {
+    console.log("Emitted: joinRoom ("+id+","+buyin+")")
     socket.emit("joinRoom", [id,buyin])
     //socket.emit("joinRoom", "room1")
     //room_id = "room1"
 }
 
 function homeLeaveRoom() {
+    console.log("Emitted: leaveRoom")
     socket.emit("leaveRoom")
     document.getElementById("game").style.display = "none";
     document.getElementById("home").style.display = "block";
 
+    console.log("Emitted: lookingForRooms")
     socket.emit("lookingForRooms");
+}
+
+function homeRebuyButton() {
+    console.log("Clicked rebuy button")
+
+    var actualMax = Math.min(myBalance, cur_max_buy_in - playerStacks[0])
+    buyInRange.min = this.cur_min_buy_in
+    buyInRange.max = actualMax
+
+    var modalButton = document.getElementById("modalButton");
+    modalButton.innerHTML = "Rebuy"
+
+    modalButton.rebuy = true;
+
+    document.getElementById("buyinTextField").value = actualMax;
+
+    modalBuyIn.style.display = "block";
 }
 
 
 function homeFoldButton() {
+    console.log("Emitted: actionRequest(fold)")
     socket.emit("actionRequest", [room_id,"fold"])
     document.getElementById("raiseRange").disabled = true;
     document.getElementById("homeCallButton").disabled = true;
     document.getElementById("homeRaiseButton").disabled = true;
     document.getElementById("homeFoldButton").disabled = true;
+    document.getElementById("homeRebuyButton").disabled = true;
 }
 
 function homeCallButton() {
+    console.log("Emitted: actionRequest(checkcall)")
+
     socket.emit("actionRequest", [room_id,"checkcall"])
     document.getElementById("raiseRange").disabled = true;
     document.getElementById("homeCallButton").disabled = true;
@@ -582,6 +675,7 @@ function homeRaiseButton() {
     var val = document.getElementById("raiseRange").value;
     val = parseInt(val)
 
+    console.log("Emitted: actionRequest(raise,"+val+")")
     socket.emit("actionRequest", [room_id,"raise", val])
     document.getElementById("raiseRange").disabled = true;
     document.getElementById("homeCallButton").disabled = true;
@@ -621,7 +715,7 @@ function drawTable(){
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     var img = document.getElementById("img_table")
-    ctx.drawImage(img,0 + width*0.10,0 + height * 0.10, width*0.8, height*0.8)
+    ctx.drawImage(img,0 ,0 + height * 0.10, width, height*0.8)
 }
 
 function drawProfile(x,y,id){
@@ -667,17 +761,38 @@ function drawProfile(x,y,id){
     ctx.font = "40px Tahoma";
     ctx.fillText(playerNames[id].slice(0, -5) , x + 0.01*width, y + 0.04*height);
 
-    ctx.fillStyle = "white";
+    var radious = border_height/3;
 
+    if(playerToAct == playerNames[id] & state == 1){
+        //drawTimer(x-radious*1.5,y+cardHeight/4,radious);
+        drawTimer(x-(radious),y+(border_height/2),radious, 42);
+    }
+
+
+    ctx.fillStyle = "white";
     ctx.font = "60px Tahoma";
+    var stackWidth = ctx.measureText(playerStacks[id]).width;
+
     ctx.fillText(playerStacks[id], x + 0.01*width, y + 0.10*height);
 
     ctx.font = "65px Tahoma";
     ctx.fillStyle =  "#EE42DA";
 
     if(playerBets[id]){
-        ctx.strokeText(playerBets[id], x + border_width/2, y + 0.10*height);
-        ctx.fillText(playerBets[id], x + border_width/2, y + 0.10*height);
+
+        var betWidth = ctx.measureText(playerBets[id]).width;
+
+        ctx.strokeText(playerBets[id], x + border_width - 0.01*width - betWidth, y + 0.10*height);
+        ctx.fillText(playerBets[id], x + border_width  - 0.01*width -  betWidth, y + 0.10*height);
+    }
+
+    if(state >= 2 & playerResults[id]>0){
+        ctx.font = "60px Tahoma";
+
+        ctx.fillStyle = "#339966";
+
+        ctx.strokeText("+"+playerResults[id], x + 0.01*width + stackWidth, y + 0.10*height);
+        ctx.fillText("+"+playerResults[id], x + 0.01*width + stackWidth, y + 0.10*height);
     }
 }
 
@@ -702,7 +817,7 @@ function drawPlayers(){
 
     //P1
     if(playerNames[1]){ 
-        x = 0.25*width - border_width/2
+        x = 0.20*width - border_width/2
         y = 0.75*height- border_height/2
         drawProfile(x,y,1)
 
@@ -710,7 +825,7 @@ function drawPlayers(){
 
     //P2
     if(playerNames[2]){ 
-        x = 0.25*width - border_width/2
+        x = 0.20*width - border_width/2
         y = 0.25*height - border_height/2
         drawProfile(x,y,2)
 
@@ -719,14 +834,14 @@ function drawPlayers(){
     //P3
     if(playerNames[3]){
         x = 0.5*width - border_width/2
-        y = 0.15*height - border_height/2
+        y = 0.16*height - border_height/2
         drawProfile(x,y,3)
 
     }
 
     //P4
     if(playerNames[4]){
-        x = 0.75*width - border_width/2
+        x = 0.8*width - border_width/2
         y = 0.25*height - border_height/2
         drawProfile(x,y,4)
 
@@ -734,7 +849,7 @@ function drawPlayers(){
 
     //P5
     if(playerNames[5]){
-        x = 0.75*width - border_width/2
+        x = 0.8*width - border_width/2
         y = 0.75*height - border_height/2
         drawProfile(x,y,5)
     }
@@ -762,10 +877,6 @@ function drawMyCards(){
 
         ctx.globalAlpha = 1
     }
-}
-
-function drawShowdown(){
-
 }
 
 function drawRevealedCards(){
@@ -802,18 +913,14 @@ function drawRevealedCards(){
     }
 }
 
-function drawNumbers(){
+function drawTimer(timer_x, timer_y, r_outer, font_size){
     var canvas = document.getElementById("canvas");
     var width = canvas.width;
     var height = canvas.height;
     var ctx = canvas.getContext("2d");
 
-    var ctx = canvas.getContext("2d");
-
-    var outerRadius = 80;
-    var innerRadius = 50;
-    var timer_x = 160;
-    var timer_y = 180;
+    var outerRadius = r_outer;
+    var innerRadius = r_outer*0.7;
 
     //Timer
     var percentage = timeToAct/startTime;
@@ -827,7 +934,7 @@ function drawNumbers(){
             ctx.globalAlpha = 1;
             ctx.arc(timer_x,timer_y,outerRadius,0,6.283,false);
             ctx.arc(timer_x,timer_y,innerRadius,6.283,((Math.PI*2)),true);
-            ctx.fillStyle = "#bbb";
+            ctx.fillStyle = "#3E3E3E";
             ctx.fill();
             ctx.closePath();
             
@@ -854,24 +961,37 @@ function drawNumbers(){
             ctx.closePath();
             
 
-            ctx.font = "Bold 45px Arial";
+            ctx.font = "Bold "+font_size+"px Arial";
             ctx.fillStyle =  "black";
 
             var textWidth = ctx.measureText(""+timeToAct).width;
 
             //var textHeight = ctx.measureText(""+timeToAct).height;
-            ctx.fillText(timeToAct, timer_x - textWidth/2 , timer_y + 10 );
+            ctx.fillText(timeToAct, timer_x - textWidth/2 , timer_y + font_size/3 );
         }
     }
+}
+
+function drawNumbers(){
+    var canvas = document.getElementById("canvas");
+    var width = canvas.width;
+    var height = canvas.height;
+    var ctx = canvas.getContext("2d");
+
+    
 
     //Pot
-    if(pot > 0){
+    if(pot > 0 & state == 1){
         ctx.font = "Bold 80px Tahoma";
         ctx.fillStyle =  "#832e7c";
 
         var textWidth = ctx.measureText("POT: " + pot).width;
         ctx.fillText("POT: " + pot, width*0.5 - textWidth/2, height * 0.4);
-    }   
+    }
+
+    if(state == 3){
+        drawTimer(width*0.5, height*0.3, 110, 80)
+    }
 
     //Bet sizes
     //ctx.fillText("")

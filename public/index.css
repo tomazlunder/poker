@@ -527,6 +527,14 @@ input:checked + .slider2:before {
   top:1vh;
 }
 
+#rebuyContainer
+{
+  position: absolute; 
+
+  left:1vw;
+  top:8vh; /*TODO*/
+}
+
 #raiseContainer
 {
   position: absolute; 

@@ -16,10 +16,11 @@ let socketUserMap = new Map()
 var con = require('./db');
 var Room = require('./room.js')
 
-//var hash = crypto.createHash('sha256').update("awdqseww" + "Test.1234").digest('base64');
-//console.log(hash)
-//hash = crypto.createHash('sha256').update("awdqseww" + "Test.1234").digest('base64');
-//console.log(hash)
+var hash = crypto.createHash('sha256').update("awdqseww" + "Test.4444").digest('base64');
+console.log(hash)
+hash = crypto.createHash('sha256').update("awdqseww" + "Test.4444").digest('base64');
+console.log(hash)
+
 app.get('/', function(req, res) {
    res.sendFile(__dirname +'/index.html');
 });
@@ -343,12 +344,12 @@ io.on('connection', function(socket) {
 
 				room.seats[seatId] = user
 				console.log(room.room_id + ": join room sucessful ("+user.name+")")
-				socket.emit("roomJoined",[room.room_id, seatId, user.balance])
+				socket.emit("roomJoined",[room.room_id, seatId, user.balance, room.min_buy_in, room.max_buy_in])
 				socket.join(room.room_id);
 
-				if(room.state == 0){
-					room.sendWaitingForPlayer()
-				}
+				room.sendNamesStacks()
+				room.sendGamestate();
+			
 			}
 			else{
 				console.log("Something went very wrong")
@@ -404,7 +405,7 @@ rooms.push(new Room.Room(io,1, 1, 40,100,6, "Logan's Quarters"));
 
 rooms.push(new Room.Room(io,2, 1, 40,100,6, "Zojja's Lab"));
 
-rooms.push(new Room.Room(io,3, 2, 80, 200,6, "Braham's Pub"));
+rooms.push(new Room.Room(io,3, 2, 80, 200,6, "Braham's Lodge"));
 rooms.push(new Room.Room(io,4, 2, 80, 200,6, "Rytlock's Tent"));
 
 /*

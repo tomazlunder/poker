@@ -38,6 +38,7 @@ class Room{
 	    this.fold_win = 0
 
         this.state = 0;
+		this.roundState = new RoundState();
 
         //Delta time for update loop
 	    this.last_update = Date.now()
@@ -45,12 +46,18 @@ class Room{
     }
 
     sendWaitingForPlayer(){
-        var data;
+		console.log(this.room_id + ": waiting for players sent.")
+		this.io.to(this.room_id).emit('waitingForPlayers');
+    }
+
+	sendNamesStacks(){
+		var data;
 		data = playerData(this.seats)
 		var args = [data[0],data[2]]
-		console.log(this.room_id + ": waiting for players sent.")
-		this.io.to(this.room_id).emit('waitingForPlayers',args);
-    }
+		console.log(this.room_id + ": names and stacks sent.")
+		this.io.to(this.room_id).emit('namesStacks',args);
+	}
+	
 
     sendMessage(){
         this.io.to(this.room_id).emit('message', message);
@@ -59,12 +66,17 @@ class Room{
     sendGamestate(){
         var args = []
 		args.push(this.roundState.pot)
-		args = args.concat([this.roundState.revealedCards])
-		args = args.concat(playerData(this.seats))
-		//console.log(args)
+		var pData = playerData(this.seats)
+		args = args.concat([pData[1]])
+		args = args.concat([pData[2]])
+		args = args.concat([pData[3]])
 
 		this.io.to(this.room_id).emit('gameState', args);
     }
+
+	sendRevealedCards(){
+		this.io.to(this.room_id).emit("revealedCards", this.roundState.revealedCards)
+	}
 
     removeZomibePlayers(){
 		for(var i = 0; i < this.seats.length; i++){
@@ -77,7 +89,7 @@ class Room{
 
 
 					if(this.state = 0){
-						this.sendWaitingForPlayer()
+						this.sendNamesStacks()
 					}
 				}
 			}
@@ -138,6 +150,8 @@ class Room{
 
 					this.roundState.last_to_act = prevPlayer(this.seats.indexOf(this.roundState.to_act),this.seats)
 					this.roundState.to_act = nextPlayer(this.seats.indexOf(this.roundState.to_act), this.seats)
+
+					this.sendGamestate();
 					return
 				}else{
 					console.log(this.room_id + ": " + this.roundState.to_act.name + "tried to raise but doensn't have enough money.");
@@ -152,6 +166,8 @@ class Room{
 					this.winner.push(nextPlayer(this.seats.indexOf(this.roundState.to_act), this.seats))
 					this.fold_win = 1;
 					this.state = 12;
+
+					this.sendGamestate();
 					return;
 				}
 
@@ -174,10 +190,20 @@ class Room{
 							console.log(this.room_id + ": " +this.roundState.to_act.name + " is all in (" + this.roundState.to_act.total_bet_size + ").")
 							this.roundState.to_act.all_in = 1;
 						}
+
 					}
 					else{
 						//ALL IN
+						this.roundState.to_act.all_in = 1;
+						callsize = this.roundState.to_act.stack;
+						console.log(this.room_id + ": " +this.roundState.to_act.name + " part-calls all in(" + callsize + ").")
+
+						this.roundState.pot += callsize
+						this.roundState.to_act.total_bet_size += callsize
+						this.roundState.to_act.stack -= callsize
+						this.roundState.to_act.bet = this.roundState.bet_size
 					}
+					this.sendGamestate();
 				}
 				else{
 					//check
@@ -203,7 +229,7 @@ class Room{
     betting(){
 		if(!this.message_sent){
 			//console.log("Betting...")
-			this.sendGamestate();
+			//this.sendGamestate();
 			if(this.roundState.to_act.all_in){
 				//Skip calling for action, force "check"
 				if(this.roundState.to_act != this.roundState.last_to_act){
@@ -274,6 +300,8 @@ class Room{
 					this.fold_win = true;
 					this.logged = 0;
 					this.state = 12;
+					
+					this.sendGamestate();
 					return;
 				}
 			} 
@@ -312,6 +340,7 @@ class Room{
 		console.log(this.roundState.revealedCards)
 
 		this.state++;
+		this.sendRevealedCards();
 		this.sendGamestate();
 	}
 
@@ -329,6 +358,7 @@ class Room{
 					console.log(this.room_id + ": (state0) waiting for players.")
 					
 					this.sendWaitingForPlayer();
+					this.sendNamesStacks();
 					this.logged = 1;
 				}
 
@@ -519,7 +549,8 @@ class Room{
 					this.winner[0].stack+=this.roundState.pot
 					this.state++;
 					console.log(this.winner[0].name + " wins " + this.roundState.pot + " by folds")
-					this.io.to(this.room_id).emit('winner', this.winner[0].name + " wins " + this.roundState.pot + ".");
+					this.io.to(this.room_id).emit('winner', [this.winner[0].name, this.roundState.pot, "folds"]);
+
 					return
 				}
 
@@ -544,19 +575,35 @@ class Room{
 				var min_stack;
 				var runningPot = 0;
 				while(players.length > 1){
+					console.log("plen " + players.length)
+					//console.log(players)
+					//console.log(hands)
+					console.log(investment)
+
 					min_stack = Math.min(...investment)
 
+					console.log("min_stack" + min_stack)
+
+					console.log("investments: " + investment)
+
 					runningPot += players.length * min_stack;
+
+					console.log("runningPot" + runningPot)
+
 
 					for(var i = 0; i < investment.length; i++){
 						investment[i]-= min_stack;
 					}
 
 					var winnerHands = Hand.winners(hands)
+					console.log("num winners "+winnerHands.length)
 					for(var i in winnerHands){
 						var winningPlayer = handUserMap.get(winnerHands[i])
 
 						winningPlayer.result += Math.floor(runningPot/winnerHands.length)
+
+						console.log("winner: " + winningPlayer.name + " result+= " + Math.floor(runningPot/winnerHands.length))
+
 						userHandMap.set(winningPlayer, winnerHands[i].descr)
 					}
 
@@ -567,13 +614,26 @@ class Room{
 						}
 					}
 
-					for(var i = remove_ids.length; i >= 0; i--){
+					console.log("investments: " + investment)
+
+					console.log("remove ids" + remove_ids)
+
+					for(var i = remove_ids.length-1; i >= 0; i--){
+						console.log(remove_ids[i])
+						//console.log(players[remove_ids[i]])
+						console.log(investment[remove_ids[i]])
+
 						players.splice(remove_ids[i],1)
 						hands.splice(remove_ids[i],1)
+						investment.splice(remove_ids[i],1)
 					}
+
+					console.log("investments: " + investment)
+
 
 					if(players.length == 1){
 						//return uncalled bet
+						console.log("Return uncalled bet "+players[0].name+" "+investment[0])
 						players[0].result += investment[0]
 					}
 
@@ -583,9 +643,8 @@ class Room{
 				for(var i in this.seats){
 					if(this.seats[i]){
 						if(this.seats[i].result > 0){
-							var winnerStr = this.seats[i].name + " wins " + this.seats[i].result + " with " + userHandMap.get(this.seats[i])+"."
 							this.seats[i].stack+=this.seats[i].result;
-							this.io.to(this.room_id).emit('winner', winnerStr);
+							this.io.to(this.room_id).emit('winner', [this.seats[i].name, this.seats[i].result, userHandMap.get(this.seats[i])]);
 						}
 					}
 				}
