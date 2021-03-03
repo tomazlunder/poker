@@ -34,7 +34,7 @@ var state = 0;
 var timeToAct;
 var startTime;
 var intervalId;
-var modalBuyIn;
+var modal;
 var span;
 var buyInRange;
 
@@ -43,7 +43,7 @@ var myBalance;
 var cur_min_buy_in;
 var cur_max_buy_in;
 
-modalBuyIn = document.getElementById("modalBuyIn");
+modal = document.getElementById("modal");
 span = document.getElementById("close");
 buyInRange = document.getElementById("buyInRange");
 
@@ -55,15 +55,15 @@ document.addEventListener("DOMContentLoaded", function(event){
 
 window.onload = function(){ 
     window.onclick = function(event) {
-        if (event.target == modalBuyIn) {
-            modalBuyIn.style.display = "none";
+        if (event.target == modal) {
+            modal.style.display = "none";
         }
     } 
 };
 
 // When the user clicks on <span> (x), close the modal
 span.onclick = function() {
-    modalBuyIn.style.display = "none";
+    modal.style.display = "none";
 }
   
 
@@ -168,8 +168,7 @@ socket.on('roomList', (arg) =>{
 
 
        button_join.addEventListener ("click", function() {
-            console.log("Clicked room button")
-            console.log(button_join.room_id)
+            console.log("Clicked room button" + button_join.room_id)
 
             buyInRange.min = this.minBuyIn;
             var actualMax = Math.min(myBalance, this.maxBuyIn);
@@ -178,12 +177,13 @@ socket.on('roomList', (arg) =>{
 
             var modalButton = document.getElementById("modalButton");
             modalButton.innerHTML = "Join"
+            modalButton.rebuy = false;
 
             modalButton.room_id = this.room_id;
 
             document.getElementById("buyinTextField").value = actualMax;
 
-            modalBuyIn.style.display = "block";
+            modal.style.display = "block";
         });
 
         if(arg[0]){
@@ -220,15 +220,16 @@ socket.on('drawnCards', (arg) => {
 socket.on('roomJoined', (arg) => {
     console.log("Received: Room Joined ("+arg+")")
 
+
     var rid = arg[0]
     var seat_id = arg[1]
-    cur_min_buy_in = arg[2]
-    cur_max_buy_in = arg[3]
+    myBalance = arg[2]
+    cur_min_buy_in = arg[3]
+    cur_max_buy_in = arg[4]
     document.getElementById("home_label_balance").innerHTML = "Balance: " + arg[2]
 
     room_id = rid
 
-    console.log("JOINED ROOM "+rid+". Seat id:"+seat_id+".")
     mySeat = seat_id;
 
     document.getElementById("welcome").style.display = "none";
@@ -241,6 +242,8 @@ socket.on('roomJoined', (arg) => {
     document.getElementById('homeRaiseButton').disabled = true;
     document.getElementById('homeCallButton').disabled = true;
     document.getElementById('homeFoldButton').disabled = true;
+
+    document.getElementById('homeRebuyButton').disabled = true;
 
     var myNode = document.getElementById("containerRooms");
     myNode.innerHTML = '';
@@ -277,6 +280,8 @@ socket.on('roundStarted', (arg) => {
         audio_bridge.play();
     }
 
+    document.getElementById("homeRebuyButton").disabled = true;
+
     message = "Starting...";
 } )
 
@@ -301,7 +306,6 @@ socket.on('showdown', (arg) => {
     message = ""
 
     this.showdown = arg;
-    console.log(mySeat)
     this.showdown = showdown.slice(mySeat).concat(showdown.slice(0,mySeat))
     
     drawGame();
@@ -380,6 +384,12 @@ socket.on('roomKick', (arg) =>{
 } )
 
 socket.on('waitingForNewGame', (arg) => {
+    if(playerStacks[0] < cur_min_buy_in){
+        if(myBalance > 0){
+            document.getElementById("homeRebuyButton").disabled = false;
+        }
+    }
+
     console.log("Received: Waiting for new game")
     timeToAct = arg;
     startTime = timeToAct;
@@ -481,13 +491,13 @@ function modalButtonClicked(){
     var rangeSlider = document.getElementById("buyInRange");
 
     if(modalButton.rebuy){
-        rebuyRoom(rangeSlider.value)
+        rebuyRoom(room_id,rangeSlider.value)
     }
     else if(modalButton.room_id){
         joinRoom(modalButton.room_id,rangeSlider.value)
     }
 
-    modalBuyIn.style.display = "none";
+    modal.style.display = "none";
 }
 
 function soundCheckboxClicked(){
@@ -619,8 +629,11 @@ function registrationBackButton() {
 function joinRoom(id, buyin) {
     console.log("Emitted: joinRoom ("+id+","+buyin+")")
     socket.emit("joinRoom", [id,buyin])
-    //socket.emit("joinRoom", "room1")
-    //room_id = "room1"
+}
+
+function rebuyRoom(id, buyin) {
+    console.log("Emitted: rebuyRoom ("+id+","+buyin+")")
+    socket.emit("rebuyRoom", [id,buyin])
 }
 
 function homeLeaveRoom() {
@@ -637,17 +650,22 @@ function homeRebuyButton() {
     console.log("Clicked rebuy button")
 
     var actualMax = Math.min(myBalance, cur_max_buy_in - playerStacks[0])
-    buyInRange.min = this.cur_min_buy_in
+    buyInRange.min = cur_min_buy_in
     buyInRange.max = actualMax
+    buyInRange.value = buyInRange.max
+    buyInRange.disabled =  false;
+
+    console.log(buyInRange.min)
+    console.log(buyInRange.max)
 
     var modalButton = document.getElementById("modalButton");
     modalButton.innerHTML = "Rebuy"
 
     modalButton.rebuy = true;
 
-    document.getElementById("buyinTextField").value = actualMax;
+    document.getElementById("buyinTextField").value = buyInRange.max;
 
-    modalBuyIn.style.display = "block";
+    modal.style.display = "block";
 }
 
 

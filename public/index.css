@@ -63,10 +63,17 @@ html, body{
     text-align: left;
 }
 
+.containerPage{
+  /*background: yellow;*/
+  width: 100%;
+  height: 85%;
+  position: relative;
+}
+
 .containerNav{
     /*background: rgb(165, 91, 162); */
     width: 100%;
-    height: 7%;
+    height: 7vh;
 }
 
 .containerMain{
@@ -76,21 +83,19 @@ html, body{
     height: 86%;
 }
 
-.containerPage{
-    /*background: yellow;*/
-    width: 100%;
-    height: 85%;
-    position: relative;
-}
-
 .containerFoot{
     /*background: rgb(165, 91, 162); */
     width: 100%;
-    height: 7%;
+    height: 7vh;
 
     position:absolute;
     text-align: right;
     bottom:0;
+}
+
+#imgChip{
+  width: 1.3vmax;
+  height: 1.3vmax;
 }
 
 /* Labels */
@@ -118,7 +123,7 @@ label{
 
 #labelRoomMessage{
   text-align: center;
-  font-size: 1.5vmax;
+  font-size: 1.8vmax;
   margin: 0;
   display: inline-block;
 
@@ -168,6 +173,19 @@ button {
   font-size: 1.5vmax;
   font-family: "Tahoma", Times, serif;
 }
+
+.buttonFoot {
+  width: 20vw;
+  height: 5vh;
+  padding: 0 0;
+
+  position: absolute;
+  bottom: 0;
+  right: 0;
+
+  background-color: #afe223;
+  color: #000000;
+}
   
 .buttonJoin {
   color: white;
@@ -187,11 +205,13 @@ button {
   padding: 0 0;
 }
 
-.buttonFoot {
-  background-color: #afe223;
-  color: #000000;
+.navButton{
+  width: 10vw;
+  height: 5vh;
+  padding: 0 0;
 }
-  
+
+
 button:disabled {
   background: #6d6d6d;
 }
@@ -199,6 +219,11 @@ button:disabled {
 button:hover {
   background-color: #fdea5a;
   color:black;
+}
+
+button:hover:disabled {
+  background-color: #444444;
+  color:rgb(255, 255, 255);
 }
 
 .col30{
@@ -220,6 +245,7 @@ button:hover {
 
 .row {
     width: 100%;
+    min-height: 7vh;
 }
 
 .res{
@@ -352,15 +378,15 @@ canvas{
 .switch {
     position: relative;
     display: inline-block;
-    width: 60px;
-    height: 34px;
+    width: 9.6vh;
+    height: 5vh;
   }
   
 /* Hide default HTML checkbox */
 .switch input {
   opacity: 0;
-  width: 0;
-  height: 0;
+  width: 50%;
+  height: 100%;
 }
 
 /* The slider */
@@ -379,10 +405,10 @@ canvas{
 .slider2:before {
   position: absolute;
   content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
+  height: 4.4vh;
+  width: 4.4vh;
+  right: 4.7vh;
+  bottom: 0.3vh;
   background-color: white;
   -webkit-transition: .4s;
   transition: .4s;
@@ -397,15 +423,9 @@ input:focus + .slider2 {
 }
   
 input:checked + .slider2:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);
-}
-
-.wrapperRooms{
-  width: 100%;
-  height: 100%;
-  background: 'red';
+  -webkit-transform: translateX(4.4vh);
+  -ms-transform: translateX(4.4vh);
+  transform: translateX(4.4vh);
 }
 
 .containerRooms{
@@ -413,10 +433,10 @@ input:checked + .slider2:before {
 
   text-align: left;
 
-  overflow-y:none;
-  overflow-x:auto;
-  height:100%;
+  overflow-y:auto;
+  overflow-x:none;
   width: 100%;
+  max-height: 54vh;
   float: left;
 }
 
@@ -424,7 +444,7 @@ input:checked + .slider2:before {
   background: #dddddd;
   border-radius: 0.5vw;
   border: 2px solid #3E3E3E;
-  width: 95%;
+  width: 50%;
   height: 6vh;
 }
   
@@ -608,8 +628,16 @@ input:checked + .slider2:before {
     width: 40vw;
   }
 
+  .navButton{
+    width: 20vw;
+  }
+
   #callContainer{
     bottom: 7vh;
     right: 1vw;
+  }
+
+  .room{
+    width: 99%;
   }
 }

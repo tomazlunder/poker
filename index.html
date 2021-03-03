@@ -4,13 +4,15 @@
 <head>
   <meta charset="utf-8">
 
-  <title>The HTML5 Herald</title>
-  <meta name="description" content="The HTML5 Herald">
-  <meta name="author" content="SitePoint">
+  <title>EctoPoker</title>
+  <meta name="description" content="EctoPoker">
+  <meta name="author" content="tl">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-
   <link rel="stylesheet" href="index.css">
+
+  <link rel="shortcut icon" href="#" />
+
 
 </head>
 
@@ -23,7 +25,7 @@
         <tr><td>
         <b><label class="labelUser" id="home_label_user"></label></b>
         </td></tr>
-        <tr> <td><img src="images/chip.png" width="21.8" height="21.8"></td>	
+        <tr> <td><img id="imgChip" src="images/chip.png" width="21.8" height="21.8"></td>	
         <td><label class="labelUser" id="home_label_balance"></label>	</td>
         </tr>	
       </table>
@@ -31,15 +33,14 @@
   </div>
 
 <!-- The Modal -->
-  <div id="modalBuyIn" class="modal" style="display:none">
-
+  <div id="modal" class="modal" style="display:none">
     <!-- Modal content -->
-    <div class="modal-content">
+    <div class="modal-content" id="modal-content-range">
       <span class="close" id = "close">&times;</span>
       <p>Buy-in size</p>
-      <input type="range"  id="buyInRange" class="sliderBuyIn" name="raise" min="0" max="50" oninput="rangeBuyinChange()" onchange="rangeChange()">
+      <input type="range"  id="buyInRange" class="sliderBuyIn" name="raise" min="0" max="50" oninput="rangeBuyinChange()">
       <input type="text" id="buyinTextField" style="width: 10%;" disabled></input>
-      <button id="modalButton" class="Button" onclick="modalButtonClicked()">JOIN</button>
+      <button id="modalButton" class="Button" onclick="modalButtonClicked()">BUY IN</button>
     </div>
 
   </div>
@@ -81,9 +82,9 @@
 
     <div class ="containerPage" id="home">
       <div class="containerNav">
-        <button onclick="homeRefreshButton()" id="homeRefreshButton" >Play</button>
-        <button onclick="homeRefreshButton()" id="homeRefreshButton" >Lottery</button>
-        <button onclick="homeRefreshButton()" id="homeRefreshButton" >Withdraw</button>
+        <button onclick="homeRefreshButton()" class="navButton" id="homePlayButton" >Play</button>
+        <!--<button onclick="homeRefreshButton()" class="navButton" id="homeLotteryButton" >Lottery</button>-->
+        <button onclick="homeRefreshButton()" class="navButton" id="homeWithdrawButton" disabled=true>Withdraw</button>
       </div>
       <div class="containerMain">
         <div id="roomList">
@@ -110,7 +111,7 @@
             <br><br>
           </div>
           <div class="row" id = "roomListRefreshRow">
-            <button onclick="homeRefreshButton()" style="margin-top:1vh;" id="homeRefreshButton" >Refresh</button>
+            <button onclick="homeRefreshButton()" class="navButton" style="margin-top:1vh;" id="homeRefreshButton" >Refresh</button>
            </div>
           <!--
           <div class="row" id="roomListTitle" style="text-align: left;">
@@ -127,7 +128,7 @@
         </div>
       </div>
       <div class="containerFoot">
-        <button class="buttonFoot" onclick="tipButton()" id="tipButton" >Tip the house</button>
+        <!-- <button class="buttonFoot" onclick="tipButton()" id="tipButton" >Tip the house</button> -->
       </div>  
     </div>
 
@@ -146,7 +147,7 @@
       </div>
 
       <div id="soundButtonContainer">
-        <label>Sound</label>
+        <label class="formLabel">Sound</label>
         <label class="switch">
           <input id="soundCheckbox" type="checkbox" checked onclick="soundCheckboxClicked()">
           <span class="slider2"></span>

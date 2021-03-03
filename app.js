@@ -16,10 +16,11 @@ let socketUserMap = new Map()
 var con = require('./db');
 var Room = require('./room.js')
 
-var hash = crypto.createHash('sha256').update("awdqseww" + "Test.4444").digest('base64');
+var hash 
+hash = crypto.createHash('sha256').update("12345678" + "TestOne.1234").digest('base64');
 console.log(hash)
-hash = crypto.createHash('sha256').update("awdqseww" + "Test.4444").digest('base64');
-console.log(hash)
+
+
 
 app.get('/', function(req, res) {
    res.sendFile(__dirname +'/index.html');
@@ -32,6 +33,8 @@ io.on('connection', function(socket) {
 	socket.on('disconnect', disconnect);
 	socket.on('registration', registration);
 	socket.on('joinRoom', joinRoom);
+	socket.on('rebuyRoom', rebuyRoom);
+
 	socket.on('leaveRoom',leaveRoom)
 
 	socket.on('lookingForRooms',lookingForRooms)
@@ -199,7 +202,7 @@ io.on('connection', function(socket) {
 				var seatId = rooms[i].getEmptySeatID()
 				if(seatId >= 0){
 					//TODO
-					checkAccountBalance(user,room,seatId,buy_in);
+					checkAccountBalance(user,room,seatId,buy_in,completeJoinRoom);
 				}
 				else{
 					socket.emit("roomFull")
@@ -207,6 +210,33 @@ io.on('connection', function(socket) {
 				}
 			}	
 		}
+	}
+	
+	function rebuyRoom(arg){
+		var room_id = arg[0]
+		var buy_in = arg[1]
+		var user = socketUserMap.get(socket)
+
+		for(var i in rooms){
+			var room = rooms[i]
+			if(room.room_id == room_id){
+				for(var j in room.seats){
+					if(room.seats[j]){
+						if(room.seats[j].name == user.name){
+							if(room.state == 0 || room.state == 14){
+								if(buy_in <= room.max_buy_in - user.stack & buy_in != 0 & user.stack < room.min_buy_in){
+									checkAccountBalance(user,room, null, buy_in, completeRebuy);
+								}
+							}
+							else{
+								console.log("Someone tried rebuy but roomstate not 0 or 14.")
+							}
+						}
+					}
+				}
+			}
+		}
+	
 	}
 
 	//HELPER
@@ -299,7 +329,7 @@ io.on('connection', function(socket) {
 	}
 
 	// Join room chain
-	function checkAccountBalance(user, room, seatId, buy_in) {
+	function checkAccountBalance(user, room, seatId, buy_in, myCallback) {
 		var query = con.query("SELECT * FROM user WHERE account_name = ?",
 		[user.name],
 		function(err, result){
@@ -311,7 +341,7 @@ io.on('connection', function(socket) {
 				if(user.balance >= buy_in){
 					console.log("Balance high enough for buy in")
 
-					decreaseAccountBalance(user,room, seatId, buy_in)
+					myCallback(user, room, seatId, buy_in);
 				}
 				else{
 					console.log("Balance not high enough for buy in")
@@ -326,7 +356,7 @@ io.on('connection', function(socket) {
 	);
 	}
 
-	function decreaseAccountBalance(user,room, seatId, buy_in){
+	function completeJoinRoom(user,room, seatId, buy_in){
 		var diff = user.balance - buy_in
 		var query =  con.query("UPDATE user SET balance = ?, stack = ? WHERE account_name = ?",
 		[diff,buy_in,user.name],
@@ -357,6 +387,37 @@ io.on('connection', function(socket) {
 			}
 		}
 	);
+	}
+
+	function completeRebuy(user, room, seatId, buy_in){
+		var diff = user.balance - buy_in
+		var newStack = parseInt(user.stack) + parseInt(buy_in)
+		var query =  con.query("UPDATE user SET balance = ?, stack = ? WHERE account_name = ?",
+		[diff,newStack,user.name],
+		function(err, result){
+			if (err) throw err;
+			console.log(query.sql); 
+			console.log(result);
+			if(result.changedRows == 1){
+				//Complete room join
+				user.balance -= buy_in
+				user.stack = newStack
+
+				console.log(room.room_id + ": rebuy successful ("+user.name+","+buy_in+")")
+
+				user.socket.emit
+
+				user.socket.emit("newBalance", user.balance)
+				room.sendNamesStacks()
+			
+			}
+			else{
+				console.log("Something went very wrong")
+				//socket.emit("loginFailed","Account is not registered");
+			}
+		}
+	);
+
 	}
 
 });
@@ -401,15 +462,20 @@ const timeForAction = 25000;
 const timeAtEnd = 10000;
 const showdownTime = 2000;
 
-rooms.push(new Room.Room(io,1, 1, 40,100,6, "Logan's Quarters"));
-
+rooms.push(new Room.Room(io,1, 1, 40,100,6, "Lord Fahren's Quarters"));
 rooms.push(new Room.Room(io,2, 1, 40,100,6, "Zojja's Lab"));
-
 rooms.push(new Room.Room(io,3, 2, 80, 200,6, "Braham's Lodge"));
 rooms.push(new Room.Room(io,4, 2, 80, 200,6, "Rytlock's Tent"));
 
 /*
-rooms.push(new Room.Room(io,5, 2, 100,6));
+rooms.push(new Room.Room(io,5, 2, 100, 500,6, "Bla"));
+rooms.push(new Room.Room(io,6, 2, 100, 500,6, "Bla"));
+rooms.push(new Room.Room(io,7, 2, 100, 500,6, "Bla"));
+rooms.push(new Room.Room(io,8, 2, 100, 500,6, "Bla"));
+rooms.push(new Room.Room(io,9, 2, 100, 500,6, "Bla"));
+rooms.push(new Room.Room(io,10, 2, 100, 500,6, "Bla"));
+rooms.push(new Room.Room(io,11, 2, 100, 500,6, "Bla"));
+/*
 rooms.push(new Room.Room(io,6, 2, 100,6));
 rooms.push(new Room.Room(io,7, 2, 100,6));
 rooms.push(new Room.Room(io,8, 2, 100,6));
