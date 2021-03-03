@@ -181,6 +181,12 @@ button {
   transform: translate(-50%, -50%);
 }
   
+.actionButton{
+  width: 15vw;
+  height: 5vh;
+  padding: 0 0;
+}
+
 .buttonFoot {
   background-color: #afe223;
   color: #000000;
@@ -260,7 +266,7 @@ canvas{
     margin: auto;
     margin-left: auto;
     margin-right: auto;
-    
+
     height: 100%;
     width: 100%;
     object-fit: scale-down;
@@ -286,6 +292,38 @@ canvas{
 }
 
 .sliderBuyIn::-moz-range-thumb {
+  width: 2vh; /* Set a specific slider handle width */
+  height: 2vh; /* Slider handle height */
+  background: #832e7c; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+
+.sliderRaise{
+  -webkit-appearance: none;  /* Override default CSS styles */
+  appearance: none;
+
+  position:absolute;
+  bottom:0;
+  left: 16vw;
+
+  margin: 0;
+
+  width: 30vw; /* Full-width */
+  height: 5vh;
+  background-color: #ccc;
+}
+
+/* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+.sliderRaise::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Override default look */
+  appearance: none;
+  width: 4vh; /* Set a specific slider handle width */
+  height: 4vh; /* Slider handle height */
+  background:  #832e7c; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+
+.sliderRaise::-moz-range-thumb {
   width: 2vh; /* Set a specific slider handle width */
   height: 2vh; /* Slider handle height */
   background: #832e7c; /* Green background */
@@ -497,13 +535,18 @@ input:checked + .slider2:before {
   bottom:1vh;
 }
 
-#callFoldContainer
+#foldContainer
 {
   position: absolute; 
 
   right:1vw;
   bottom:1vh;
-  text-align: right;
+}
+
+#callContainer{
+  position: absolute;
+  right: 17vw;
+  bottom:1vh;
 }
 
 /* Add Animation */
@@ -527,10 +570,6 @@ input:checked + .slider2:before {
     right: 7%;
   }
 
-  .col50{
-    width: 100%;
-  }
-
   .containerPage{
     height: 92.5%;
   }
@@ -549,5 +588,20 @@ input:checked + .slider2:before {
 
   .modal-content {
     width: 80%; /* Could be more or less, depending on screen size */
+  }
+
+  .sliderRaise{
+    bottom: 6vh;
+    left: 0;
+    width: 40vw;
+  }
+
+  .actionButton{
+    width: 40vw;
+  }
+
+  #callContainer{
+    bottom: 7vh;
+    right: 1vw;
   }
 }

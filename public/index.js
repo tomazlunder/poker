@@ -305,6 +305,12 @@ socket.on('winner', (arg) =>{
     console.log(arg)
     this.message += arg;
     timeToAct = 0;
+
+    //Disable everything, enable when needed
+    document.getElementById("raiseRange").disabled = true;
+    document.getElementById("homeRaiseButton").disabled = true;
+    document.getElementById("homeCallButton").disabled = true;
+    document.getElementById("homeFoldButton").disabled = true;
 });
 
 socket.on('roomJoinFailed', (arg) => {
@@ -313,7 +319,7 @@ socket.on('roomJoinFailed', (arg) => {
 
 socket.on('roomKick', (arg) =>{
     document.getElementById("game").style.display = "none";
-    document.getElementById("content").style.display = "block";
+    document.getElementById("home").style.display = "block";
 
     socket.emit("lookingForRooms");
 } )
@@ -355,6 +361,12 @@ socket.on('actionRequired', (arg) => {
         }, 1000);
     }
 
+    //Disable everything, enable when needed
+    document.getElementById("raiseRange").disabled = true;
+    document.getElementById("homeRaiseButton").disabled = true;
+    document.getElementById("homeCallButton").disabled = true;
+    document.getElementById("homeFoldButton").disabled = true;
+
     var curBetSize = arg[2]
     if(playerToAct == myName){
         message = "Your turn!"
@@ -363,20 +375,40 @@ socket.on('actionRequired', (arg) => {
         }
         console.log("That is you...")
 
-        var max = playerStacks[0]
+        var max = playerStacks[0]-(curBetSize-playerBets[0])
         var min = curBetSize;
         if(min == 0){
             min = 1;
         }
 
-        document.getElementById('raiseRange').max = max;
+        if(max <= 0){
+            min = 0;
+            document.getElementById('raiseRange').max = 0;
+        } else {
+            document.getElementById('raiseRange').max = max;
+            document.getElementById("raiseRange").disabled = false;
+            document.getElementById("homeRaiseButton").disabled = false;
+        }
+
         document.getElementById('raiseRange').min = min;
         document.getElementById('raiseRange').value = min;
-        document.getElementById('rangeTextField').value = min;
 
-        document.getElementById("raiseRange").disabled = false;
+        console.log(curBetSize)
+        console.log(playerBets[0])
+        var callsize = curBetSize-playerBets[0]
 
-        document.getElementById('homeRaiseButton').disabled = false;
+        document.getElementById('homeCallButton').innerHTML = "Check";
+
+
+        if(callsize>0){
+            document.getElementById('homeCallButton').innerHTML = "Call ("+callsize+")";
+        }
+
+        if(max<=0){
+            //Can't full call, only all in
+            document.getElementById('homeCallButton').innerHTML = "ALL IN ("+playerStacks[0]+")";
+        }
+
         document.getElementById('homeCallButton').disabled = false;
         document.getElementById('homeFoldButton').disabled = false;
 
@@ -550,7 +582,6 @@ function homeRaiseButton() {
     var val = document.getElementById("raiseRange").value;
     val = parseInt(val)
 
-    console.log("VAL:" + val)
     socket.emit("actionRequest", [room_id,"raise", val])
     document.getElementById("raiseRange").disabled = true;
     document.getElementById("homeCallButton").disabled = true;
@@ -560,7 +591,12 @@ function homeRaiseButton() {
 
 function rangeChange() {
     var val = document.getElementById("raiseRange").value;
-    document.getElementById("rangeTextField").value = val;
+    if((parseInt(val) + Math.max(...playerBets)-playerBets[0])==playerStacks[0]){
+        document.getElementById("homeRaiseButton").innerHTML = "ALL IN ("+val+")"
+
+    } else {
+        document.getElementById("homeRaiseButton").innerHTML = "Raise ("+val+")"
+    }
 }
 
 function rangeBuyinChange() {
@@ -774,10 +810,10 @@ function drawNumbers(){
 
     var ctx = canvas.getContext("2d");
 
-    var outerRadius = 100;
-    var innerRadius = 70;
+    var outerRadius = 80;
+    var innerRadius = 50;
     var timer_x = 160;
-    var timer_y = 160;
+    var timer_y = 180;
 
     //Timer
     var percentage = timeToAct/startTime;
@@ -818,14 +854,13 @@ function drawNumbers(){
             ctx.closePath();
             
 
-            ctx.font = "Bold 80px Arial";
+            ctx.font = "Bold 45px Arial";
             ctx.fillStyle =  "black";
 
             var textWidth = ctx.measureText(""+timeToAct).width;
 
             //var textHeight = ctx.measureText(""+timeToAct).height;
-            console.log(textWidth)
-            ctx.fillText(timeToAct, timer_x - textWidth/2 , timer_y + 25 );
+            ctx.fillText(timeToAct, timer_x - textWidth/2 , timer_y + 10 );
         }
     }
 

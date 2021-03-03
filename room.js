@@ -206,10 +206,7 @@ class Room{
 			this.sendGamestate();
 			if(this.roundState.to_act.all_in){
 				//Skip calling for action, force "check"
-				if(this.roundState.to_act == this.roundState.last_to_act){
-					this.state++;
-					this.logged = false;
-				} else {
+				if(this.roundState.to_act != this.roundState.last_to_act){
 					this.roundState.to_act = nextPlayer(this.seats.indexOf(this.roundState.to_act), this.seats)
                     this.message_sent = 0;
                     return;
@@ -229,13 +226,14 @@ class Room{
                         }
                     }
                 }
-
                 if(count == 1){
-                    if(this.bet == this.roundState.bet_size){
+					console.log(this.roundState.bet_size)
+                    if(this.roundState.to_act.bet == this.roundState.bet_size){
                         console.log(this.room_id + ": " + this.roundState.to_act.name + "forced check (everyone else all_in)");
                         this.logged = 0;
-                        this.message_sent = 1;
+                        this.message_sent = 0;
                         this.state++;
+						return;
                     }
                 }
             }

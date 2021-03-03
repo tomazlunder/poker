@@ -151,14 +151,16 @@
       </div>
 
       <div id = "raiseContainer">
-        <input type="text" id="rangeTextField" value="0" style="width:5vmax;"disabled></input>
-        <input type="range"  id="raiseRange" class="slider" name="raise" min="0" max="50" oninput="rangeChange()" onchange="rangeChange()">
         <button class="actionButton" id="homeRaiseButton" onclick="homeRaiseButton()" disabled>Raise</button>
+        <input type="range"  id="raiseRange" class="sliderRaise" name="raise" min="0" max="0" oninput="rangeChange()" onchange="rangeChange()">
       </div>
 
-      <div id = "callFoldContainer">
-      <button class="actionButton" id="homeCallButton" onclick="homeCallButton()" disabled>Check/Call</button>
-      <button class="actionButton" id="homeFoldButton" onclick="homeFoldButton()" disabled>Fold</button>
+      <div id = "callContainer">
+        <button class="actionButton" id="homeCallButton" onclick="homeCallButton()" disabled>Check/Call</button>
+      </div>
+
+      <div id = "foldContainer">
+        <button class="actionButton" id="homeFoldButton" onclick="homeFoldButton()" disabled>Fold</button>
       </div>
 
     </div> 
