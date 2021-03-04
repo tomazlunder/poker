@@ -710,7 +710,8 @@ class Room{
 
                     for(var i in this.seats){
                         if(this.seats[i]){
-                            updateUserStack(this.seats[i])
+                            //updateUserStack(this.seats[i])
+							db.setPersonStack(this.seats[i].id_person, this.seats[i].stack)
     
                             if(this.seats[i].stack < this.sb_size){
                                 //Remove player
@@ -874,47 +875,5 @@ class RoundState{
         this.pot = 0;
     }
 }
-
-function updateUserStack(user){
-	var query = db.query("UPDATE person SET stack = ? WHERE account_name = ?",
-	[user.stack,user.name],
-	function(err, result){
-		if (err) throw err;
-        console.log(query.sql); 
-		console.log(result);
-		if(result.changedRows == 1){
-			console.log("Player stack updated in DB")
-		}
-		else{
-			console.log("Something went very wrong")
-			//socket.emit("loginFailed","Account is not registered");
-		}
-	}
-);
-}
-
-function transferStackBalance(user){
-	var query = db.query("UPDATE person SET balance = balance + ?, stack = 0 WHERE account_name = ?",
-	[user.stack, user.name],
-	function(err, result){
-		if (err) throw err;
-        console.log(query.sql); 
-		console.log(result);
-		if(result.changedRows == 1){
-			console.log("Transfered stack to balance.")
-			user.balance = parseInt(user.balance)
-			user.balance += parseInt(user.stack);
-			user.stack = 0;
-
-			user.socket.emit("newBalance", user.balance)
-		}
-		else{
-			console.log("Something went very wrong")
-			//socket.emit("loginFailed","Account is not registered");
-		}
-	}
-);
-}
-
 
 exports.Room = Room;
