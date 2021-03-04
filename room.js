@@ -30,9 +30,6 @@ class Room{
 
         this.message_sent = 0;
 
-        this.timer = 0;
-		this.lastUpdateState = -1
-
         this.winner = [];
 	    this.acted = 0;
 	    this.fold_win = 0
@@ -43,7 +40,12 @@ class Room{
         //Delta time for update loop
 	    this.last_update = Date.now()
 	    this.deltaTime = 0;
+
+		this.lastUpdateState = -1
+		this.timer = 0;
     }
+
+	/* Functions for sending data */
 
     sendWaitingForPlayer(){
 		console.log(this.room_id + ": waiting for players sent.")
@@ -58,7 +60,6 @@ class Room{
 		this.io.to(this.room_id).emit('namesStacks',args);
 	}
 	
-
     sendMessage(){
         this.io.to(this.room_id).emit('message', message);
     }
@@ -78,6 +79,7 @@ class Room{
 		this.io.to(this.room_id).emit("revealedCards", this.roundState.revealedCards)
 	}
 
+	//Removes zombie players from the game and updates DB
 	async removeZomibePlayers(){
 		var promises = []
 
@@ -119,6 +121,7 @@ class Room{
 			}
 		})
 	}
+
 
 	numberOfPlayers(){
 		var ret = 0;
@@ -196,9 +199,6 @@ class Room{
 					this.sendGamestate();
 					return;
 				}
-
-				//TODO: Check if winner
-
 			}
 
 			if(action == "checkcall"){
@@ -236,7 +236,6 @@ class Room{
 					console.log(this.room_id + ": " +this.roundState.to_act.name + " checks.")
 				}
 			}
-
 
 			if(this.roundState.to_act == this.roundState.last_to_act){
 				this.state++;
@@ -451,7 +450,6 @@ class Room{
 
 				this.roundState.bet_size = 2*this.sb_size;
 
-				//TODO: SEND GAME STATE TO ROOM CLIENTS
 				this.io.to(this.room_id).emit('compulsoryBets');
 
 				this.sendGamestate();
@@ -596,34 +594,20 @@ class Room{
 				var min_stack;
 				var runningPot = 0;
 				while(players.length > 1){
-					console.log("plen " + players.length)
-					//console.log(players)
-					//console.log(hands)
-					console.log(investment)
-
 					min_stack = Math.min(...investment)
-
-					console.log("min_stack" + min_stack)
-
-					console.log("investments: " + investment)
-
 					runningPot += players.length * min_stack;
-
-					console.log("runningPot" + runningPot)
-
 
 					for(var i = 0; i < investment.length; i++){
 						investment[i]-= min_stack;
 					}
 
 					var winnerHands = Hand.winners(hands)
-					console.log("num winners "+winnerHands.length)
 					for(var i in winnerHands){
 						var winningPlayer = handUserMap.get(winnerHands[i])
 
 						winningPlayer.result += Math.floor(runningPot/winnerHands.length)
 
-						console.log("winner: " + winningPlayer.name + " result+= " + Math.floor(runningPot/winnerHands.length))
+						console.log("["+room_id +"] Winner: " + winningPlayer.name + " result+= " + Math.floor(runningPot/winnerHands.length))
 
 						userHandMap.set(winningPlayer, winnerHands[i].descr)
 					}
@@ -635,22 +619,12 @@ class Room{
 						}
 					}
 
-					console.log("investments: " + investment)
-
-					console.log("remove ids" + remove_ids)
-
 					for(var i = remove_ids.length-1; i >= 0; i--){
-						console.log(remove_ids[i])
-						//console.log(players[remove_ids[i]])
-						console.log(investment[remove_ids[i]])
 
 						players.splice(remove_ids[i],1)
 						hands.splice(remove_ids[i],1)
 						investment.splice(remove_ids[i],1)
 					}
-
-					console.log("investments: " + investment)
-
 
 					if(players.length == 1){
 						//return uncalled bet
@@ -721,8 +695,12 @@ class Room{
 				}
 			} break;
 
+			//Waiting for zombie players to be removed and their balances updated
 			case 15:{
-				//Waiting for zombie players to be removed and their balances updated
+				if(gameStateChanged){
+					console.log(this.room_id + ": (state15) Updating db....")
+
+				}
 			} break;
 
 			default:{
