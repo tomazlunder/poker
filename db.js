@@ -89,7 +89,7 @@ function setPersonStack(user_id, new_stack){
 
 
 //getUserBalance
-function insertUser(account_name, password_hash, email){
+function insertPerson(account_name, password_hash, email){
     return new Promise((resolve,reject) => {    
         var query = con.query("INSERT INTO person(account_name, password_hash, email) VALUES (?,?,?)",
             [account_name,
@@ -159,11 +159,33 @@ function changeWinnings(id_person, change_by){
     });
 }
 
+function insertWithdraw(id_person, amount){
+    return new Promise((resolve,reject) => {    
+        var query = con.query("INSERT INTO withdraw(id_person, amount) VALUE (?,?)",
+            [id_person, amount],
+            function(err, result){
+                if (err) {
+                    console.log(err)
+                    reject()
+                }
+                console.log(query.sql); 
+                console.log(result);
+                if(result.affectedRows == 1){
+                    console.log("Changed winnings.")
+                    resolve()
+                }else{
+                    reject()
+                }
+            }
+        );
+    });
+}
 
 module.exports = connectDatabase();
 module.exports.getPerson = getPerson;
 module.exports.tryDecreaseBalance = tryDecreaseBalance;
 module.exports.setPersonStack = setPersonStack;
-module.exports.insertUser = insertUser;
+module.exports.insertPerson = insertPerson;
 module.exports.transferStackToBalance = transferStackToBalance;
 module.exports.changeWinnings = changeWinnings;
+module.exports.insertWithdraw = insertWithdraw;

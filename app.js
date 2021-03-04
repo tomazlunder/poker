@@ -39,6 +39,24 @@ io.on('connection', function(socket) {
 	socket.on('leaveRoom',leaveRoom)
 	socket.on('lookingForRooms',lookingForRooms)
 	socket.on('actionRequest', actionRequest);
+	socket.on('withdraw',withdraw);
+
+	async function withdraw(amount){
+		try{
+			var user = socketUserMap.get(socket)
+			const a = await db.tryDecreaseBalance(user.id_person, amount)
+			const b = await db.insertWithdraw(user.id_person, amount)
+			
+			user.balance -= amount
+			socket.emit("withdrawOk")
+			user.socket.emit("newBalance", user.balance)
+
+		} catch (err){
+			console.log("Withdraw failed")
+			console.log(err)
+		}
+
+	}
 
 	function lookingForRooms(){
 		var alreadyInRoom = 0
@@ -165,7 +183,7 @@ io.on('connection', function(socket) {
 				return;
 			}
 
-			const response2 = await db.insertUser(data.name, hash, data.email)
+			const response2 = await db.insertPerson(data.name, hash, data.email)
 
 			console.log("Registration Successful!")
 			login(data)

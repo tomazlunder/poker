@@ -34,8 +34,10 @@ var state = 0;
 var timeToAct;
 var startTime;
 var intervalId;
-var modal;
-var span;
+var modalBuyIn;
+var modalRebuy;
+
+var span1, span2;
 var buyInRange;
 
 var myBalance;
@@ -43,27 +45,43 @@ var myBalance;
 var cur_min_buy_in;
 var cur_max_buy_in;
 
-modal = document.getElementById("modal");
-span = document.getElementById("close");
+modalBuyIn = document.getElementById("modalBuyIn");
+modalRebuy = document.getElementById("modalRebuy");
+
+
+span1 = document.getElementById("closeBuyIn");
+span2 = document.getElementById("closeRebuy");
+
+
 buyInRange = document.getElementById("buyInRange");
+rebuyRange = document.getElementById("rebuyRange");
+
 
 document.addEventListener("DOMContentLoaded", function(event){
     console.log("DOM LOADED")
 });
 
 
-
+//TODO:
 window.onload = function(){ 
     window.onclick = function(event) {
-        if (event.target == modal) {
-            modal.style.display = "none";
+        if (event.target == modalBuyIn) {
+            modalBuyIn.style.display = "none";
+        }
+        else if (event.target == modalRebuy) {
+            modalRebuy.style.display = "none";
         }
     } 
 };
 
 // When the user clicks on <span> (x), close the modal
-span.onclick = function() {
-    modal.style.display = "none";
+span1.onclick = function() {
+    modalBuyIn.style.display = "none";
+}
+
+// When the user clicks on <span> (x), close the modal
+span2.onclick = function() {
+    modalRebuy.style.display = "none";
 }
   
 
@@ -176,15 +194,14 @@ socket.on('roomList', (arg) =>{
             buyInRange.max = actualMax;
             buyInRange.value = actualMax;
 
-            var modalButton = document.getElementById("modalButton");
+            var modalButton = document.getElementById("modalBuyInButton");
             modalButton.innerHTML = "Join"
-            modalButton.rebuy = false;
 
             modalButton.room_id = this.room_id;
 
             document.getElementById("buyinTextField").value = actualMax;
 
-            modal.style.display = "block";
+            modalBuyIn.style.display = "block";
         });
 
         if(arg[0]){
@@ -197,6 +214,10 @@ socket.on('roomList', (arg) =>{
         containerRooms.append(document.createElement("br"))
     }
 });
+
+function buttonJoinRoomClicked(room_id){
+
+}
 
 socket.on('listOutdated', (arg) => {
     console.log("Received: Room list outdated");
@@ -487,18 +508,24 @@ socket.on('actionRequired', (arg) => {
     drawGame();
 } );
 
-function modalButtonClicked(){
-    var modalButton = document.getElementById("modalButton");
+function modalBuyInClicked(){
+    var modalButton = document.getElementById("modalBuyInButton");
     var rangeSlider = document.getElementById("buyInRange");
 
-    if(modalButton.rebuy){
-        rebuyRoom(rangeSlider.value)
-    }
-    else if(modalButton.room_id){
-        joinRoom(modalButton.room_id,rangeSlider.value)
-    }
+    joinRoom(modalButton.room_id,rangeSlider.value)
 
-    modal.style.display = "none";
+    modalBuyIn.style.display = "none";
+}
+
+function modalRebuyClicked(){
+    var rangeSlider = document.getElementById("rebuyRange");
+    rebuyRoom(rangeSlider.value);
+
+    var rebuyButton = document.getElementById("homeRebuyButton");
+    rebuyButton.disabled = true;
+
+    modalRebuy.style.display = "none";
+
 }
 
 function soundCheckboxClicked(){
@@ -651,22 +678,20 @@ function homeRebuyButton() {
     console.log("Clicked rebuy button")
 
     var actualMax = Math.min(myBalance, cur_max_buy_in - playerStacks[0])
-    buyInRange.min = cur_min_buy_in
-    buyInRange.max = actualMax
-    buyInRange.value = buyInRange.max
-    buyInRange.disabled =  false;
+    rebuyRange.min = cur_min_buy_in
+    rebuyRange.max = actualMax
+    rebuyRange.value = rebuyRange.max
+    rebuyRange.disabled =  false;
 
-    console.log(buyInRange.min)
-    console.log(buyInRange.max)
+    console.log(rebuyRange.min)
+    console.log(rebuyRange.max)
 
-    var modalButton = document.getElementById("modalButton");
+    var modalButton = document.getElementById("modalRebuyButton");
     modalButton.innerHTML = "Rebuy"
 
-    modalButton.rebuy = true;
+    document.getElementById("rebuyTextField").value = rebuyRange.max;
 
-    document.getElementById("buyinTextField").value = buyInRange.max;
-
-    modal.style.display = "block";
+    modalRebuy.style.display = "block";
 }
 
 
@@ -715,6 +740,11 @@ function rangeChange() {
 function rangeBuyinChange() {
     var val = document.getElementById("buyInRange").value;
     document.getElementById("buyinTextField").value = val;
+}
+
+function rangeRebuyChange() {
+    var val = document.getElementById("rebuyRange").value;
+    document.getElementById("rebuyTextField").value = val;
 }
 
 function drawGame(){

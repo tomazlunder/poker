@@ -33,16 +33,26 @@
   </div>
 
 <!-- The Modal -->
-  <div id="modal" class="modal" style="display:none">
+  <div id="modalBuyIn" class="modal" style="display:none">
     <!-- Modal content -->
     <div class="modal-content" id="modal-content-range">
-      <span class="close" id = "close">&times;</span>
+      <span class="close" id = "closeBuyIn">&times;</span>
       <p>Buy-in size</p>
       <input type="range"  id="buyInRange" class="sliderBuyIn" name="raise" min="0" max="50" oninput="rangeBuyinChange()">
       <input type="text" id="buyinTextField" style="width: 10%;" disabled></input>
-      <button id="modalButton" class="Button" onclick="modalButtonClicked()">BUY IN</button>
+      <button id="modalBuyInButton" class="Button" onclick="modalBuyInClicked()">BUY IN</button>
     </div>
+  </div>
 
+  <div id="modalRebuy" class="modal" style="display:none">
+    <!-- Modal content -->
+    <div class="modal-content" id="modal-content-rebuy">
+      <span class="close" id = "closeRebuy">&times;</span>
+      <p>Buy-in size</p>
+      <input type="range"  id="rebuyRange" class="sliderBuyIn" name="raise" min="0" max="50" oninput="rangeRebuyChange()">
+      <input type="text" id="rebuyTextField" style="width: 10%;" disabled></input>
+      <button id="modalRebuyButton" class="Button" onclick="modalRebuyClicked()">BUY IN</button>
+    </div>
   </div>
 
   <div class="wrapper1" id="mainWrapper">
