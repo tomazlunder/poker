@@ -1,5 +1,5 @@
 var Hand = require('pokersolver').Hand;
-var con = require('./db');
+var db = require('./db');
 
 
 const allCards = ["2h", "3h", "4h", "5h", "6h", "7h", "8h", "9h", "Th", "Jh", "Qh", "Kh", "Ah",
@@ -87,7 +87,7 @@ class Room{
 			if(this.seats[i]){
 				if(this.seats[i].zombie == 1){
 						var user = this.seats[i]
-						promises.push(transferStackBalance(user))
+						promises.push(db.transferStackToBalance(user))
 
 						user.balance = parseInt(user.balance)
 						user.balance += parseInt(user.stack);
@@ -106,6 +106,10 @@ class Room{
 		}
 
 		if(promises.length == 0){
+			if(this.state == 15){
+				this.state = 0;
+			}
+
 			return;
 		}
 
@@ -727,7 +731,6 @@ class Room{
 
 			case 15:{
 				//Waiting for zombie players to be removed and their balances updated
-				pass
 			} break;
 
 			default:{
@@ -873,7 +876,7 @@ class RoundState{
 }
 
 function updateUserStack(user){
-	var query = con.query("UPDATE person SET stack = ? WHERE account_name = ?",
+	var query = db.query("UPDATE person SET stack = ? WHERE account_name = ?",
 	[user.stack,user.name],
 	function(err, result){
 		if (err) throw err;
@@ -891,7 +894,7 @@ function updateUserStack(user){
 }
 
 function transferStackBalance(user){
-	var query = con.query("UPDATE person SET balance = balance + ?, stack = 0 WHERE account_name = ?",
+	var query = db.query("UPDATE person SET balance = balance + ?, stack = 0 WHERE account_name = ?",
 	[user.stack, user.name],
 	function(err, result){
 		if (err) throw err;

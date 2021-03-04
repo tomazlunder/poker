@@ -139,4 +139,4 @@ module.exports.getPerson = getPerson;
 module.exports.tryDecreaseBalance = tryDecreaseBalance;
 module.exports.setPersonStack = setPersonStack;
 module.exports.insertUser = insertUser;
-module.exports.transferStackToBalance = insertUser;
+module.exports.transferStackToBalance = transferStackToBalance;
