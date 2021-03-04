@@ -126,7 +126,7 @@ function transferStackToBalance(user){
                 }
                 console.log(query.sql); 
                 console.log(result);
-                if(result.changedRows == 1){
+                if(result.affectedRows == 1){
                     console.log("Transfered stack to balance.")
                     resolve()
                 }else{
@@ -149,7 +149,7 @@ function changeWinnings(id_person, change_by){
                 console.log(query.sql); 
                 console.log(result);
                 if(result.changedRows == 1){
-                    console.log("Transfered stack to balance.")
+                    console.log("Changed winnings.")
                     resolve()
                 }else{
                     reject()

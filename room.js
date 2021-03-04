@@ -84,24 +84,25 @@ class Room{
 	//Removes zombie players from the game and updates DB
 	async removeZomibePlayers(){
 		var promises = []
-
+		
 		for(var i = 0; i < this.seats.length; i++){
 			if(this.seats[i]){
-				if(this.seats[i].zombie == 1){
-						var user = this.seats[i]
-						promises.push(db.transferStackToBalance(user))
+				if(this.seats[i].zombie == 1 || this.seats[i].stack < this.sb_size){
+					var user = this.seats[i]
+					
+					promises.push(db.transferStackToBalance(user))
 
-						user.balance = parseInt(user.balance)
-						user.balance += parseInt(user.stack);
-						user.stack = 0;
-			
-						user.socket.emit("newBalance", user.balance)
+					user.balance = parseInt(user.balance)
+					user.balance += parseInt(user.stack);
+					user.stack = 0;
+		
+					user.socket.emit("newBalance", user.balance)
 
-						console.log(this.room_id + ": removed zombie player ("+ user.name+").")
-						this.pidRoomMap.delete(user.id_person)
+					console.log(this.room_id + ": removed zombie player ("+ user.name+").")
+					this.pidRoomMap.delete(user.id_person)
 
-						user.socket.emit("listOutdated")
-						this.seats[i] = null;
+					user.socket.emit("listOutdated")
+					this.seats[i] = null;
 
 				}
 			}
@@ -116,11 +117,12 @@ class Room{
 		}
 
 		Promise.all([...promises]).then(values => {
-			if(this.state == 0){
-				this.sendNamesStacks()
-			} else if (this.state == 15){
+			if (this.state == 15){
 				this.state = 0;
 			}
+			this.sendNamesStacks()
+		}).catch((err) => {
+			console.log(err)
 		})
 	}
 
@@ -453,7 +455,7 @@ class Room{
 					this.io.to(this.room_id).emit('winner', [this.seats[i].name, this.seats[i].result, userHandMap.get(this.seats[i])]);
 
 					//Add result to winnings
-					db.changeWinnings(this.seats[i].id_person, this.seats[i].result-this.seat[i].total_bet_size)
+					db.changeWinnings(this.seats[i].id_person, this.seats[i].result-this.seats[i].total_bet_size)
 				}
 
 				else {
@@ -709,7 +711,6 @@ class Room{
 					this.timer = 0;
 					this.state++;
 
-					this.removeZomibePlayers()
 					this.io.to(this.room_id).emit('resetGame');
 				}
 			} break;
@@ -718,7 +719,7 @@ class Room{
 			case 15:{
 				if(gameStateChanged){
 					console.log(this.room_id + ": (state15) Updating db....")
-
+					this.removeZomibePlayers()
 				}
 			} break;
 
