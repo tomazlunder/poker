@@ -92,8 +92,7 @@ io.on('connection', function(socket) {
 
    }
 
-   //MAIN HANLDERS
-	async function login(data){
+    async function login(data){
 		var hash = crypto.createHash('sha256').update(data.password + data.name).digest('base64');
 	
 		try{
@@ -159,8 +158,6 @@ io.on('connection', function(socket) {
 			return
 		}
 
-		//checkNameVsAPI(data, checkAccountNameExists)
-
 		try{
 			const response = await api.getAccountName(data.api)
 
@@ -174,10 +171,6 @@ io.on('connection', function(socket) {
 			const response2 = await db.insertUser(data.name, hash, data.email)
 
 			console.log("Registration Successful!")
-			/*
-			console.log("LoginOK")
-			socket.emit("loginOk",[data.name, 0]);
-			*/
 			login(data)
 
 		} catch (err){
@@ -185,8 +178,10 @@ io.on('connection', function(socket) {
 			if(err == "Invalid API Key"){
 				socket.emit("registrationFailed", "Invalid API Key");
 			}
+			else if(err == "User exist"){
+				socket.emit("registrationFailed", "Account already registered");
+			}
 		}
-		//checkAccountNameExists -> Register
     }
 
 	async function joinRoom(arg){

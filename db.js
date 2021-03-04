@@ -71,9 +71,12 @@ function setPersonStack(user_id, new_stack){
         var query = con.query("UPDATE person SET stack = ? WHERE id_person = ?",
         [new_stack, user_id],
 		function(err, result){
-			if (err) throw err;
-            console.log(query.sql); 
-			console.log(result);
+            if (err){
+                console.log(err)
+                reject();
+                return;
+            }
+
 			if(result.changedRows == 1){
 				resolve()
 			}
@@ -94,7 +97,11 @@ function insertUser(account_name, password_hash, email){
             email
             ],
             function(err, result){
-                if (err) throw err;
+                if (err){
+                    console.log(err)
+                    reject("User exist");
+                    return;
+                }
 
                 if(result.affectedRows == 1){
                     resolve()
