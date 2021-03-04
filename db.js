@@ -120,7 +120,10 @@ function transferStackToBalance(user){
         var query = con.query("UPDATE person SET balance = balance + ?, stack = 0 WHERE account_name = ?",
             [user.stack, user.name],
             function(err, result){
-                if (err) throw err;
+                if (err) {
+                    console.log(err)
+                    reject()
+                }
                 console.log(query.sql); 
                 console.log(result);
                 if(result.changedRows == 1){
@@ -130,9 +133,32 @@ function transferStackToBalance(user){
                     reject()
                 }
             }
-    );
-});
+        );
+    });
 }
+
+function changeWinnings(id_person, change_by){
+    return new Promise((resolve,reject) => {    
+        var query = con.query("UPDATE person SET winnings = winnings + ? WHERE id_person = ?",
+            [change_by, id_person],
+            function(err, result){
+                if (err) {
+                    console.log(err)
+                    reject()
+                }
+                console.log(query.sql); 
+                console.log(result);
+                if(result.changedRows == 1){
+                    console.log("Transfered stack to balance.")
+                    resolve()
+                }else{
+                    reject()
+                }
+            }
+        );
+    });
+}
+
 
 module.exports = connectDatabase();
 module.exports.getPerson = getPerson;
@@ -140,3 +166,4 @@ module.exports.tryDecreaseBalance = tryDecreaseBalance;
 module.exports.setPersonStack = setPersonStack;
 module.exports.insertUser = insertUser;
 module.exports.transferStackToBalance = transferStackToBalance;
+module.exports.changeWinnings = changeWinnings;

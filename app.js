@@ -36,11 +36,8 @@ io.on('connection', function(socket) {
 	socket.on('registration', registration);
 	socket.on('joinRoom', joinRoom);
 	socket.on('rebuyRoom', rebuyRoom);
-
 	socket.on('leaveRoom',leaveRoom)
-
 	socket.on('lookingForRooms',lookingForRooms)
-
 	socket.on('actionRequest', actionRequest);
 
 	function lookingForRooms(){
@@ -319,7 +316,6 @@ function User(socket, id_person, name, balance){
 	this.total_bet_size = 0;
 	this.result = 0;
 }
-
 
 //GAME LOOP  
 var users = []

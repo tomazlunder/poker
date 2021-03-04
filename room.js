@@ -43,6 +43,8 @@ class Room{
 
 		this.lastUpdateState = -1
 		this.timer = 0;
+
+		this.markedForShutdown = 0;
     }
 
 	/* Functions for sending data */
@@ -95,10 +97,10 @@ class Room{
 			
 						user.socket.emit("newBalance", user.balance)
 
-						console.log(this.room_id + ": removed zombie player ("+ this.seats[i].name+").")
-						this.pidRoomMap.delete(this.seats[i].id_person)
+						console.log(this.room_id + ": removed zombie player ("+ user.name+").")
+						this.pidRoomMap.delete(user.id_person)
 
-						this.seats[i].socket.emit("listOutdated")
+						user.socket.emit("listOutdated")
 						this.seats[i] = null;
 
 				}
@@ -122,7 +124,6 @@ class Room{
 		})
 	}
 
-
 	numberOfPlayers(){
 		var ret = 0;
 		for(var i in this.seats){
@@ -145,6 +146,103 @@ class Room{
         return emptySeat;
     }
 
+	//Betting states
+    betting(){
+		if(!this.message_sent){
+
+			//IF PLAYER TO ACT IS ALL IN
+			if(this.roundState.to_act.all_in){
+				//Skip calling for action, force him to check
+				console.log(this.room_id + ": " + this.roundState.to_act.name + "(all_in) forced skip");
+
+				//If he is not last to act
+				if(this.roundState.to_act != this.roundState.last_to_act){
+					this.roundState.to_act = nextPlayer(this.seats.indexOf(this.roundState.to_act), this.seats)
+                    this.message_sent = 0;
+                    return;
+				}
+
+				//If he is last to act
+				this.state++;
+				return;
+			} 
+
+			//IF EVERYONE ELSE IS ALL IN AND DOESN'T HAVE TO CALL
+			var count = 0;
+			for(var i in this.seats){
+				if(this.seats[i]){
+					if(this.seats[i].alive & this.seats[i].all_in == 0){
+						count++;
+					}
+				}
+			}
+			if(count == 1){
+				console.log(this.roundState.bet_size)
+				if(this.roundState.to_act.bet == this.roundState.bet_size){
+					console.log(this.room_id + ": " + this.roundState.to_act.name + "forced check (everyone else all_in)");
+					this.message_sent = 0;
+					this.state++;
+					return;
+				}
+			}
+            
+			//IF TO ACT IS A ZOMBIE (LEFT THE TABLE SCREEN)
+			if(this.roundState.to_act.zombie){
+				//Skip calling for action, force check/fold
+				console.log(this.room_id + ": " + this.roundState.to_act.name + "(zomibe) forced to act");
+				this.message_sent = 1;
+				this.timer = timeForAction+1; //fake timer runout
+			}
+
+			//SEND PLAYER THE ACTION REQUIRED MESSAGE
+			else{                
+				this.io.to(this.room_id).emit('actionRequired', [this.roundState.to_act.name, timeForAction, this.roundState.bet_size]);
+				console.log(this.room_id + ": " + this.roundState.to_act.name + " called to act");
+				this.message_sent = 1;
+				this.acted = 0;
+				this.timer = 0;
+			}
+		}
+		//IF Message was already sent, increase timer to forced action
+		else{
+			this.timer += this.deltaTime;
+		}
+	
+		if(this.timer > timeForAction){
+			this.message_sent = 0;
+			this.acted = 0;
+			this.timer = 0;
+
+			
+			//AUTO FOLD
+			if(this.roundState.to_act.bet < this.roundState.bet_size){
+				console.log(this.room_id + ": " + this.roundState.to_act.name + " autofold (timeout)");
+
+				this.roundState.to_act.alive = 0;
+
+				if(alivePlayers(this.seats) == 1){
+					this.winner.push(nextPlayer(this.seats.indexOf(this.roundState.to_act), this.seats))
+					this.fold_win = true;
+					this.state = 12;
+					
+					this.sendGamestate();
+					return;
+				}
+			} 
+			//AUTO CHECK
+			else {
+				console.log(this.room_id + ": " + this.roundState.to_act.name + " autocheck (timeout)");
+			}
+	
+			if(this.roundState.to_act == this.roundState.last_to_act){
+				this.state++;
+			} else {
+				this.roundState.to_act = nextPlayer(this.seats.indexOf(this.roundState.to_act), this.seats)
+			}
+		}	
+	}
+
+	//Handle received player action
     tryAction(socket_id, action, raise_number){
         if(this.roundState.to_act.socket.id == socket_id){
 			//If player acted already
@@ -250,101 +348,6 @@ class Room{
 
     }
 
-    betting(){
-		if(!this.message_sent){
-
-			//IF PLAYER TO ACT IS ALL IN
-			if(this.roundState.to_act.all_in){
-				//Skip calling for action, force him to check
-				console.log(this.room_id + ": " + this.roundState.to_act.name + "(all_in) forced skip");
-
-				//If he is not last to act
-				if(this.roundState.to_act != this.roundState.last_to_act){
-					this.roundState.to_act = nextPlayer(this.seats.indexOf(this.roundState.to_act), this.seats)
-                    this.message_sent = 0;
-                    return;
-				}
-
-				//If he is last to act
-				this.state++;
-				return;
-			} 
-
-			//IF EVERYONE ELSE IS ALL IN AND DOESN'T HAVE TO CALL
-			var count = 0;
-			for(var i in this.seats){
-				if(this.seats[i]){
-					if(this.seats[i].alive & this.seats[i].all_in == 0){
-						count++;
-					}
-				}
-			}
-			if(count == 1){
-				console.log(this.roundState.bet_size)
-				if(this.roundState.to_act.bet == this.roundState.bet_size){
-					console.log(this.room_id + ": " + this.roundState.to_act.name + "forced check (everyone else all_in)");
-					this.message_sent = 0;
-					this.state++;
-					return;
-				}
-			}
-            
-			//IF TO ACT IS A ZOMBIE (LEFT THE TABLE SCREEN)
-			if(this.roundState.to_act.zombie){
-				//Skip calling for action, force check/fold
-				console.log(this.room_id + ": " + this.roundState.to_act.name + "(zomibe) forced to act");
-				this.message_sent = 1;
-				this.timer = timeForAction+1; //fake timer runout
-			}
-
-			//SEND PLAYER THE ACTION REQUIRED MESSAGE
-			else{                
-				this.io.to(this.room_id).emit('actionRequired', [this.roundState.to_act.name, timeForAction, this.roundState.bet_size]);
-				console.log(this.room_id + ": " + this.roundState.to_act.name + " called to act");
-				this.message_sent = 1;
-				this.acted = 0;
-				this.timer = 0;
-			}
-		}
-		//IF Message was already sent, increase timer to forced action
-		else{
-			this.timer += this.deltaTime;
-		}
-	
-		if(this.timer > timeForAction){
-			this.message_sent = 0;
-			this.acted = 0;
-			this.timer = 0;
-
-			
-			//AUTO FOLD
-			if(this.roundState.to_act.bet < this.roundState.bet_size){
-				console.log(this.room_id + ": " + this.roundState.to_act.name + " autofold (timeout)");
-
-				this.roundState.to_act.alive = 0;
-
-				if(alivePlayers(this.seats) == 1){
-					this.winner.push(nextPlayer(this.seats.indexOf(this.roundState.to_act), this.seats))
-					this.fold_win = true;
-					this.state = 12;
-					
-					this.sendGamestate();
-					return;
-				}
-			} 
-			//AUTO CHECK
-			else {
-				console.log(this.room_id + ": " + this.roundState.to_act.name + " autocheck (timeout)");
-			}
-	
-			if(this.roundState.to_act == this.roundState.last_to_act){
-				this.state++;
-			} else {
-				this.roundState.to_act = nextPlayer(this.seats.indexOf(this.roundState.to_act), this.seats)
-			}
-		}	
-	}
-
     //Card turn states
 	cardTurns(num_cards){
 		this.roundState.bet_size = 0;
@@ -369,6 +372,100 @@ class Room{
 		this.sendGamestate();
 	}
 
+	//Result calculation
+	calculateResults(){
+		if(this.fold_win){
+			this.winner[0].stack+=this.roundState.pot
+			this.state++;
+			console.log(this.winner[0].name + " wins " + this.roundState.pot + " by folds")
+			this.io.to(this.room_id).emit('winner', [this.winner[0].name, this.roundState.pot, "folds"]);
+
+			return
+		}
+
+		var handUserMap = new Map()
+		var userHandMap = new Map()
+		var hands = []
+		var players = []
+		var investment = []
+
+		for(var i = 0; i < this.seats.length; i++){
+			if(this.seats[i]){
+				this.seats[i].result = 0; //new
+				players.push(this.seats[i]);
+				investment.push(this.seats[i].total_bet_size)
+				if(this.seats[i].alive){
+					var hand = Hand.solve(this.roundState.revealedCards.concat(this.seats[i].cards))
+					handUserMap.set(hand, this.seats[i])
+					hands.push(hand)
+				}
+			}
+		}
+
+		var min_stack;
+		var runningPot = 0;
+		while(players.length > 1){
+			min_stack = Math.min(...investment)
+			runningPot += players.length * min_stack;
+
+			for(var i = 0; i < investment.length; i++){
+				investment[i]-= min_stack;
+			}
+
+			var winnerHands = Hand.winners(hands)
+			for(var i in winnerHands){
+				var winningPlayer = handUserMap.get(winnerHands[i])
+
+				winningPlayer.result += Math.floor(runningPot/winnerHands.length)
+
+				console.log("["+this.room_id +"] Winner: " + winningPlayer.name + " result+= " + Math.floor(runningPot/winnerHands.length))
+
+				userHandMap.set(winningPlayer, winnerHands[i].descr)
+			}
+
+			var remove_ids = []
+			for(var i in investment){
+				if(investment[i] <= 0){
+					remove_ids.push(i);
+				}
+			}
+
+			for(var i = remove_ids.length-1; i >= 0; i--){
+
+				players.splice(remove_ids[i],1)
+				hands.splice(remove_ids[i],1)
+				investment.splice(remove_ids[i],1)
+			}
+
+			if(players.length == 1){
+				//return uncalled bet
+				console.log("Return uncalled bet "+players[0].name+" "+investment[0])
+				players[0].result += investment[0]
+			}
+
+			runningPot = 0;
+		}
+		
+		for(var i in this.seats){
+			if(this.seats[i]){
+				if(this.seats[i].result > 0){
+					this.seats[i].stack+=this.seats[i].result;
+					this.io.to(this.room_id).emit('winner', [this.seats[i].name, this.seats[i].result, userHandMap.get(this.seats[i])]);
+
+					//Add result to winnings
+					db.changeWinnings(this.seats[i].id_person, this.seats[i].result-this.seat[i].total_bet_size)
+				}
+
+				else {
+					//Remove investment from winnings
+					db.changeWinnings(this.seats[i].id_person, -this.seats[i].total_bet_size)
+				}
+			}
+		}
+		this.state++;
+	}
+
+	//Game updating big boi
     updateGame(){
 		var now = Date.now();
 		this.deltaTime = now - this.last_update;
@@ -562,88 +659,10 @@ class Room{
 
 			//state 12 - winner calc
 			case 12:{
-				console.log(this.room_id + ": (state12) Winner calculation.")
-
-				if(this.fold_win){
-					this.winner[0].stack+=this.roundState.pot
-					this.state++;
-					console.log(this.winner[0].name + " wins " + this.roundState.pot + " by folds")
-					this.io.to(this.room_id).emit('winner', [this.winner[0].name, this.roundState.pot, "folds"]);
-
-					return
+				if(gameStateChanged){
+					console.log(this.room_id + ": (state12) Winner calculation.")
+					this.calculateResults();
 				}
-
-				var handUserMap = new Map()
-				var userHandMap = new Map()
-				var hands = []
-				var players = []
-				var investment = []
-				for(var i = 0; i < this.seats.length; i++){
-					if(this.seats[i]){
-						this.seats[i].result = 0; //new
-						players.push(this.seats[i]);
-						investment.push(this.seats[i].total_bet_size)
-						if(this.seats[i].alive){
-							var hand = Hand.solve(this.roundState.revealedCards.concat(this.seats[i].cards))
-							handUserMap.set(hand, this.seats[i])
-							hands.push(hand)
-						}
-					}
-				}
-
-				var min_stack;
-				var runningPot = 0;
-				while(players.length > 1){
-					min_stack = Math.min(...investment)
-					runningPot += players.length * min_stack;
-
-					for(var i = 0; i < investment.length; i++){
-						investment[i]-= min_stack;
-					}
-
-					var winnerHands = Hand.winners(hands)
-					for(var i in winnerHands){
-						var winningPlayer = handUserMap.get(winnerHands[i])
-
-						winningPlayer.result += Math.floor(runningPot/winnerHands.length)
-
-						console.log("["+room_id +"] Winner: " + winningPlayer.name + " result+= " + Math.floor(runningPot/winnerHands.length))
-
-						userHandMap.set(winningPlayer, winnerHands[i].descr)
-					}
-
-					var remove_ids = []
-					for(var i in investment){
-						if(investment[i] <= 0){
-							remove_ids.push(i);
-						}
-					}
-
-					for(var i = remove_ids.length-1; i >= 0; i--){
-
-						players.splice(remove_ids[i],1)
-						hands.splice(remove_ids[i],1)
-						investment.splice(remove_ids[i],1)
-					}
-
-					if(players.length == 1){
-						//return uncalled bet
-						console.log("Return uncalled bet "+players[0].name+" "+investment[0])
-						players[0].result += investment[0]
-					}
-
-					runningPot = 0;
-				}
-				
-				for(var i in this.seats){
-					if(this.seats[i]){
-						if(this.seats[i].result > 0){
-							this.seats[i].stack+=this.seats[i].result;
-							this.io.to(this.room_id).emit('winner', [this.seats[i].name, this.seats[i].result, userHandMap.get(this.seats[i])]);
-						}
-					}
-				}
-				this.state++;
 			} break;
 
 			//state 13 - cleanup
