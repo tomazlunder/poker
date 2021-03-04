@@ -77,9 +77,10 @@ socket.on("registrationFailed", (arg) => {
 
 socket.on("loginFailed", (arg) => {
     console.log("Received: Loing failed ");
+    
     console.log(arg) 
     document.getElementById("error_label_login").innerHTML = "Login failed: "+ arg+"."
-    document.getElementById("error_label_login").style.dsisplay="block"
+    document.getElementById("error_label_login").style.display="block"
 });
 
 socket.on('loginOk', (arg) => {

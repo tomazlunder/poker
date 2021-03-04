@@ -5,7 +5,6 @@ var app = express();
 
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-const https = require('https');
 var crypto = require('crypto');
 
 // Express Middleware for serving static files
@@ -16,7 +15,9 @@ let pidRoomMap = new Map()
 
 //var con = require('./db');
 var Room = require('./room.js');
-var db = require('./db');
+var db = require('./db.js');
+var api = require('./api.js')
+
 const { RSA_PKCS1_PADDING } = require('constants');
 
 var hash 
@@ -97,21 +98,27 @@ io.on('connection', function(socket) {
 	
 		try{
 			const response = await db.getPerson(data.name)
-			console.log("Someone logged in")
 
 			if(response.password_hash == hash){
 				var user = new User(socket,response.id_person,response.account_name,response.balance)
+
 				users.push(user);
-				socket.emit("loginOk",[response.account_name, response.balance]);
 				socketUserMap.set(socket, user)
+
+				console.log(response.account_name + " logged in")
 				console.log('Number of users: '+ users.length);
+
+				socket.emit("loginOk",[response.account_name, response.balance]);
 			}
 			else{
 				console.log("Incorrect login info")
+				socket.emit("loginFailed", "Incorrect password");
 			}
 
 		} catch (err) {
-			console.log(err)
+			console.log("Account not registered")
+			socket.emit("loginFailed", "Account not registered");
+
 		}
 	}
 
@@ -144,7 +151,7 @@ io.on('connection', function(socket) {
 		}
 	}
 
-	function registration(data) {
+	async function registration(data) {
         console.log(data)
 
         if(data.password.length < 8){
@@ -152,7 +159,33 @@ io.on('connection', function(socket) {
 			return
 		}
 
-		checkNameVsAPI(data, checkAccountNameExists)
+		//checkNameVsAPI(data, checkAccountNameExists)
+
+		try{
+			const response = await api.getAccountName(data.api)
+
+			var hash = crypto.createHash('sha256').update(data.password + data.name).digest('base64');
+
+			if(response != data.name){
+				socket.emit("registrationFailed", "API key does not match user name")
+				return;
+			}
+
+			const response2 = await db.insertUser(data.name, hash, data.email)
+
+			console.log("Registration Successful!")
+			/*
+			console.log("LoginOK")
+			socket.emit("loginOk",[data.name, 0]);
+			*/
+			login(data)
+
+		} catch (err){
+			console.log(err)
+			if(err == "Invalid API Key"){
+				socket.emit("registrationFailed", "Invalid API Key");
+			}
+		}
 		//checkAccountNameExists -> Register
     }
 
@@ -258,97 +291,7 @@ io.on('connection', function(socket) {
 			}
 		}
 	}
-
-	//HELPER
-	// Registration chain
-	function checkNameVsAPI(data, myCallback){
-		var url = "https://api.guildwars2.com/v2/account?access_token=" + data.api
-		https.get(url, (resp) => {
-			let api_data = '';
-
-			// A chunk of data has been received.
-			resp.on('data', (chunk) => {
-				api_data += chunk;
-			});
-
-			// The whole response has been received. Print out the result.
-			resp.on('end', () => {
-				//console.log(JSON.parse(data))
-				parsedData = JSON.parse(api_data)
-				if(parsedData.text == "Invalid access token"){
-					console.log("Invalid access token.")
-					//RESPOND WITH API KEY INCORRECT
-					socket.emit("registrationFailed","Invalid API key")
-					return 1
-				}
-
-
-				//console.log(JSON.parse(api_data).name);
-				var nameFromApi = JSON.parse(api_data).name;
-
-				if(data.name !== nameFromApi){
-					console.log(data.name)
-					console.log(nameFromApi)
-					socket.emit("registrationFailed","Entered account name does not match the API key")
-					return 1
-				}
-
-				console.log("Name matches api")
-				myCallback(data, register)
-			});
-
-		}).on("error", (err) => {
-		console.log("Error: " + err.message);
-		});
-	}
-
-	function checkAccountNameExists(data, myCallback) {
-		var query =  db.query("SELECT * FROM user WHERE account_name = ?",
-			[data.name],
-		    function(err, result){
-		    	if (err) throw err;
-			    console.log(result);
-			    console.log(result.length)
-			    if(result.length == 1){
-			    	console.log("Name already registered")
-			    	socket.emit("registrationFailed","Name is already registered");
-			    	return 1;
-			    }
-			    else{
-			    	console.log("Name not registered")
-			    	myCallback(data)
-			    }
-			}
-		);
-	}
-
-	function register(data){
-		if(!data.email){
-			data.email = null
-		}
 	
-		var hash = crypto.createHash('sha256').update(data.password + data.name).digest('base64');
-		console.log(hash)
-		console.log(hash.length)
-	
-	
-		var query = db.query("INSERT INTO user(account_name, password_hash, screen_name, email) VALUES (?,?,?,?)",
-			[data.name,
-			hash,
-			data.name,
-			data.email
-			],
-			function(err, result){
-				if (err) throw err;
-				console.log("1 record inserted");
-				console.log("Registration Successful!")
-				console.log("LoginOK")
-				socket.emit("loginOk",[data.name, 0]);
-
-			
-			}
-		);
-	}
 });
 
 http.listen(process.env.PORT || 3000, function() {

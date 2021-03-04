@@ -37,8 +37,7 @@ function getPerson(account_name){
                         resolve(result[0])
 					}
 					else{
-						console.log("Name not registered")
-                        reject("password")
+                        reject()
 					}
 				}
 			);
@@ -67,7 +66,6 @@ function tryDecreaseBalance(user_id, decrease_by){
     });
 }
 
-//getUserBalance
 function setPersonStack(user_id, new_stack){
     return new Promise((resolve,reject) => {
         var query = con.query("UPDATE person SET stack = ? WHERE id_person = ?",
@@ -86,7 +84,31 @@ function setPersonStack(user_id, new_stack){
     });
 }
 
+
+//getUserBalance
+function insertUser(account_name, password_hash, email){
+    return new Promise((resolve,reject) => {    
+        var query = con.query("INSERT INTO person(account_name, password_hash, email) VALUES (?,?,?)",
+            [account_name,
+            password_hash,
+            email
+            ],
+            function(err, result){
+                if (err) throw err;
+
+                if(result.affectedRows == 1){
+                    resolve()
+                }
+                else{
+                    reject()
+                }            
+            }
+        );
+        
+    });
+}
 module.exports = connectDatabase();
 module.exports.getPerson = getPerson;
 module.exports.tryDecreaseBalance = tryDecreaseBalance;
 module.exports.setPersonStack = setPersonStack;
+module.exports.insertUser = insertUser;
