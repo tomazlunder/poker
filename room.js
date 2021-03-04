@@ -80,24 +80,42 @@ class Room{
 		this.io.to(this.room_id).emit("revealedCards", this.roundState.revealedCards)
 	}
 
-    removeZomibePlayers(){
+	async removeZomibePlayers(){
+		var promises = []
+
 		for(var i = 0; i < this.seats.length; i++){
 			if(this.seats[i]){
 				if(this.seats[i].zombie == 1){
-					transferStackBalance(this.seats[i])
-					console.log(this.room_id + ": removed zombie player ("+ this.seats[i].name+").")
-					this.pidRoomMap.delete(this.seats[i].id_person)
+						var user = this.seats[i]
+						promises.push(transferStackBalance(user))
 
-					this.seats[i].socket.emit("listOutdated")
-					this.seats[i] = null;
+						user.balance = parseInt(user.balance)
+						user.balance += parseInt(user.stack);
+						user.stack = 0;
+			
+						user.socket.emit("newBalance", user.balance)
 
+						console.log(this.room_id + ": removed zombie player ("+ this.seats[i].name+").")
+						this.pidRoomMap.delete(this.seats[i].id_person)
 
-					if(this.state = 0){
-						this.sendNamesStacks()
-					}
+						this.seats[i].socket.emit("listOutdated")
+						this.seats[i] = null;
+
 				}
 			}
 		}
+
+		if(promises.length == 0){
+			return;
+		}
+
+		Promise.all([...promises]).then(values => {
+			if(this.state == 0){
+				this.sendNamesStacks()
+			} else if (this.state == 15){
+				this.state = 0;
+			}
+		})
 	}
 
 	numberOfPlayers(){
@@ -700,11 +718,16 @@ class Room{
 
 					this.logged = 0;
 					this.timer = 0;
-					this.state = 0;
+					this.state++;
 
 					this.removeZomibePlayers()
 					this.io.to(this.room_id).emit('resetGame');
 				}
+			} break;
+
+			case 15:{
+				//Waiting for zombie players to be removed and their balances updated
+				pass
 			} break;
 
 			default:{
@@ -890,8 +913,5 @@ function transferStackBalance(user){
 );
 }
 
-function checkDBbalance(user){
-
-}
 
 exports.Room = Room;

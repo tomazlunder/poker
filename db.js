@@ -114,8 +114,29 @@ function insertUser(account_name, password_hash, email){
         
     });
 }
+
+function transferStackToBalance(user){
+    return new Promise((resolve,reject) => {    
+        var query = con.query("UPDATE person SET balance = balance + ?, stack = 0 WHERE account_name = ?",
+            [user.stack, user.name],
+            function(err, result){
+                if (err) throw err;
+                console.log(query.sql); 
+                console.log(result);
+                if(result.changedRows == 1){
+                    console.log("Transfered stack to balance.")
+                    resolve()
+                }else{
+                    reject()
+                }
+            }
+    );
+});
+}
+
 module.exports = connectDatabase();
 module.exports.getPerson = getPerson;
 module.exports.tryDecreaseBalance = tryDecreaseBalance;
 module.exports.setPersonStack = setPersonStack;
 module.exports.insertUser = insertUser;
+module.exports.transferStackToBalance = insertUser;
