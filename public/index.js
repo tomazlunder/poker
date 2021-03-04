@@ -491,7 +491,7 @@ function modalButtonClicked(){
     var rangeSlider = document.getElementById("buyInRange");
 
     if(modalButton.rebuy){
-        rebuyRoom(room_id,rangeSlider.value)
+        rebuyRoom(rangeSlider.value)
     }
     else if(modalButton.room_id){
         joinRoom(modalButton.room_id,rangeSlider.value)
@@ -748,7 +748,7 @@ function drawProfile(x,y,id){
     var border_height = 0.4 * border_width
 
     var img1,img2
-    if(id != 0 && playerAlive[id] && myCards.length==2){
+    if(id != 0 && playerAlive[id]){
 
         if(showdown[id]){
             img1 = document.getElementById("img_" + showdown[id][0])

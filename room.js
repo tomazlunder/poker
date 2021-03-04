@@ -13,13 +13,15 @@ const showdownTime = 2000;
 
 
 class Room{
-    constructor(io, room_id, sb_size, min_buy_in, max_buy_in, numPlayers, name){
+    constructor(io, room_id, sb_size, min_buy_in, max_buy_in, numPlayers, name, pidRoomMap){
         this.io = io;
         this.room_id = "room"+room_id
 		this.min_buy_in = min_buy_in;
 		this.max_buy_in = max_buy_in;
         this.sb_size = sb_size
 		this.name = name;
+
+		this.pidRoomMap = pidRoomMap;
 
         this.seats = []
         for(var i = 0; i < numPlayers; i++){
@@ -84,6 +86,8 @@ class Room{
 				if(this.seats[i].zombie == 1){
 					transferStackBalance(this.seats[i])
 					console.log(this.room_id + ": removed zombie player ("+ this.seats[i].name+").")
+					this.pidRoomMap.delete(this.seats[i].id_person)
+
 					this.seats[i].socket.emit("listOutdated")
 					this.seats[i] = null;
 
@@ -846,7 +850,7 @@ class RoundState{
 }
 
 function updateUserStack(user){
-	var query = con.query("UPDATE user SET stack = ? WHERE account_name = ?",
+	var query = con.query("UPDATE person SET stack = ? WHERE account_name = ?",
 	[user.stack,user.name],
 	function(err, result){
 		if (err) throw err;
@@ -864,7 +868,7 @@ function updateUserStack(user){
 }
 
 function transferStackBalance(user){
-	var query = con.query("UPDATE user SET balance = balance + ?, stack = 0 WHERE account_name = ?",
+	var query = con.query("UPDATE person SET balance = balance + ?, stack = 0 WHERE account_name = ?",
 	[user.stack, user.name],
 	function(err, result){
 		if (err) throw err;

@@ -443,7 +443,7 @@ input:checked + .slider2:before {
 .room{
   background: #dddddd;
   border-radius: 0.5vw;
-  border: 2px solid #3E3E3E;
+  /*border: 2px solid #3E3E3E;*/
   width: 50%;
   height: 6vh;
 }
