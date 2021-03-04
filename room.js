@@ -1,7 +1,6 @@
 var Hand = require('pokersolver').Hand;
 var db = require('./db');
 
-
 const allCards = ["2h", "3h", "4h", "5h", "6h", "7h", "8h", "9h", "Th", "Jh", "Qh", "Kh", "Ah",
       "2d", "3d", "4d", "5d", "6d", "7d", "8d", "9d", "Td", "Jd", "Qd", "Kd", "Ad",
       "2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s", "Ts", "Js", "Qs", "Ks", "As",
@@ -10,7 +9,6 @@ const allCards = ["2h", "3h", "4h", "5h", "6h", "7h", "8h", "9h", "Th", "Jh", "Q
 const timeForAction = 22000;
 const timeAtEnd = 12000;
 const showdownTime = 2000;
-
 
 class Room{
     constructor(io, room_id, sb_size, min_buy_in, max_buy_in, numPlayers, name, pidRoomMap){
@@ -31,10 +29,10 @@ class Room{
         this.dealer_prev = -1
 
         this.message_sent = 0;
-        this.answer_received = 0;
 
         this.timer = 0;
-        this.logged = 0;
+		this.lastUpdateState = -1
+
         this.winner = [];
 	    this.acted = 0;
 	    this.fold_win = 0
@@ -146,10 +144,12 @@ class Room{
 
     tryAction(socket_id, action, raise_number){
         if(this.roundState.to_act.socket.id == socket_id){
+			//If player acted already
 			if(this.acted == 1){
 				return;
 			}
 			this.acted = 1;
+
 			console.log(this.room_id + ": " + this.roundState.to_act.name + " " + action + " " +raise_number);
 			this.message_received = 1;
 			this.message_sent = 0;
@@ -239,7 +239,6 @@ class Room{
 
 
 			if(this.roundState.to_act == this.roundState.last_to_act){
-				this.logged = 0;
 				this.state++;
 			} else {
 				this.roundState.to_act = nextPlayer(this.seats.indexOf(this.roundState.to_act), this.seats)
@@ -254,68 +253,72 @@ class Room{
 
     betting(){
 		if(!this.message_sent){
-			//console.log("Betting...")
-			//this.sendGamestate();
+
+			//IF PLAYER TO ACT IS ALL IN
 			if(this.roundState.to_act.all_in){
-				//Skip calling for action, force "check"
+				//Skip calling for action, force him to check
+				console.log(this.room_id + ": " + this.roundState.to_act.name + "(all_in) forced skip");
+
+				//If he is not last to act
 				if(this.roundState.to_act != this.roundState.last_to_act){
 					this.roundState.to_act = nextPlayer(this.seats.indexOf(this.roundState.to_act), this.seats)
                     this.message_sent = 0;
                     return;
 				}
 
-				console.log(this.room_id + ": " + this.roundState.to_act.name + "(all_in) forced skip");
-				this.logged = 0;
+				//If he is last to act
 				this.state++;
 				return;
-			} else {
-                //If everyone else is all_in and player doesn't have to call -> force check
-                var count = 0;
-                for(var i in this.seats){
-                    if(this.seats[i]){
-                        if(this.seats[i].alive & this.seats[i].all_in == 0){
-                            count++;
-                        }
-                    }
-                }
-                if(count == 1){
-					console.log(this.roundState.bet_size)
-                    if(this.roundState.to_act.bet == this.roundState.bet_size){
-                        console.log(this.room_id + ": " + this.roundState.to_act.name + "forced check (everyone else all_in)");
-                        this.logged = 0;
-                        this.message_sent = 0;
-                        this.state++;
-						return;
-                    }
-                }
-            }
+			} 
 
+			//IF EVERYONE ELSE IS ALL IN AND DOESN'T HAVE TO CALL
+			var count = 0;
+			for(var i in this.seats){
+				if(this.seats[i]){
+					if(this.seats[i].alive & this.seats[i].all_in == 0){
+						count++;
+					}
+				}
+			}
+			if(count == 1){
+				console.log(this.roundState.bet_size)
+				if(this.roundState.to_act.bet == this.roundState.bet_size){
+					console.log(this.room_id + ": " + this.roundState.to_act.name + "forced check (everyone else all_in)");
+					this.message_sent = 0;
+					this.state++;
+					return;
+				}
+			}
+            
+			//IF TO ACT IS A ZOMBIE (LEFT THE TABLE SCREEN)
 			if(this.roundState.to_act.zombie){
 				//Skip calling for action, force check/fold
-				this.timer = timeForAction+1;
 				console.log(this.room_id + ": " + this.roundState.to_act.name + "(zomibe) forced to act");
 				this.message_sent = 1;
+				this.timer = timeForAction+1; //fake timer runout
 			}
+
+			//SEND PLAYER THE ACTION REQUIRED MESSAGE
 			else{                
 				this.io.to(this.room_id).emit('actionRequired', [this.roundState.to_act.name, timeForAction, this.roundState.bet_size]);
 				console.log(this.room_id + ": " + this.roundState.to_act.name + " called to act");
-				this.acted = 0;
 				this.message_sent = 1;
+				this.acted = 0;
 				this.timer = 0;
 			}
 		}
+		//IF Message was already sent, increase timer to forced action
 		else{
 			this.timer += this.deltaTime;
-			//console.log(this.timer)
 		}
 	
 		if(this.timer > timeForAction){
 			this.message_sent = 0;
-			this.timer = 0;
 			this.acted = 0;
+			this.timer = 0;
+
 			
-			//AUTO Check/FOLD
-			//Fold
+			//AUTO FOLD
 			if(this.roundState.to_act.bet < this.roundState.bet_size){
 				console.log(this.room_id + ": " + this.roundState.to_act.name + " autofold (timeout)");
 
@@ -324,21 +327,19 @@ class Room{
 				if(alivePlayers(this.seats) == 1){
 					this.winner.push(nextPlayer(this.seats.indexOf(this.roundState.to_act), this.seats))
 					this.fold_win = true;
-					this.logged = 0;
 					this.state = 12;
 					
 					this.sendGamestate();
 					return;
 				}
 			} 
-			//Check
+			//AUTO CHECK
 			else {
 				console.log(this.room_id + ": " + this.roundState.to_act.name + " autocheck (timeout)");
 			}
 	
 			if(this.roundState.to_act == this.roundState.last_to_act){
 				this.state++;
-				this.logged = 0;
 			} else {
 				this.roundState.to_act = nextPlayer(this.seats.indexOf(this.roundState.to_act), this.seats)
 			}
@@ -347,7 +348,6 @@ class Room{
 
     //Card turn states
 	cardTurns(num_cards){
-		this.logged = 0;
 		this.roundState.bet_size = 0;
 		resetPlayerBets(this.seats)
 
@@ -375,22 +375,23 @@ class Room{
 		this.deltaTime = now - this.last_update;
 		this.last_update = now;
 
+		var gameStateChanged = (this.lastUpdateState != this.state)
+		this.lastUpdateState = this.state;
+
 		switch(this.state){
 			//state 0 - Waiting for at least two players (LOOP)
 			case 0:{
 				this.removeZomibePlayers()
 
-				if(this.logged == 0){
+				if(gameStateChanged){
 					console.log(this.room_id + ": (state0) waiting for players.")
 					
 					this.sendWaitingForPlayer();
 					this.sendNamesStacks();
-					this.logged = 1;
 				}
 
 				if(this.numberOfPlayers()>=2){
-					this.state = 1;
-					this.logged = 0;
+					this.state++;
 				}
 			} break;
 
@@ -479,9 +480,8 @@ class Room{
 
 			//state 4 - betting 1
 			case 4:{
-				if(this.logged == 0){
+				if(gameStateChanged){
 					console.log(this.room_id + ": (state4) betting1 (preflop).")
-					this.logged = 1;
 				}
 				this.betting()
 			} break;
@@ -494,9 +494,8 @@ class Room{
 
 			//state 6 - betting 2
 			case 6:{
-				if(this.logged == 0){
+				if(gameStateChanged){
 					console.log(this.room_id + ": (state6) betting2.")
-					this.logged = 1;
 				}
 				this.betting();
 			} break;
@@ -509,9 +508,8 @@ class Room{
 
 			//state 8 - betting 3
 			case 8:{
-				if(this.logged == 0){
+				if(gameStateChanged){
 					console.log(this.room_id + ": (state8) betting3.")
-					this.logged = 1;
 				}
 				this.betting();
 			}break;
@@ -525,18 +523,16 @@ class Room{
 
 			//state 10 - betting 4
 			case 10:{
-				if(this.logged == 0){
+				if(gameStateChanged){
 					console.log(this.room_id + ": (state10) betting4.")
-					this.logged = 1;
 				}
 				this.betting();
 			} break;
 
 			//state 11 - showdown
 			case 11:{
-				if(this.logged == 0){
+				if(gameStateChanged){
 					console.log(this.room_id + ": (state11) showdown.")
-					this.logged = 1;
 					this.timer = 0;
 
 					var hands = [];
@@ -562,11 +558,10 @@ class Room{
 				if(this.timer > showdownTime){
 					this.state++;
 					this.timer = 0;
-					this.logged = 0;
 				}
 
-
 			} break;
+
 			//state 12 - winner calc
 			case 12:{
 				console.log(this.room_id + ": (state12) Winner calculation.")
@@ -683,9 +678,7 @@ class Room{
 
 				this.sendGamestate()
 
-				this.logged = 0;
 				this.winner = []
-				this.acted = 0;
 				this.message_sent = 0;
 				this.fold_win = 0;
 
@@ -696,11 +689,10 @@ class Room{
 
 			//state 14 waiting for new game... 
 			case 14:{
-				if(this.logged == 0){
+				if(gameStateChanged){
 					console.log(this.room_id + ": (state14) Waiting for new game....")
 					this.io.to(this.room_id).emit("waitingForNewGame",timeAtEnd/1000)
 					this.timer = 0;
-					this.logged = 1;
 				}
 				else {
 					this.timer+=this.deltaTime;
@@ -721,7 +713,6 @@ class Room{
                         } 
                     }
 
-					this.logged = 0;
 					this.timer = 0;
 					this.state++;
 
