@@ -95,7 +95,9 @@ span3.onclick = function() {
     modalWithdraw.style.display = "none";
 }
   
-
+socket.on("dc", (arg) => {
+    location.reload();
+});
 
 socket.on("registrationFailed", (arg) => {
     console.log("Received: Registration failed ");
@@ -215,6 +217,15 @@ socket.on('roomList', (arg) =>{
             console.log("Waiting for last round to end")
         }
 
+        if(arg[0] == id){
+            button_join.innerHTML = "Reconnect";
+            button_join.disabled = false;
+
+            button_join.onclick = function(){
+                socket.emit("reconnect");
+            }
+        }
+
         var containerRooms = document.getElementById("containerRooms");
         containerRooms.append(div_room)
         containerRooms.append(document.createElement("br"))
@@ -297,6 +308,9 @@ socket.on('roomJoined', (arg) => {
     myNode.innerHTML = '';
 
     message = "";
+})
+
+socket.on('reconnectOK', (arg) => {
 })
 
 socket.on('waitingForPlayers', (arg) => {
@@ -462,6 +476,7 @@ socket.on('actionRequired', (arg) => {
     playerToAct = arg[0]
     timeToAct = arg[1]/1000
     startTime = timeToAct;
+    state = 1; //In case reconnect
 
     if(!intervalId){
         intervalId = window.setInterval(function(){

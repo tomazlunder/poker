@@ -245,8 +245,8 @@ class Room{
 	}
 
 	//Handle received player action
-    tryAction(socket_id, action, raise_number){
-        if(this.roundState.to_act.socket.id == socket_id){
+    tryAction(id_person, action, raise_number){
+        if(this.roundState.to_act.id_person == id_person){
 			//If player acted already
 			if(this.acted == 1){
 				return;
@@ -345,7 +345,7 @@ class Room{
 
 		}
 		else{
-			console.log(this.room_id + ": " + socket_id + "tried to act but it is not his turn.");
+			console.log(this.room_id + ": " + id_person + "tried to act but it is not his turn.");
 		}
 
     }

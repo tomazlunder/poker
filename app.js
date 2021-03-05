@@ -49,6 +49,7 @@ io.on('connection', function(socket) {
 	socket.on('lookingForRooms',lookingForRooms)
 	socket.on('actionRequest', actionRequest);
 	socket.on('withdraw',withdraw);
+	socket.on('reconnect', reconnect);
 
 	async function withdraw(amount){
 		try{
@@ -69,14 +70,14 @@ io.on('connection', function(socket) {
 	}
 
 	function lookingForRooms(){
-		var alreadyInRoom = 0
+		var alreadyInRoom
 		var user = socketUserMap.get(socket)
 
 		for(var i = 0; i<rooms.length; i++){
 			for(var j = 0; j<rooms[i].seats.length; j++){
 				if(rooms[i].seats[j]){
 					if(rooms[i].seats[j].name == user.name ){
-						alreadyInRoom = 1
+						alreadyInRoom = rooms[i].room_id
 						break
 					}
 				}
@@ -97,6 +98,7 @@ io.on('connection', function(socket) {
 	    var room_id = data[0]
 	    var action = data[1];
 		var raise_number = null;
+		var user = socketUserMap.get(socket)
 
 	    if(action == "raise"){
 		   raise_number = data[2];
@@ -110,7 +112,7 @@ io.on('connection', function(socket) {
 		}
 	
 		if(the_room){
-			the_room.tryAction(socket.id,action,raise_number)
+			the_room.tryAction(user.id_person,action,raise_number)
 		} else {
 			console.log(socket.id +" tried action but not in a room.")
 		}
@@ -124,14 +126,31 @@ io.on('connection', function(socket) {
 			const response = await db.getPerson(data.name)
 
 			if(response.password_hash == hash){
-				var user = new User(socket,response.id_person,response.account_name,response.balance)
+				var someUser = null;
+				for(var i in users){
+					if(users[i].id_person == response.id_person){
+						someUser = users[i];
+					}
+				}
+				
+				//User already logged in with another socket
+				if(someUser){
+					console.log("Duplicate login")
+					someUser.socket.emit("dc")
+					someUser.socket.disconnect();
+					someUser.socket = socket;
+					socketUserMap.set(socket, someUser);
+					someUser.disconnected = 0;
+				}
+				else {
+					var user = new User(socket,response.id_person,response.account_name,response.balance)
 
-				users.push(user);
-				socketUserMap.set(socket, user)
+					users.push(user);
+					socketUserMap.set(socket, user)
+				}
 
 				console.log(response.account_name + " logged in")
 				console.log('Number of users: '+ users.length);
-
 				socket.emit("loginOk",[response.account_name, response.balance]);
 			}
 			else{
@@ -152,13 +171,8 @@ io.on('connection', function(socket) {
 		//Marks user as zombie if in any room
 		leaveRoom()
 
-		for(var i =0;i<users.length;i++){
-			if(users[i].socket.id == socket.id){
-			  //socket.broadcast.to(users[i].room).emit("opponentDisconnect");
-			  users.splice(i,1);
-			  console.log('Number of users: '+users.length);
-			  break;
-			}
+		if(socketUserMap.has(socket)){
+			socketUserMap.get(socket).disconnected = 1;
 		}
 	}
 
@@ -280,6 +294,30 @@ io.on('connection', function(socket) {
 			console.log("Selected room is full.");
 		}
 	}
+
+	async function reconnect(){
+		var user = socketUserMap.get(socket)
+		var room = pidRoomMap.get(user.id_person)
+
+
+		if(room){
+			user.zombie = 0;
+			if(room.roundState.to_act == user){
+				room.message_sent = 0;
+			}
+		}
+
+		var seatId = room.seats.indexOf(user);
+
+		socket.join(room.room_id);
+
+		socket.emit("roomJoined",[room.room_id, seatId, user.balance, room.min_buy_in, room.max_buy_in])
+
+		io.to(user.socket.id).emit("drawnCards", user.cards);				
+		room.sendNamesStacks();
+		room.sendGamestate();
+		socket.emit("reconnectOK");
+	}
 	
 	async function rebuyRoom(arg){
 		var buy_in = parseInt(arg[0])
@@ -345,6 +383,8 @@ function User(socket, id_person, name, balance){
 	this.all_in = 0;
 	this.total_bet_size = 0;
 	this.result = 0;
+
+	this.disconnected = 0;
 }
 
 async function runServer(){
@@ -362,6 +402,17 @@ async function runServer(){
 		setInterval(function(){
 			for(var i in rooms){
 				rooms[i].updateGame();
+			}
+
+			for(var i =0;i<users.length;i++){
+
+
+				if(users[i].disconnect & pidRoomMap.has(users[i].id_person)){
+				  //socket.broadcast.to(users[i].room).emit("opponentDisconnect");
+				  users.splice(i,1);
+				  console.log('Number of users: '+users.length);
+				  break;
+				}
 			}
 		}, tickTime);
 
