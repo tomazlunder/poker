@@ -174,7 +174,7 @@ socket.on('roomList', (arg) =>{
     document.getElementById("labelRoomMessage").innerHTML= ""
 
     if(alreadyInRoom){
-        document.getElementById("labelRoomMessage").innerHTML= "  Waiting for previous round to finish."
+        document.getElementById("labelRoomMessage").innerHTML= "&#160&#160&#160&#160 Waiting for previous round to finish."
     }
 
     buttonRoomdataMap = new Map()
