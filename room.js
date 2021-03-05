@@ -87,7 +87,7 @@ class Room{
 		
 		for(var i = 0; i < this.seats.length; i++){
 			if(this.seats[i]){
-				if(this.seats[i].zombie == 1 || this.seats[i].stack < this.sb_size){
+				if(this.seats[i].zombie == 1 || this.seats[i].stack < this.sb_size*2){
 					var user = this.seats[i]
 					
 					promises.push(db.transferStackToBalance(user))
