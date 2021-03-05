@@ -915,7 +915,7 @@ function drawProfile(x,y,id){
     ctx.font = "65px Tahoma";
     ctx.fillStyle =  "#EE42DA";
 
-    if(state = 1 & playerBets[id]){
+    if(state == 1 & playerBets[id]){
 
         var betWidth = ctx.measureText(playerBets[id]).width;
 

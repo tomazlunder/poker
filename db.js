@@ -51,7 +51,12 @@ function tryDecreaseBalance(user_id, decrease_by){
         var query = con.query("UPDATE person SET balance = balance - ? WHERE id_person = ?",
         [decrease_by, user_id],
 		function(err, result){
-			if (err) throw err;
+            if (err){
+                console.log(err)
+                reject();
+                return;
+            }
+            
             console.log(query.sql); 
 			console.log(result);
 
