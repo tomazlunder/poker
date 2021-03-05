@@ -181,8 +181,26 @@ function insertWithdraw(id_person, amount){
     });
 }
 
+//On startup (if crashed)
+function transferAllPersonStackToBalance(){
+    return new Promise((resolve,reject) => {    
+        var query = con.query("UPDATE person SET balance = balance + stack, stack = 0 WHERE id_person >= 0;",
+            null,
+            function(err, result){
+                if (err) {
+                    console.log(err)
+                    reject()
+                }
+                console.log(query.sql)
+                console.log(result)
+                resolve()
+            }
+        );
+    });
+}
+
 function insertTip(id_person, amount){
-    
+
 }
 
 module.exports = connectDatabase();
@@ -193,4 +211,6 @@ module.exports.insertPerson = insertPerson;
 module.exports.transferStackToBalance = transferStackToBalance;
 module.exports.changeWinnings = changeWinnings;
 module.exports.insertWithdraw = insertWithdraw;
+module.exports.transferAllPersonStackToBalance = transferAllPersonStackToBalance;
+
 

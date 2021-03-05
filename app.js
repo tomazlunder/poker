@@ -20,6 +20,15 @@ var api = require('./api.js')
 
 const { RSA_PKCS1_PADDING } = require('constants');
 
+//Server vars
+var users = []
+var rooms = []
+
+const tickTime = 2000;
+const timeForAction = 25000;
+const timeAtEnd = 10000;
+const showdownTime = 2000;
+
 var hash 
 hash = crypto.createHash('sha256').update("12345678" + "TestOne.1234").digest('base64');
 console.log(hash)
@@ -251,6 +260,8 @@ io.on('connection', function(socket) {
 				user.zombie = 0
 				user.alive = 0
 
+				const response2 = await db.setPersonStack(user.id_person, user.stack)
+
 				room.seats[seatId] = user
 				console.log(room.room_id + ": join room sucessful ("+user.name+")")
 				socket.emit("roomJoined",[room.room_id, seatId, user.balance, room.min_buy_in, room.max_buy_in])
@@ -336,19 +347,32 @@ function User(socket, id_person, name, balance){
 	this.result = 0;
 }
 
+async function runServer(){
+	users = []
+	rooms = []
+	
+	try{
+		const p = await db.transferAllPersonStackToBalance();
+
+		rooms.push(new Room.Room(io,1, 1, 40,100,6, "Lord Fahren's Quarters", pidRoomMap));
+		rooms.push(new Room.Room(io,2, 1, 40,100,6, "Zojja's Lab", pidRoomMap));
+		rooms.push(new Room.Room(io,3, 2, 80, 200,6, "Braham's Lodge", pidRoomMap));
+		rooms.push(new Room.Room(io,4, 2, 80, 200,6, "Rytlock's Tent", pidRoomMap));
+
+		setInterval(function(){
+			for(var i in rooms){
+				rooms[i].updateGame();
+			}
+		}, tickTime);
+
+
+	} catch (err) {
+		console.log(err)
+	}
+}
+
+runServer();
 //GAME LOOP  
-var users = []
-var rooms = []
-
-const tickTime = 2000;
-const timeForAction = 25000;
-const timeAtEnd = 10000;
-const showdownTime = 2000;
-
-rooms.push(new Room.Room(io,1, 1, 40,100,6, "Lord Fahren's Quarters", pidRoomMap));
-rooms.push(new Room.Room(io,2, 1, 40,100,6, "Zojja's Lab", pidRoomMap));
-rooms.push(new Room.Room(io,3, 2, 80, 200,6, "Braham's Lodge", pidRoomMap));
-rooms.push(new Room.Room(io,4, 2, 80, 200,6, "Rytlock's Tent", pidRoomMap));
 
 /*
 rooms.push(new Room.Room(io,5, 2, 100, 500,6, "Bla"));
@@ -370,10 +394,3 @@ rooms.push(new Room.Room(io,13, 2, 100,6));
 */
 
 
-for(var i in rooms){
-	setInterval(function(){
-		for(var i in rooms){
-			rooms[i].updateGame();
-		}
-	}, tickTime);
-}
