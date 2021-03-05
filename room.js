@@ -531,7 +531,7 @@ class Room{
 				this.io.to(this.room_id).emit('roundStarted');
 
 				this.state = 2;
-			} break;
+			} //no break... continue into next case
 
 			//state 2 compulsory bets
 			case 2:{
@@ -554,7 +554,7 @@ class Room{
 				this.sendGamestate();
 
 				this.state = 3;
-			} break;
+			} //no break... continue into next case
 
 			//state 3 - dealing
 			case 3: {

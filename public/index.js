@@ -5,6 +5,9 @@ var audio_notify = new Audio('audio/notify.wav');
 var audio_deal = new Audio('audio/deal.wav');
 var audio_bridge = new Audio('audio/bridge.wav');
 
+audio_notify.volume = 0.3;
+audio_bridge.volume = 0.5;
+
 var mute = 0;
 
 var myName = ""
@@ -912,7 +915,7 @@ function drawProfile(x,y,id){
     ctx.font = "65px Tahoma";
     ctx.fillStyle =  "#EE42DA";
 
-    if(playerBets[id]){
+    if(state = 1 & playerBets[id]){
 
         var betWidth = ctx.measureText(playerBets[id]).width;
 
