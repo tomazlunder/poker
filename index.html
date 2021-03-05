@@ -21,14 +21,14 @@
 
   <div class="userWrapper" id="userWrapper">
     <div class="userContainer">
-      <table>
-        <tr><td>
+      <table id="tableUser">
+        <tr><td style="float: right;">
         <b><label class="labelUser" id="home_label_user"></label></b>
         </td></tr>
-        <tr> <td><img id="imgChip" src="images/chip.png" width="21.8" height="21.8"></td>	
-        <td><label class="labelUser" id="home_label_balance"></label>	</td>
+        <tr> <td style="float: right;"><img id="imgChip" src="images/chip.png" width="21.8" height="21.8"></td>	
+        <td style="float: right;"><label class="labelUser" id="home_label_balance"></label>	</td>
         </tr>	
-      </table>
+      </table id="tableUser">
     </div>
   </div>
 
@@ -103,9 +103,8 @@
 
     <div class ="containerPage" id="home">
       <div class="containerNav">
-        <button onclick="homePlayButton()" class="navButton" id="homePlayButton" >Play</button>
+        <button onclick="homePlayButton()" class="navButton" id="homePlayButton" disabled >Play</button>
         <button onclick="homeAccountButton()" class="navButton" id="homeAccountButton">Account</button>
-        <!--<button onclick="homeRefreshButton()" class="navButton" id="homeLotteryButton" >Lottery</button>-->
         <button onclick="homeWithdrawButton()" class="navButton" id="homeWithdrawButton" >Withdraw</button>
       </div>
 
@@ -115,28 +114,54 @@
         <label class="roomListRefreshRow" id="labelRoomMessage">aa</label>
         <br>
         <div class="containerRooms" id="containerRooms"></div>
-
-        <div style="width:100%; height:auto">
           
         <div class="clear" style="clear: both;"></div>
 
-
         <button onclick="homeRefreshButton()" class="navButton"  >Refresh</button>
-         </div>
-
-
       </div>
 
       <!-- account-->
       <div class="containerMain" id="homeAccount" style="display:none;">
-        <div class="row">
-          <label class="labelTitle"> Account</label><br>
-        </div>
-          <label class="formLabel"> Total winings: </label><br>
-          <label class="formLabel"> Total tipped: </label><br>
-          <label class="formLabel"> Change email: </label><br>
-          <label class="formLabel"> Change password: </label><br>
+        <label class="labelTitle"> Account</label><br>
+          <table >
+            <tr>
+              <td class="tdAccount1"><label class="formLabel"> Total winnings: </label></td>
+              <td class="tdAccount2"><label class="formLabel"> 1 </label></td>
+            </tr>
+
+            <tr>
+              <td class="tdAccount1"><label class="formLabel"> Total tipped: </label></td>
+              <td class="tdAccount2"><label class="formLabel"> 2 </label></td>
+            </tr>
+
+            <tr>
+              <td class="tdAccount1"><label class="formLabel"> Balance:</label></td>
+              <td class="tdAccount2"><label class="formLabel"> 1 </label></td>
+            </tr>
+
+            <tr>
+              <td class="tdAccount1"><label class="formLabel"> Withdrawal(s) pending: </label></td>
+              <td class="tdAccount2"><label class="formLabel"> 1 </label></td>
+            </tr>
+
+            <tr>
+              <td></td>
+              <td></td>
+            </tr>
+
+            <tr>
+              <td class="tdAccount1"><label class="formLabel"> Change email: </label></td>
+              <td class="tdAccount2"><label class="formLabel"> 1 </label></td>
+            </tr>
+            <tr>
+              <td class="tdAccount1"><label class="formLabel"> Change password: </label></td>
+              <td class="tdAccount2"><label class="formLabel"> 1 </label></td>
+            </tr>
+
+          </table>
+          
       </div>
+
       <div class="containerFoot"></div>  
     </div>
 

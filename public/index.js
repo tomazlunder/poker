@@ -209,7 +209,7 @@ socket.on('roomList', (arg) =>{
         button_join.classList.add("buttonJoin")
 
         label_room_1.innerHTML = roomName;
-        label_room_2.innerHTML = "Stakes: "+sb+"/"+2*sb+"  Buy-in: "+20*sb*2+"-"+50*sb*2+ " Players: "+numplayers+"/"+numseats
+        label_room_2.innerHTML = "Stakes: "+sb+"/"+2*sb+"&#160&#160&#160&#160&#160Buy-in: "+20*sb*2+"-"+50*sb*2+ "&#160&#160&#160&#160&#160Players: "+numplayers+"/"+numseats
         div_row50_1.append(label_room_1)
         div_row50_2.append(label_room_2)
 
