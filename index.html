@@ -108,37 +108,26 @@
         <!--<button onclick="homeRefreshButton()" class="navButton" id="homeLotteryButton" >Lottery</button>-->
         <button onclick="homeWithdrawButton()" class="navButton" id="homeWithdrawButton" >Withdraw</button>
       </div>
+
+      <!-- rooms-->
       <div class="containerMain" id="homeRooms">
-        <div id="roomList">
-          <div class="row" id="roomListTitleRow">
-            <label id="labelRooms">Room List</label>
-            <label id="labelRoomMessage">aa</label>
-            <br>
-            <br>
-          </div>
-          <div class="row" id="roomListContentRow">
-            <div class="containerRooms" id="containerRooms">
-              <div class="room">
-                <div class="col80">
-                  <div class="row50"><label>a</label></div>
-                  <div class="row50"><label>b</label></div>
-                </div>
-                <div class="col20">
-                <button class="buttonJoin">
-                 TEST
-                </button>
-                </div>
-              </div>
-            </div>
-            <br><br>
-          </div>
-          <div class="row" id = "roomListRefreshRow">
-            <button onclick="homeRefreshButton()" class="navButton" style="margin-top:1vh;" id="homeRefreshButton" >Refresh</button>
-           </div>
-        
-        </div>
+        <label class="labelTitle">Room List</label>
+        <label class="roomListRefreshRow" id="labelRoomMessage">aa</label>
+        <br>
+        <div class="containerRooms" id="containerRooms"></div>
+
+        <div style="width:100%; height:auto">
+          
+        <div class="clear" style="clear: both;"></div>
+
+
+        <button onclick="homeRefreshButton()" class="navButton"  >Refresh</button>
+         </div>
+
+
       </div>
 
+      <!-- account-->
       <div class="containerMain" id="homeAccount" style="display:none;">
         <div class="row">
           <label class="labelTitle"> Account</label><br>

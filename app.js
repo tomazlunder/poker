@@ -399,6 +399,14 @@ async function runServer(){
 		rooms.push(new Room.Room(io,3, 2, 80, 200,6, "Braham's Lodge", pidRoomMap));
 		rooms.push(new Room.Room(io,4, 2, 80, 200,6, "Rytlock's Tent", pidRoomMap));
 
+		rooms.push(new Room.Room(io,5, 2, 100, 500,6, "Bla", pidRoomMap));
+		rooms.push(new Room.Room(io,6, 2, 100, 500,6, "Bla, pidRoomMap"));
+		rooms.push(new Room.Room(io,7, 2, 100, 500,6, "Bla", pidRoomMap));
+		rooms.push(new Room.Room(io,8, 2, 100, 500,6, "Bla", pidRoomMap));
+		rooms.push(new Room.Room(io,9, 2, 100, 500,6, "Bla", pidRoomMap));
+		rooms.push(new Room.Room(io,10, 2, 100, 500,6, "Bla", pidRoomMap));
+		rooms.push(new Room.Room(io,11, 2, 100, 500,6, "Bla", pidRoomMap));
+
 		setInterval(function(){
 			for(var i in rooms){
 				rooms[i].updateGame();
@@ -426,13 +434,13 @@ runServer();
 //GAME LOOP  
 
 /*
-rooms.push(new Room.Room(io,5, 2, 100, 500,6, "Bla"));
-rooms.push(new Room.Room(io,6, 2, 100, 500,6, "Bla"));
-rooms.push(new Room.Room(io,7, 2, 100, 500,6, "Bla"));
-rooms.push(new Room.Room(io,8, 2, 100, 500,6, "Bla"));
-rooms.push(new Room.Room(io,9, 2, 100, 500,6, "Bla"));
-rooms.push(new Room.Room(io,10, 2, 100, 500,6, "Bla"));
-rooms.push(new Room.Room(io,11, 2, 100, 500,6, "Bla"));
+rooms.push(new Room.Room(io,5, 2, 100, 500,6, "Bla", pidRoomMap));
+rooms.push(new Room.Room(io,6, 2, 100, 500,6, "Bla, pidRoomMap"));
+rooms.push(new Room.Room(io,7, 2, 100, 500,6, "Bla", pidRoomMap));
+rooms.push(new Room.Room(io,8, 2, 100, 500,6, "Bla", pidRoomMap));
+rooms.push(new Room.Room(io,9, 2, 100, 500,6, "Bla", pidRoomMap));
+rooms.push(new Room.Room(io,10, 2, 100, 500,6, "Bla", pidRoomMap));
+rooms.push(new Room.Room(io,11, 2, 100, 500,6, "Bla", pidRoomMap));
 /*
 rooms.push(new Room.Room(io,6, 2, 100,6));
 rooms.push(new Room.Room(io,7, 2, 100,6));

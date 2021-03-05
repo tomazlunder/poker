@@ -151,6 +151,18 @@ socket.on('withdrawFailed', (arg) => {
     //TODO: add popup
 });
 
+
+/*
+    <div class="room">
+    <div class="col80">
+        <div class="row50"><label>a</label></div>
+        <div class="row50"><label>b</label></div>
+    </div>
+    <div class="col20">
+        <button class="buttonJoin"> TEST </button>
+    </div>
+    </div>
+*/
 socket.on('roomList', (arg) =>{
     console.log("Received: RoomList");
     console.log(arg)

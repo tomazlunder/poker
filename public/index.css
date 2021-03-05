@@ -129,6 +129,7 @@ label{
   display: inline-block;
 }
 
+/*
 #labelRoomMessage{
   text-align: center;
   font-size: 1.8vmax;
@@ -139,7 +140,7 @@ label{
   top: 50%;
   left: 50%;
   transform: translate(0%, -50%);
-}
+}*/
 
 .labelRoom {
   font-size: 1.3vmax;
@@ -461,7 +462,7 @@ input:checked + .slider2:before {
 
   overflow-y:auto;
   overflow-x:none;
-  width: 100%;
+  width: 50%;
   max-height: 54vh;
   float: left;
 }
@@ -470,7 +471,7 @@ input:checked + .slider2:before {
   background: #dddddd;
   border-radius: 0.5vw;
   /*border: 2px solid #3E3E3E;*/
-  width: 50%;
+  width: 99%;
   height: 6vh;
 }
   
@@ -490,7 +491,7 @@ input:checked + .slider2:before {
 
 .row50{
   width:100%;
-  height:50%;
+  height:55%;
   font-size:1.5vw;
   margin-left: 2vw;
 
@@ -666,7 +667,7 @@ input:checked + .slider2:before {
     right: 1vw;
   }
 
-  .room{
+  .containerRooms{
     width: 99%;
   }
 }
