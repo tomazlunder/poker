@@ -599,6 +599,22 @@ function homeRefreshButton(){
     socket.emit("lookingForRooms")
 }
 
+function homePlayButton(){
+    document.getElementById("homeRooms").style.display="block"
+    document.getElementById("homeAccount").style.display="none"
+
+    document.getElementById("homePlayButton").disabled = true;
+    document.getElementById("homeAccountButton").disabled = false;
+}
+
+function homeAccountButton(){
+    document.getElementById("homeRooms").style.display="none"
+    document.getElementById("homeAccount").style.display="block"
+
+    document.getElementById("homePlayButton").disabled = false;
+    document.getElementById("homeAccountButton").disabled = true;;
+}
+
 function welcomeLoginButton() {
     document.getElementById("error_label_login").style.display="none"
 

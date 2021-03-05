@@ -103,14 +103,15 @@
 
     <div class ="containerPage" id="home">
       <div class="containerNav">
-        <button onclick="homeRefreshButton()" class="navButton" id="homePlayButton" >Play</button>
+        <button onclick="homePlayButton()" class="navButton" id="homePlayButton" >Play</button>
+        <button onclick="homeAccountButton()" class="navButton" id="homeAccountButton">Account</button>
         <!--<button onclick="homeRefreshButton()" class="navButton" id="homeLotteryButton" >Lottery</button>-->
         <button onclick="homeWithdrawButton()" class="navButton" id="homeWithdrawButton" >Withdraw</button>
       </div>
-      <div class="containerMain">
+      <div class="containerMain" id="homeRooms">
         <div id="roomList">
           <div class="row" id="roomListTitleRow">
-            <label class="labelTitle">Room List</label>
+            <label id="labelRooms">Room List</label>
             <label id="labelRoomMessage">aa</label>
             <br>
             <br>
@@ -134,23 +135,20 @@
           <div class="row" id = "roomListRefreshRow">
             <button onclick="homeRefreshButton()" class="navButton" style="margin-top:1vh;" id="homeRefreshButton" >Refresh</button>
            </div>
-          <!--
-          <div class="row" id="roomListTitle" style="text-align: left;">
-            <label class="labelTitle">Room List</label>
-            <br>
-            <br>
-          </div>
-          <div class="row" id="roomButtons">
-          </div>
-          <br>
-        -->
-
         
         </div>
       </div>
-      <div class="containerFoot">
-        <!-- <button class="buttonFoot" onclick="tipButton()" id="tipButton" >Tip the house</button> -->
-      </div>  
+
+      <div class="containerMain" id="homeAccount" style="display:none;">
+        <div class="row">
+          <label class="labelTitle"> Account</label><br>
+        </div>
+          <label class="formLabel"> Total winings: </label><br>
+          <label class="formLabel"> Total tipped: </label><br>
+          <label class="formLabel"> Change email: </label><br>
+          <label class="formLabel"> Change password: </label><br>
+      </div>
+      <div class="containerFoot"></div>  
     </div>
 
     <div class="containerPage" id="game">
