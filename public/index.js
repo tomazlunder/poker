@@ -136,6 +136,16 @@ socket.on('newBalance', (arg) => {
     document.getElementById("home_label_balance").innerHTML = "Balance: " + arg
 });
 
+socket.on('withdrawOk', (arg) => {
+    document.getElementById("homeWithdrawButton").disabled = false;
+    //TODO: add popup
+});
+
+socket.on('withdrawFailed', (arg) => {
+    document.getElementById("homeWithdrawButton").disabled = false;
+    //TODO: add popup
+});
+
 socket.on('roomList', (arg) =>{
     console.log("Received: RoomList");
     console.log(arg)
@@ -216,6 +226,13 @@ function buttonJoinRoomClicked(room_id, room_min, room_max){
     var actualMax = Math.min(myBalance, room_max);
     buyInRange.max = actualMax;
     buyInRange.value = actualMax;
+    buyInRange.step = 1;
+
+    var buyInNumberField = document.getElementById("buyInNumberField");
+    buyInNumberField.min = room_min;
+    buyInNumberField.max = actualMax;
+    buyInNumberField.step = 1;
+    buyInNumberField.value = actualMax;
 
     var modalButton = document.getElementById("modalBuyInButton");
     modalButton.innerHTML = "Join"
@@ -224,7 +241,6 @@ function buttonJoinRoomClicked(room_id, room_min, room_max){
         modalBuyInClicked(room_id);
     }
 
-    document.getElementById("buyInNumberField").value = actualMax;
 
     modalBuyIn.style.display = "block";
 }
@@ -698,18 +714,16 @@ function homeRebuyButton() {
     console.log("Clicked rebuy button")
 
     var actualMax = Math.min(myBalance, cur_max_buy_in - playerStacks[0])
-    rebuyRange.min = cur_min_buy_in
+    rebuyRange.min = cur_min_buy_in - playerStacks[0]
     rebuyRange.max = actualMax
     rebuyRange.value = rebuyRange.max
     rebuyRange.disabled =  false;
 
-    console.log(rebuyRange.min)
-    console.log(rebuyRange.max)
+    var rebuyNumberField = document.getElementById("rebuyNumberField");
 
-    var modalButton = document.getElementById("modalRebuyButton");
-    modalButton.innerHTML = "Rebuy"
-
-    document.getElementById("rebuyTextField").value = rebuyRange.max;
+    rebuyNumberField.min = cur_min_buy_in - playerStacks[0]
+    rebuyNumberField.max = actualMax
+    rebuyNumberField.value = rebuyRange.max
 
     modalRebuy.style.display = "block";
 }
@@ -720,15 +734,12 @@ function homeWithdrawButton() {
     withdrawRange.min = 0
     withdrawRange.max = myBalance
     withdrawRange.value = withdrawRange.min
-    withdrawRange.disabled =  false;
+    withdrawRange.disabled =  false
 
-    console.log(withdrawRange.min)
-    console.log(withdrawRange.max)
-
-    var modalButton = document.getElementById("modalWithdrawButton");
-    modalButton.innerHTML = "Withdraw"
-
-    document.getElementById("withdrawTextField").value = withdrawRange.max;
+    var withdrawNumberField = document.getElementById("withdrawNumberField")
+    withdrawNumberField.min = 0;
+    withdrawNumberField. max = myBalance
+    withdrawNumberField.value = withdrawRange.min
 
     modalWithdraw.style.display = "block";
 }
@@ -779,17 +790,31 @@ function rangeChange() {
 function rangeBuyinChange() {
     var val = document.getElementById("buyInRange").value;
     document.getElementById("buyInNumberField").value = val;
-    document.getElementById("buyInButton") //HERE
 }
 
 function rangeRebuyChange() {
     var val = document.getElementById("rebuyRange").value;
-    document.getElementById("rebuyTextField").value = val;
+    document.getElementById("rebuyNumberField").value = val;
 }
 
 function rangeWithdrawChange() {
     var val = document.getElementById("withdrawRange").value;
-    document.getElementById("withdrawTextField").value = val;
+    document.getElementById("withdrawNumberField").value = val;
+}
+
+function numberBuyinChange(){
+    var val = document.getElementById("buyInNumberField").value;
+    document.getElementById("buyInRange").value = val;
+}
+
+function numberRebuyChange(){
+    var val = document.getElementById("rebuyNumberField").value;
+    document.getElementById("rebuyRange").value = val;
+}
+
+function numberWithdrawChange(){
+    var val = document.getElementById("withdrawNumberField").value;
+    document.getElementById("withdrawRange").value = val;
 }
 
 function drawGame(){

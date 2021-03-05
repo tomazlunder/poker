@@ -52,7 +52,8 @@ io.on('connection', function(socket) {
 			user.socket.emit("newBalance", user.balance)
 
 		} catch (err){
-			console.log("Withdraw failed")
+			console.log("withdrawFailed")
+			socket.emit("withdrawFailed")
 			console.log(err)
 		}
 

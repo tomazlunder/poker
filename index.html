@@ -39,7 +39,7 @@
       <span class="close" id = "closeBuyIn">&times;</span>
       <p>Buy-in size</p>
       <input type="range"  id="buyInRange" class="sliderBuyIn" name="raise" min="0" max="50" oninput="rangeBuyinChange()">
-      <input type="number" id="buyInNumberField" style="width: 10%;"></input>
+      <input type="number" id="buyInNumberField" style="width: 10%;" oninput="numberBuyinChange()" onkeydown="return false"></input>
       <button id="modalBuyInButton" class="Button">BUY IN</button>
     </div>
   </div>
@@ -48,10 +48,10 @@
     <!-- Modal content -->
     <div class="modal-content" id="modal-content-rebuy">
       <span class="close" id = "closeRebuy">&times;</span>
-      <p>Buy-in size</p>
+      <p>Rebuy size</p>
       <input type="range"  id="rebuyRange" class="sliderBuyIn" name="raise" min="0" max="50" oninput="rangeRebuyChange()">
-      <input type="text" id="rebuyTextField" style="width: 10%;" disabled></input>
-      <button id="modalRebuyButton" class="Button" onclick="modalRebuyClicked()">BUY IN</button>
+      <input type="number" id="rebuyNumberField" style="width: 10%;" oninput="numberRebuyChange()" onkeydown="return false" ></input>
+      <button id="modalRebuyButton" class="Button" onclick="modalRebuyClicked()">Rebuy</button>
     </div>
   </div>
 
@@ -61,8 +61,8 @@
       <span class="close" id = "closeWithdraw">&times;</span>
       <p>Withdraw</p>
       <input type="range"  id="withdrawRange" class="sliderBuyIn" name="raise" min="0" max="50" oninput="rangeWithdrawChange()">
-      <input type="text" id="withdrawTextField" style="width: 10%;" disabled></input>
-      <button id="modalWithdrawButton" class="Button" onclick="modalWithdrawClicked()">BUY IN</button>
+      <input type="number" id="withdrawNumberField" style="width: 10%;" oninput="numberWithdrawChange()" onkeydown="return false" ></input>
+      <button id="modalWithdrawButton" class="Button" onclick="modalWithdrawClicked()">Withdraw</button>
     </div>
   </div>
 
