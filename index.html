@@ -104,8 +104,9 @@
     <div class ="containerPage" id="home">
       <div class="containerNav">
         <button onclick="homePlayButton()" class="navButton" id="homePlayButton" disabled >Rooms</button>
-        <button onclick="homeAccountButton()" class="navButton" id="homeAccountButton">Account</button>
-        <button onclick="homeWithdrawButton()" class="navButton" id="homeWithdrawButton" >Withdraw</button>
+        <button onclick="homeAccountButton()" class="navButton" id="homeAccountButton" style="float: right;">Account</button>
+        <button onclick="homeLeaderboardButton()" class="navButton" id="homeLeaderboardButton">Leaderboard</button>
+
       </div>
 
       <!-- rooms-->
@@ -121,47 +122,58 @@
 
       <!-- account-->
       <div class="containerMain" id="homeAccount" style="display:none;">
-        <label class="labelTitle"> Account</label><br>
+        <label class="labelTitle">Name.1234</label><br><br>
           <table >
             <tr>
-              <td class="tdAccount1"><label"> Total winnings: </label></td>
-              <td class="tdAccount2"><label"> 1 </label></td>
+              <td class="tdAccount1"><label> Balance</label></td>
+              <td>:</td>
+              <td class="tdAccount2"><label> 1 </label></td>
             </tr>
-
             <tr>
-              <td class="tdAccount1"><label> Total tipped: </label></td>
-              <td class="tdAccount2"><label> 2 </label></td>
-            </tr>
-
-            <tr>
-              <td class="tdAccount1"><label> Balance:</label></td>
+              <td class="tdAccount1"><label> Total winnings</label></td>
+              <td>:</td>
               <td class="tdAccount2"><label> 1 </label></td>
             </tr>
 
             <tr>
-              <td class="tdAccount1"><label> Withdrawal(s) pending: </label></td>
-              <td class="tdAccount2"><label> 1 </label></td>
-            </tr>
-
-            <tr>
-              <td></td>
-              <td></td>
-            </tr>
-
-            <tr>
-              <td class="tdAccount1"><label> Change email: </label></td>
-              <td class="tdAccount2"><label> 1 </label></td>
+              <td class="tdAccount1"><label> Total tipped</label></td>
+              <td>:</td>
+              <td class="tdAccount2"><label> 2fsfa </label></td>
             </tr>
             <tr>
-              <td class="tdAccount1"><label> Change password: </label></td>
-              <td class="tdAccount2"><label> 1 </label></td>
+              <td class="tdAccount1"><label> Rounds played</label></td>
+              <td>:</td>
+              <td class="tdAccount2"><label> 2fsfa </label></td>
+            </tr>
+            <tr>
+              <td class="tdAccount1"><label> Withdrawal(s) pending</label></td>
+              <td>:</td>
+              <td class="tdAccount2"><label> 1asdsad </label></td>
             </tr>
 
           </table>
+
+          <br>
+          <button onclick="homeWithdrawButton()" class="navButton" id="homeWithdrawButton" >Withdraw</button>
+          <br><br>
+
+          <label class="labelTitle">Settings</label>
+          <br><br>
+          <button onclick="changeEmailButton()" class="navButton" id="changeEmailButton" >Change email</button>
+          <button onclick="changePasswordButton()" class="navButton" id="changePasswordButton" >Change password</button>
+
+
+
           
       </div>
 
-      <div class="containerFoot"></div>  
+      <div class="containerFoot">
+
+        <button onclick="discordButton()" id="buttonDiscord" >Discord</button>
+        <button onclick="tipButton()" id="buttonTip" >Tip the house</button>
+
+
+      </div>  
     </div>
 
     <div class="containerPage" id="game">

@@ -90,6 +90,7 @@ html, body{
 
     position:absolute;
     text-align: right;
+    float:right;
     bottom:0;
 }
 
@@ -168,17 +169,24 @@ button {
   bottom: 2vh;
 }
 
-.buttonFoot {
-  width: 20vw;
+#buttonTip {
+  width: 12vw;
   height: 5vh;
   padding: 0 0;
 
-  position: absolute;
-  bottom: 0;
-  right: 0;
+  background-color:#32d589;
+  color: #ffffff;
 
-  background-color: #afe223;
-  color: #000000;
+}
+
+#buttonDiscord {
+  width: 10vw;
+  height: 5vh;
+  padding: 0 0;
+
+  background-color: #7289da;
+  color: #ffffff;
+
 }
   
 .buttonJoin {
@@ -201,9 +209,9 @@ button {
 }
 
 .navButton{
-  width: 10vw;
+  min-width: 10vw;
   height: 5vh;
-  padding: 0 0;
+  padding: 0 0.5vw;
 }
 
 
@@ -254,11 +262,11 @@ button:hover:disabled {
 }
 
 .tdAccount1{
-  text-align: right;
+  float: left;
 }
 
 .tdAccount2{
-  text-align: left;
+  float: left;
 }
 
 #roomButtons{
@@ -614,7 +622,7 @@ input:checked + .slider2:before {
   }
 
   .navButton{
-    width: 20vw;
+    min-width: 20vw;
   }
 
   #callContainer{
