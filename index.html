@@ -39,8 +39,8 @@
       <span class="close" id = "closeBuyIn">&times;</span>
       <p>Buy-in size</p>
       <input type="range"  id="buyInRange" class="sliderBuyIn" name="raise" min="0" max="50" oninput="rangeBuyinChange()">
-      <input type="text" id="buyinTextField" style="width: 10%;" disabled></input>
-      <button id="modalBuyInButton" class="Button" onclick="modalBuyInClicked()">BUY IN</button>
+      <input type="number" id="buyInNumberField" style="width: 10%;"></input>
+      <button id="modalBuyInButton" class="Button">BUY IN</button>
     </div>
   </div>
 
@@ -52,6 +52,17 @@
       <input type="range"  id="rebuyRange" class="sliderBuyIn" name="raise" min="0" max="50" oninput="rangeRebuyChange()">
       <input type="text" id="rebuyTextField" style="width: 10%;" disabled></input>
       <button id="modalRebuyButton" class="Button" onclick="modalRebuyClicked()">BUY IN</button>
+    </div>
+  </div>
+
+  <div id="modalWithdraw" class="modal" style="display:none">
+    <!-- Modal content -->
+    <div class="modal-content" id="modal-content-range">
+      <span class="close" id = "closeWithdraw">&times;</span>
+      <p>Withdraw</p>
+      <input type="range"  id="withdrawRange" class="sliderBuyIn" name="raise" min="0" max="50" oninput="rangeWithdrawChange()">
+      <input type="text" id="withdrawTextField" style="width: 10%;" disabled></input>
+      <button id="modalWithdrawButton" class="Button" onclick="modalWithdrawClicked()">BUY IN</button>
     </div>
   </div>
 
@@ -94,7 +105,7 @@
       <div class="containerNav">
         <button onclick="homeRefreshButton()" class="navButton" id="homePlayButton" >Play</button>
         <!--<button onclick="homeRefreshButton()" class="navButton" id="homeLotteryButton" >Lottery</button>-->
-        <button onclick="homeRefreshButton()" class="navButton" id="homeWithdrawButton" disabled=true>Withdraw</button>
+        <button onclick="homeWithdrawButton()" class="navButton" id="homeWithdrawButton" >Withdraw</button>
       </div>
       <div class="containerMain">
         <div id="roomList">

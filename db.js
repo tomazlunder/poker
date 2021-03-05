@@ -171,7 +171,7 @@ function insertWithdraw(id_person, amount){
                 console.log(query.sql); 
                 console.log(result);
                 if(result.affectedRows == 1){
-                    console.log("Changed winnings.")
+                    console.log("Created withdraw.")
                     resolve()
                 }else{
                     reject()
@@ -179,6 +179,10 @@ function insertWithdraw(id_person, amount){
             }
         );
     });
+}
+
+function insertTip(id_person, amount){
+    
 }
 
 module.exports = connectDatabase();
@@ -189,3 +193,4 @@ module.exports.insertPerson = insertPerson;
 module.exports.transferStackToBalance = transferStackToBalance;
 module.exports.changeWinnings = changeWinnings;
 module.exports.insertWithdraw = insertWithdraw;
+

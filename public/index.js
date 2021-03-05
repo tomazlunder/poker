@@ -34,27 +34,32 @@ var state = 0;
 var timeToAct;
 var startTime;
 var intervalId;
-var modalBuyIn;
-var modalRebuy;
 
-var span1, span2;
-var buyInRange;
+var modalBuyIn, modalRebuy, modalWithdraw;
+var span1, span2, span3;
+var buyInRange, rebuyRange, withdrawRange;
 
 var myBalance;
+
+//to pass to buy in modal functions
+var buttonRoomdataMap = new Map()
 
 var cur_min_buy_in;
 var cur_max_buy_in;
 
 modalBuyIn = document.getElementById("modalBuyIn");
 modalRebuy = document.getElementById("modalRebuy");
-
+modalWithdraw = document.getElementById("modalWithdraw")
 
 span1 = document.getElementById("closeBuyIn");
 span2 = document.getElementById("closeRebuy");
+span3 = document.getElementById("closeWithdraw");
 
 
 buyInRange = document.getElementById("buyInRange");
 rebuyRange = document.getElementById("rebuyRange");
+withdrawRange = document.getElementById("withdrawRange");
+
 
 
 document.addEventListener("DOMContentLoaded", function(event){
@@ -62,7 +67,6 @@ document.addEventListener("DOMContentLoaded", function(event){
 });
 
 
-//TODO:
 window.onload = function(){ 
     window.onclick = function(event) {
         if (event.target == modalBuyIn) {
@@ -70,6 +74,9 @@ window.onload = function(){
         }
         else if (event.target == modalRebuy) {
             modalRebuy.style.display = "none";
+        }
+        else if (event.target == modalWithdraw) {
+            modalWithdraw.style.display = "none";
         }
     } 
 };
@@ -82,6 +89,10 @@ span1.onclick = function() {
 // When the user clicks on <span> (x), close the modal
 span2.onclick = function() {
     modalRebuy.style.display = "none";
+}
+
+span3.onclick = function() {
+    modalWithdraw.style.display = "none";
 }
   
 
@@ -139,6 +150,8 @@ socket.on('roomList', (arg) =>{
         document.getElementById("labelRoomMessage").innerHTML= "  Waiting for previous round to finish."
     }
 
+    buttonRoomdataMap = new Map()
+
     var room_list = arg[1];
     for(var i in room_list){
         var id = room_list[i][0]
@@ -168,7 +181,6 @@ socket.on('roomList', (arg) =>{
         div_col20.classList.add("col20")
         button_join.classList.add("buttonJoin")
 
-        var placeholder = "Placeholder"
         label_room_1.innerHTML = roomName;
         label_room_2.innerHTML = "Stakes: "+sb+"/"+2*sb+"  Buy-in: "+20*sb*2+"-"+50*sb*2+ " Players: "+numplayers+"/"+numseats
         div_row50_1.append(label_room_1)
@@ -177,32 +189,16 @@ socket.on('roomList', (arg) =>{
         div_col80.append(div_row50_1)
         div_col80.append(div_row50_2)
         button_join.innerHTML = "JOIN"
-        button_join.room_id = id;
-        button_join.minBuyIn = minBuyIn;
-        button_join.maxBuyIn = maxBuyIn;
 
         div_col20.append(button_join)
         div_room.append(div_col80)
         div_room.append(div_col20)
 
+        buttonRoomdataMap.set(button_join, [id, minBuyIn, maxBuyIn])
 
-       button_join.addEventListener ("click", function() {
-            console.log("Clicked room button" + button_join.room_id)
-
-            buyInRange.min = this.minBuyIn;
-            var actualMax = Math.min(myBalance, this.maxBuyIn);
-            buyInRange.max = actualMax;
-            buyInRange.value = actualMax;
-
-            var modalButton = document.getElementById("modalBuyInButton");
-            modalButton.innerHTML = "Join"
-
-            modalButton.room_id = this.room_id;
-
-            document.getElementById("buyinTextField").value = actualMax;
-
-            modalBuyIn.style.display = "block";
-        });
+        button_join.onclick = function(){
+            buttonJoinRoomClicked(buttonRoomdataMap.get(this)[0], buttonRoomdataMap.get(this)[1], buttonRoomdataMap.get(this)[2])
+        }
 
         if(arg[0]){
             button_join.disabled = true;
@@ -215,8 +211,22 @@ socket.on('roomList', (arg) =>{
     }
 });
 
-function buttonJoinRoomClicked(room_id){
+function buttonJoinRoomClicked(room_id, room_min, room_max){
+    buyInRange.min = room_min
+    var actualMax = Math.min(myBalance, room_max);
+    buyInRange.max = actualMax;
+    buyInRange.value = actualMax;
 
+    var modalButton = document.getElementById("modalBuyInButton");
+    modalButton.innerHTML = "Join"
+
+    modalButton.onclick = function (){
+        modalBuyInClicked(room_id);
+    }
+
+    document.getElementById("buyInNumberField").value = actualMax;
+
+    modalBuyIn.style.display = "block";
 }
 
 socket.on('listOutdated', (arg) => {
@@ -508,11 +518,11 @@ socket.on('actionRequired', (arg) => {
     drawGame();
 } );
 
-function modalBuyInClicked(){
+function modalBuyInClicked(room_id){
     var modalButton = document.getElementById("modalBuyInButton");
     var rangeSlider = document.getElementById("buyInRange");
 
-    joinRoom(modalButton.room_id,rangeSlider.value)
+    joinRoom(room_id,rangeSlider.value)
 
     modalBuyIn.style.display = "none";
 }
@@ -525,7 +535,17 @@ function modalRebuyClicked(){
     rebuyButton.disabled = true;
 
     modalRebuy.style.display = "none";
+}
 
+function modalWithdrawClicked(){
+    var rangeSlider = document.getElementById("withdrawRange");
+
+    socket.emit("withdraw", rangeSlider.value)
+
+    var withdrawButton = document.getElementById("homeWithdrawButton");
+    withdrawButton.disabled = true;
+
+    modalWithdraw.style.display = "none";
 }
 
 function soundCheckboxClicked(){
@@ -694,6 +714,25 @@ function homeRebuyButton() {
     modalRebuy.style.display = "block";
 }
 
+function homeWithdrawButton() {
+    console.log("Clicked withdraw button")
+
+    withdrawRange.min = 0
+    withdrawRange.max = myBalance
+    withdrawRange.value = withdrawRange.min
+    withdrawRange.disabled =  false;
+
+    console.log(withdrawRange.min)
+    console.log(withdrawRange.max)
+
+    var modalButton = document.getElementById("modalWithdrawButton");
+    modalButton.innerHTML = "Withdraw"
+
+    document.getElementById("withdrawTextField").value = withdrawRange.max;
+
+    modalWithdraw.style.display = "block";
+}
+
 
 function homeFoldButton() {
     console.log("Emitted: actionRequest(fold)")
@@ -739,12 +778,18 @@ function rangeChange() {
 
 function rangeBuyinChange() {
     var val = document.getElementById("buyInRange").value;
-    document.getElementById("buyinTextField").value = val;
+    document.getElementById("buyInNumberField").value = val;
+    document.getElementById("buyInButton") //HERE
 }
 
 function rangeRebuyChange() {
     var val = document.getElementById("rebuyRange").value;
     document.getElementById("rebuyTextField").value = val;
+}
+
+function rangeWithdrawChange() {
+    var val = document.getElementById("withdrawRange").value;
+    document.getElementById("withdrawTextField").value = val;
 }
 
 function drawGame(){
