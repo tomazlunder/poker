@@ -75,18 +75,18 @@
 
     <div class="containerPage" id="welcome">
       <br>
-      <label class="formLabel">Account Name (Example.1234):</label><br>
+      <label>Account Name (Example.1234):</label><br>
       <input type="text" id=input_welcome_name></input><br>
-      <label class="formLabel" >Password:</label><br>
+      <label>Password:</label><br>
       <input type="password" id="input_welcome_password"></input><br><br>
-      <button class ="button" onclick="welcomeLoginButton()">Login</button>
+      <button class ="button" onclick="welcomeLoginButton()">Log in</button>
       <button class ="button" onclick="welcomeRegisterButton()">Register</button><br><br>
-      <label style="display: none" id="error_label_login" class="formLabel"></label>
+      <label style="display: none" id="error_label_login"></label>
     </div>  
 
     <div class="containerPage" id="registration">
       <br>
-      <label class="formLabel">Account Name (Example.1234):</label><br>
+      <label>Account Name (Example.1234):</label><br>
       <input type="text" id="input_registration_name"></input><br>
       <label>Password:</label><br>
       <input type="password" id="input_registration_password"></input><br>
@@ -98,12 +98,12 @@
       <input type="password" id="input_registration_repeat_password"></input><br><br>
       <button onclick="registrationRegisterButton()">Register</button>
       <button onclick="registrationBackButton()">Back</button><br><br>
-      <label style="display: none" id="error_label_register" class="formLabel"></label>
+      <label style="display: none" id="error_label_register"></label>
     </div>  
 
     <div class ="containerPage" id="home">
       <div class="containerNav">
-        <button onclick="homePlayButton()" class="navButton" id="homePlayButton" disabled >Play</button>
+        <button onclick="homePlayButton()" class="navButton" id="homePlayButton" disabled >Rooms</button>
         <button onclick="homeAccountButton()" class="navButton" id="homeAccountButton">Account</button>
         <button onclick="homeWithdrawButton()" class="navButton" id="homeWithdrawButton" >Withdraw</button>
       </div>
@@ -125,23 +125,23 @@
         <label class="labelTitle"> Account</label><br>
           <table >
             <tr>
-              <td class="tdAccount1"><label class="formLabel"> Total winnings: </label></td>
-              <td class="tdAccount2"><label class="formLabel"> 1 </label></td>
+              <td class="tdAccount1"><label"> Total winnings: </label></td>
+              <td class="tdAccount2"><label"> 1 </label></td>
             </tr>
 
             <tr>
-              <td class="tdAccount1"><label class="formLabel"> Total tipped: </label></td>
-              <td class="tdAccount2"><label class="formLabel"> 2 </label></td>
+              <td class="tdAccount1"><label> Total tipped: </label></td>
+              <td class="tdAccount2"><label> 2 </label></td>
             </tr>
 
             <tr>
-              <td class="tdAccount1"><label class="formLabel"> Balance:</label></td>
-              <td class="tdAccount2"><label class="formLabel"> 1 </label></td>
+              <td class="tdAccount1"><label> Balance:</label></td>
+              <td class="tdAccount2"><label> 1 </label></td>
             </tr>
 
             <tr>
-              <td class="tdAccount1"><label class="formLabel"> Withdrawal(s) pending: </label></td>
-              <td class="tdAccount2"><label class="formLabel"> 1 </label></td>
+              <td class="tdAccount1"><label> Withdrawal(s) pending: </label></td>
+              <td class="tdAccount2"><label> 1 </label></td>
             </tr>
 
             <tr>
@@ -150,12 +150,12 @@
             </tr>
 
             <tr>
-              <td class="tdAccount1"><label class="formLabel"> Change email: </label></td>
-              <td class="tdAccount2"><label class="formLabel"> 1 </label></td>
+              <td class="tdAccount1"><label> Change email: </label></td>
+              <td class="tdAccount2"><label> 1 </label></td>
             </tr>
             <tr>
-              <td class="tdAccount1"><label class="formLabel"> Change password: </label></td>
-              <td class="tdAccount2"><label class="formLabel"> 1 </label></td>
+              <td class="tdAccount1"><label> Change password: </label></td>
+              <td class="tdAccount2"><label> 1 </label></td>
             </tr>
 
           </table>
@@ -180,7 +180,7 @@
       </div>
 
       <div id="soundButtonContainer">
-        <label class="formLabel">Sound</label>
+        <label>Sound</label>
         <label class="switch">
           <input id="soundCheckbox" type="checkbox" checked onclick="soundCheckboxClicked()">
           <span class="slider2"></span>

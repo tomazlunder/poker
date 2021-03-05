@@ -189,7 +189,6 @@ socket.on('roomList', (arg) =>{
         var numseats = room_list[i][5]
         var roomName = room_list[i][6]
 
-        //New
         var div_room = document.createElement("div");
         var div_col80 = document.createElement("div");
         var div_row50_1 = document.createElement("div");
@@ -203,8 +202,8 @@ socket.on('roomList', (arg) =>{
         div_col80.classList.add("col80")
         div_row50_1.classList.add("row50")
         div_row50_2.classList.add("row50")
-        label_room_1.classList.add("labelRoom")
-        label_room_2.classList.add("labelRoom")
+        //label_room_1.classList.add("labelRoom")
+        //label_room_2.classList.add("labelRoom")
         div_col20.classList.add("col20")
         button_join.classList.add("buttonJoin")
 
@@ -215,7 +214,7 @@ socket.on('roomList', (arg) =>{
 
         div_col80.append(div_row50_1)
         div_col80.append(div_row50_2)
-        button_join.innerHTML = "JOIN"
+        button_join.innerHTML = "Join"
 
         div_col20.append(button_join)
         div_room.append(div_col80)
