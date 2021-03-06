@@ -38,8 +38,8 @@ var timeToAct;
 var startTime;
 var intervalId;
 
-var modalBuyIn, modalRebuy, modalWithdraw, modalTip;
-var span1, span2, span3, span4;
+var modalBuyIn, modalRebuy, modalWithdraw, modalTip, modalEmail, modalPassword;
+var span1, span2, span3, span4, span5, span6;
 var buyInRange, rebuyRange, withdrawRange, tipRange;
 
 var myBalance;
@@ -54,11 +54,17 @@ modalBuyIn = document.getElementById("modalBuyIn");
 modalRebuy = document.getElementById("modalRebuy");
 modalWithdraw = document.getElementById("modalWithdraw")
 modalTip = document.getElementById("modalTip")
+modalEmail = document.getElementById("modalEmail")
+modalPassword = document.getElementById("modalPassword")
+
+
 
 span1 = document.getElementById("closeBuyIn");
 span2 = document.getElementById("closeRebuy");
 span3 = document.getElementById("closeWithdraw");
-span4 = document.getElementById("closeTip")
+span4 = document.getElementById("closeTip");
+span5 = document.getElementById("closeEmail")
+span6 = document.getElementById("closePassword")
 
 buyInRange = document.getElementById("buyInRange");
 rebuyRange = document.getElementById("rebuyRange");
@@ -86,6 +92,12 @@ window.onload = function(){
         else if (event.target == modalTip) {
             modalTip.style.display = "none";
         }
+        else if (event.target == modalEmail) {
+            modalEmail.style.display = "none";
+        }
+        else if (event.target == modalPassword) {
+            modalPassword.style.display = "none";
+        }
     } 
 };
 
@@ -106,6 +118,18 @@ span3.onclick = function() {
 span4.onclick = function() {
     modalTip.style.display = "none";
 }
+
+span5.onclick = function(){
+    modalEmail.style.display = "none";
+}
+
+span6.onclick = function(){
+    modalPassword.style.display = "none";
+}
+
+socket.on("changePasswordOk", (arg) => {
+    location.reload();
+});
 
 socket.on("dc", (arg) => {
     location.reload();
@@ -640,6 +664,42 @@ function modalWithdrawClicked(){
     modalWithdraw.style.display = "none";
 }
 
+function modalEmailClicked(){
+
+    
+    //TODO: 
+}
+
+function modalPasswordClicked(){
+
+    var password = document.getElementById("password1").value
+    var repeat_password  = document.getElementById("password2").value
+
+    //TODO:
+    console.log(password)
+    if(password.length < 8){
+        console.log("Test: Password length FAIL");
+
+        document.getElementById("errorLabelModalPassword").innerHTML = "Password must be least 8 symbols long."
+        document.getElementById("errorLabelModalPassword").style.display="block"
+        return
+    }
+
+    if(password !== repeat_password){
+        console.log("Test: Password matching FAIL");
+
+        console.log(repeat_password)
+
+        document.getElementById("errorLabelModalPassword").innerHTML = "Passwords do not match."
+        document.getElementById("errorLabelModalPassword").style.display="block"
+        return
+    }
+
+    socket.emit("changePassword", password)
+    modalPassword.style.display = "none";
+
+}
+
 function modalTipClicked(){
     var rangeSlider = document.getElementById("tipRange");
 
@@ -848,7 +908,7 @@ function homeWithdrawButton() {
 }
 
 function homeTipButton(){
-    console.log("Clicked withdraw button")
+    console.log("Clicked tip button")
 
     tipRange.min = 0
     tipRange.max = myBalance
@@ -858,10 +918,27 @@ function homeTipButton(){
     var tipNumberField = document.getElementById("tipNumberField")
     tipNumberField.min = 0;
     tipNumberField. max = myBalance
-    tipNumberField.value = tipNumberField.min
+    tipNumberField.value = tipRange.min
 
     modalTip.style.display = "block";
 }
+
+function changeEmailButton(){
+    console.log("Clicked email button")
+
+    modalEmail.style.display = "block";
+}
+
+function changePasswordButton(){
+    console.log("Clicked email button")
+
+    modalPassword.style.display = "block";
+
+    document.getElementById("password1").value = ""
+    document.getElementById("password2").value = ""
+    document.getElementById("errorLabelModalPassword").innerHTML = ""
+}
+
 
 
 function homeFoldButton() {

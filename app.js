@@ -30,7 +30,10 @@ const timeAtEnd = 10000;
 const showdownTime = 2000;
 
 var hash 
-hash = crypto.createHash('sha256').update("12345678" + "TestOne.1234").digest('base64');
+hash = crypto.createHash('sha256').update("awdqseww" + "ThaMightyBird.9712").digest('base64');
+console.log(hash)
+
+hash = crypto.createHash('sha256').update("awdqseww1" + "ThaMightyBird.9712").digest('base64');
 console.log(hash)
 
 app.get('/', function(req, res) {
@@ -48,10 +51,31 @@ io.on('connection', function(socket) {
 	socket.on('leaveRoom',leaveRoom)
 	socket.on('lookingForRooms',lookingForRooms)
 	socket.on('actionRequest', actionRequest);
-	socket.on('withdraw',withdraw);
+	socket.on('withdraw', withdraw);
 	socket.on('tip', tip);
 	socket.on('reconnect', reconnect);
-	socket.on('accountStats', accountStats)
+	socket.on('accountStats', accountStats);
+	socket.on('changePassword', changePassword);
+
+	async function changePassword(newPassword){
+		var user = socketUserMap.get(socket)
+
+		//console.log(newPassword)
+		//console.log(user.name)
+		var hash = crypto.createHash('sha256').update(newPassword + user.name).digest('base64');
+		//console.log(hash)
+
+		try{
+			const response = await db.setPersonPassword(user.id_person, hash);
+
+			socket.emit("changePasswordOk");
+
+		} catch (err){
+			console.log("changePasswordFailed")
+			socket.emit("changePasswordFailed")
+			console.log(err)
+		}
+	}
 
 	async function withdraw(amount){
 		try{

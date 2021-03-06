@@ -96,6 +96,26 @@ function setPersonStack(user_id, new_stack){
     });
 }
 
+function setPersonPassword(id_person, hash){
+    return new Promise((resolve,reject) => {
+        var query = con.query("UPDATE person SET password_hash = ? WHERE id_person = ?",
+        [hash, id_person],
+		function(err, result){
+            if (err){
+                console.log(err)
+                reject();
+                return;
+            }
+			if(result.changedRows == 1){
+				resolve()
+			}
+			else{
+				reject()
+			}
+        });
+    });
+}
+
 
 //getUserBalance
 function insertPerson(account_name, password_hash, email){
@@ -289,5 +309,7 @@ module.exports.transferAllPersonStackToBalance = transferAllPersonStackToBalance
 module.exports.getSumTips = getSumTips;
 module.exports.getPendingWithdrawals = getPendingWithdrawals;
 module.exports.insertTip = insertTip;
+module.exports.setPersonPassword = setPersonPassword;
+
 
 

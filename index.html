@@ -212,16 +212,40 @@
     </div>
   </div>
 
-    <!-- Modal Withdraw -->
-    <div id="modalTip" class="modal" style="display:none">
-      <div class="modal-content" id="modal-content">
-        <span class="close" id = "closeTip">&times;</span>
-        <p>Tip</p>
-        <input type="range"  id="tipRange" class="sliderBuyIn" name="raise" min="0" max="50" oninput="rangeTipChange()">
-        <input type="number" id="tipNumberField"  oninput="numberTipChange()" onkeydown="return false" ></input>
-        <button id="modalTipButton" class="Button" onclick="modalTipClicked()">Tip</button>
-      </div>
+  <!-- Modal Withdraw -->
+  <div id="modalTip" class="modal" style="display:none">
+    <div class="modal-content" id="modal-content">
+      <span class="close" id = "closeTip">&times;</span>
+      <p>Tip</p>
+      <input type="range"  id="tipRange" class="sliderBuyIn" name="raise" min="0" max="50" oninput="rangeTipChange()">
+      <input type="number" id="tipNumberField"  oninput="numberTipChange()" onkeydown="return false" ></input>
+      <button id="modalTipButton" class="Button" onclick="modalTipClicked()">Tip</button>
     </div>
+  </div>
+
+  <!-- Modal Email -->
+  <div id="modalEmail" class="modal" style="display:none">
+    <div class="modal-content" id="modal-content">
+      <span class="close" id = "closeEmail">&times;</span>
+      <p>Enter email</p>
+      <input type="email" id="emailEmailField"></input>
+      <button id="modalEmailButton" class="Button" onclick="modalEmailClicked()">Change</button>
+    </div>
+  </div>
+
+  <!-- Modal passwrod -->
+  <div id="modalPassword" class="modal" style="display:none">
+    <div class="modal-content" id="modal-content">
+      <span class="close" id = "closePassword">&times;</span>
+      <p>Enter new password</p>
+      <input type="password" id="password1"></input>
+      <input type="password" id="password2"></input>
+
+      <button id="modalPasswordButton" class="Button" onclick="modalPasswordClicked()">Change</button>
+      <br>
+      <label id="errorLabelModalPassword"></label>
+    </div>
+  </div>
 
 </body>
 
