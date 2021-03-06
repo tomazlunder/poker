@@ -127,7 +127,7 @@
           <label class="labelTitle">Account settings</label>
           <br><br>
           <button onclick="changeEmailButton()" class="navButton" id="changeEmailButton" >Change email</button>
-          <label id="emailLabel">Email not set</input> 
+          <label id="emailLabel">Email not set</label> 
           <br><br>
           <button onclick="changePasswordButton()" class="navButton" id="changePasswordButton" >Change password</button>
 
@@ -228,8 +228,10 @@
     <div class="modal-content" id="modal-content">
       <span class="close" id = "closeEmail">&times;</span>
       <p>Enter email</p>
-      <input type="email" id="emailEmailField"></input>
+      <input type="text" id="emailTextField"></input>
       <button id="modalEmailButton" class="Button" onclick="modalEmailClicked()">Change</button>
+      <br>
+      <label id="errorLabelModalEmail"></label>
     </div>
   </div>
 
@@ -245,6 +247,10 @@
       <br>
       <label id="errorLabelModalPassword"></label>
     </div>
+  </div>
+
+  <div id="success">
+   a
   </div>
 
 </body>

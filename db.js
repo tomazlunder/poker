@@ -116,6 +116,26 @@ function setPersonPassword(id_person, hash){
     });
 }
 
+function setPersonEmail(id_person, email){
+    return new Promise((resolve,reject) => {
+        var query = con.query("UPDATE person SET email = ? WHERE id_person = ?",
+        [email, id_person],
+		function(err, result){
+            if (err){
+                console.log(err)
+                reject();
+                return;
+            }
+			if(result.changedRows == 1){
+				resolve()
+			}
+			else{
+				reject()
+			}
+        });
+    });
+}
+
 
 //getUserBalance
 function insertPerson(account_name, password_hash, email){
@@ -240,7 +260,6 @@ function getSumTips(id_person){
                 console.log(query.sql)
                 console.log(result)
                 if(result.length == 1){
-                    console.log(result[0])
                     if(result[0].result_sum){
                         resolve(result[0].result_sum)
                     } else {
@@ -264,7 +283,6 @@ function getPendingWithdrawals(id_person){
                 console.log(query.sql)
                 console.log(result)
                 if(result.length == 1){
-                    console.log(result[0])
                     if(result[0].result_sum){
                         resolve(result[0].result_sum)
                     } else {
@@ -310,6 +328,8 @@ module.exports.getSumTips = getSumTips;
 module.exports.getPendingWithdrawals = getPendingWithdrawals;
 module.exports.insertTip = insertTip;
 module.exports.setPersonPassword = setPersonPassword;
+module.exports.setPersonEmail = setPersonEmail;
+
 
 
 

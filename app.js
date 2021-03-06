@@ -56,6 +56,8 @@ io.on('connection', function(socket) {
 	socket.on('reconnect', reconnect);
 	socket.on('accountStats', accountStats);
 	socket.on('changePassword', changePassword);
+	socket.on('changeEmail', changeEmail);
+
 
 	async function changePassword(newPassword){
 		var user = socketUserMap.get(socket)
@@ -73,6 +75,21 @@ io.on('connection', function(socket) {
 		} catch (err){
 			console.log("changePasswordFailed")
 			socket.emit("changePasswordFailed")
+			console.log(err)
+		}
+	}
+
+	async function changeEmail(newEmail){
+		var user = socketUserMap.get(socket);
+		try{
+			const response = await db.setPersonEmail(user.id_person, newEmail);
+
+			socket.emit("changeEmailOk");
+			accountStats();
+
+		} catch (err){
+			console.log("changeEmailFailed")
+			socket.emit("changeEmailFailed")
 			console.log(err)
 		}
 	}
@@ -204,7 +221,7 @@ io.on('connection', function(socket) {
 				console.log('Number of users: '+ users.length);
 				socket.emit("loginOk",[response.account_name, response.balance]);
 
-				socket.emit("accountStats", [response.balance, response.winnings, response2, response.roundsPlayed, response3] )
+				socket.emit("accountStats", [response.balance, response.winnings, response2, response.roundsPlayed, response3, response.email] )
 			}
 			else{
 				console.log("Incorrect login info")
@@ -226,8 +243,6 @@ io.on('connection', function(socket) {
 			const response2 = await db.getSumTips(response.id_person)
 			const response3 = await db.getPendingWithdrawals(response.id_person)
 
-			console.log(response2)
-			console.log(response3)
 			socket.emit("accountStats", [response.balance, response.winnings, response2, response.roundsPlayed, response3, response.email] )
 			
 		} catch (err) {

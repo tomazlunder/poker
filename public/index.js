@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", function(event){
     console.log("DOM LOADED")
 });
 
-
+//Modal stuff
 window.onload = function(){ 
     window.onclick = function(event) {
         if (event.target == modalBuyIn) {
@@ -101,12 +101,10 @@ window.onload = function(){
     } 
 };
 
-// When the user clicks on <span> (x), close the modal
 span1.onclick = function() {
     modalBuyIn.style.display = "none";
 }
 
-// When the user clicks on <span> (x), close the modal
 span2.onclick = function() {
     modalRebuy.style.display = "none";
 }
@@ -127,10 +125,7 @@ span6.onclick = function(){
     modalPassword.style.display = "none";
 }
 
-socket.on("changePasswordOk", (arg) => {
-    location.reload();
-});
-
+//Messages
 socket.on("dc", (arg) => {
     location.reload();
 });
@@ -170,6 +165,9 @@ socket.on('loginOk', (arg) => {
 });
 
 socket.on("accountStats", (arg) => {
+    console.log("Received: accountStats")
+    console.log(arg)
+
     document.getElementById("homeAccountName").innerHTML = myName;
     document.getElementById("homeAccountBalance").innerHTML = arg[0]
     document.getElementById("homeAccountBalance").innerHTML = arg[0]
@@ -179,9 +177,9 @@ socket.on("accountStats", (arg) => {
     document.getElementById("homeAccountWithdrawPending").innerHTML = arg[4]
 
     if(arg[5]){
-        document.getElementById("emailLabel").innerHTML = arg[4]
+        document.getElementById("emailLabel").innerHTML = arg[5]
     }
-})
+});
 
 socket.on('newBalance', (arg) => {
     console.log("Received: New balance ("+arg+")");
@@ -191,7 +189,8 @@ socket.on('newBalance', (arg) => {
 
 socket.on('withdrawOk', (arg) => {
     document.getElementById("homeWithdrawButton").disabled = false;
-    //TODO: add popup
+
+    showSuccess("Withdrawal successful!")
 });
 
 socket.on('withdrawFailed', (arg) => {
@@ -201,13 +200,37 @@ socket.on('withdrawFailed', (arg) => {
 
 socket.on('tipOk', (arg) => {
     document.getElementById("homeWithdrawButton").disabled = false;
-    //TODO: add popup
+    
+    showSuccess("Tip successful!")
 });
 
 socket.on('tipFailed', (arg) => {
     document.getElementById("homeWithdrawButton").disabled = false;
     //TODO: add popup
 });
+
+socket.on('changeEmailOk', (arg) => {
+    document.getElementById("homeWithdrawButton").disabled = false;
+    
+    showSuccess("Email changed!")
+});
+
+socket.on('changeEmailFailed', (arg) => {
+    document.getElementById("homeWithdrawButton").disabled = false;
+    //TODO: add popup
+});
+
+socket.on('changePasswordOk', (arg) => {
+    document.getElementById("homeWithdrawButton").disabled = false;
+    
+    showSuccess("Password changed!")
+});
+
+socket.on('changePasswordFailed', (arg) => {
+    document.getElementById("homeWithdrawButton").disabled = false;
+    //TODO: add popup
+});
+
 
 socket.on('roomList', (arg) =>{
     console.log("Received: RoomList");
@@ -317,36 +340,12 @@ socket.on('roomList', (arg) =>{
     }
 });
 
-function buttonJoinRoomClicked(room_id, room_min, room_max){
-    buyInRange.min = room_min
-    var actualMax = Math.min(myBalance, room_max);
-    buyInRange.max = actualMax;
-    buyInRange.value = actualMax;
-    buyInRange.step = 1;
-
-    var buyInNumberField = document.getElementById("buyInNumberField");
-    buyInNumberField.min = room_min;
-    buyInNumberField.max = actualMax;
-    buyInNumberField.step = 1;
-    buyInNumberField.value = actualMax;
-
-    var modalButton = document.getElementById("modalBuyInButton");
-    modalButton.innerHTML = "Join"
-
-    modalButton.onclick = function (){
-        modalBuyInClicked(room_id);
-    }
-
-
-    modalBuyIn.style.display = "block";
-}
-
 socket.on('listOutdated', (arg) => {
     console.log("Received: Room list outdated");
     console.log("Emitted: lookingForRooms");
 
     socket.emit("lookingForRooms")    
-})
+});
 
 socket.on('drawnCards', (arg) => {
     console.log("Received: Drawn Cards ("+arg+")")
@@ -359,7 +358,7 @@ socket.on('drawnCards', (arg) => {
     myCards.push(arg[1])
     console.log(myCards)
     message = ""
-})
+});
 
 socket.on('roomJoined', (arg) => {
     console.log("Received: Room Joined ("+arg+")")
@@ -393,10 +392,10 @@ socket.on('roomJoined', (arg) => {
     myNode.innerHTML = '';
 
     message = "";
-})
+});
 
 socket.on('reconnectOK', (arg) => {
-})
+});
 
 socket.on('waitingForPlayers', (arg) => {
     state = 0
@@ -404,7 +403,7 @@ socket.on('waitingForPlayers', (arg) => {
     message = "Waiting for players..."
 
     drawGame()
-} )
+});
 
 socket.on('namesStacks', (arg) => {
     console.log("Received: namesStacks")
@@ -418,7 +417,7 @@ socket.on('namesStacks', (arg) => {
 
     drawGame()
     
-} )
+});
 
 socket.on('roundStarted', (arg) => {
     console.log("Received: Round started")
@@ -430,7 +429,7 @@ socket.on('roundStarted', (arg) => {
     document.getElementById("homeRebuyButton").disabled = true;
 
     message = "Starting...";
-} )
+});
 
 socket.on('resetGame', (arg) => {
     myCards = []
@@ -443,7 +442,7 @@ socket.on('resetGame', (arg) => {
     this.showdown = []
 
     drawGame();
-} )
+});
 
 socket.on('showdown', (arg) => {
     console.log("Received: Showdown")
@@ -456,7 +455,7 @@ socket.on('showdown', (arg) => {
     this.showdown = showdown.slice(mySeat).concat(showdown.slice(0,mySeat))
     
     drawGame();
-} )
+});
 
 socket.on('revealedCards', (arg) => {
     console.log("Received: Revealed cards");
@@ -481,7 +480,7 @@ socket.on('gameState', (arg) => {
     playerAlive = playerAlive.slice(mySeat).concat(playerAlive.slice(0,mySeat))
 
     drawGame();
-} )
+});
 
 socket.on('winner', (arg) =>{
     console.log("Received: Winner")
@@ -528,7 +527,7 @@ socket.on('roomKick', (arg) =>{
 
     console.log("Emitted: lookingForRooms")
     socket.emit("lookingForRooms");
-} )
+});
 
 socket.on('waitingForNewGame', (arg) => {
     if(playerStacks[0] < cur_min_buy_in){
@@ -634,6 +633,32 @@ socket.on('actionRequired', (arg) => {
     drawGame();
 } );
 
+function buttonJoinRoomClicked(room_id, room_min, room_max){
+    buyInRange.min = room_min
+    var actualMax = Math.min(myBalance, room_max);
+    buyInRange.max = actualMax;
+    buyInRange.value = actualMax;
+    buyInRange.step = 1;
+
+    var buyInNumberField = document.getElementById("buyInNumberField");
+    buyInNumberField.min = room_min;
+    buyInNumberField.max = actualMax;
+    buyInNumberField.step = 1;
+    buyInNumberField.value = actualMax;
+
+    var modalButton = document.getElementById("modalBuyInButton");
+    modalButton.innerHTML = "Join"
+
+    modalButton.onclick = function (){
+        modalBuyInClicked(room_id);
+    }
+
+
+    modalBuyIn.style.display = "block";
+}
+
+//Buttons in modals
+
 function modalBuyInClicked(room_id){
     var modalButton = document.getElementById("modalBuyInButton");
     var rangeSlider = document.getElementById("buyInRange");
@@ -665,9 +690,15 @@ function modalWithdrawClicked(){
 }
 
 function modalEmailClicked(){
+    var email = document.getElementById("emailTextField").value;
+    document.getElementById("errorLabelModalEmail").innerHTML = "";
 
-    
-    //TODO: 
+    if(validateEmail(email)){
+        socket.emit("changeEmail", email)
+        modalEmail.style.display = "none";
+    } else {
+        document.getElementById("errorLabelModalEmail").innerHTML = "Email format incorrect";
+    }
 }
 
 function modalPasswordClicked(){
@@ -708,41 +739,10 @@ function modalTipClicked(){
     var withdrawButton = document.getElementById("homeTipButton");
     withdrawButton.disabled = true;
 
-    modalWithdraw.style.display = "none";
+    modalTip.style.display = "none";
 }
 
-function soundCheckboxClicked(){
-    if(mute){
-        mute = 0;
-    } else {
-        console.log("Muted")
-        mute = 1;
-    }
-}
-
-function homeRefreshButton(){
-    var myNode = document.getElementById("containerRooms");
-    myNode.innerHTML = '';
-
-    console.log("Emitted: lookingForRooms")
-    socket.emit("lookingForRooms")
-}
-
-function homePlayButton(){
-    document.getElementById("homeRooms").style.display="block"
-    document.getElementById("homeAccount").style.display="none"
-
-    document.getElementById("homePlayButton").disabled = true;
-    document.getElementById("homeAccountButton").disabled = false;
-}
-
-function homeAccountButton(){
-    document.getElementById("homeRooms").style.display="none"
-    document.getElementById("homeAccount").style.display="block"
-
-    document.getElementById("homePlayButton").disabled = false;
-    document.getElementById("homeAccountButton").disabled = true;;
-}
+//Welcome page buttons
 
 function welcomeLoginButton() {
     document.getElementById("error_label_login").style.display="none"
@@ -803,6 +803,8 @@ function welcomeRegisterButton() {
     document.getElementById("registration").style.display = "block";
 }
 
+//Register page buttons
+
 function registrationRegisterButton() {
     document.getElementById("error_label_register").style.display="none"
 
@@ -853,42 +855,30 @@ function registrationBackButton() {
     document.getElementById("registration").style.display = "none";
 }
 
-function joinRoom(id, buyin) {
-    console.log("Emitted: joinRoom ("+id+","+buyin+")")
-    socket.emit("joinRoom", [id,buyin])
+//Home buttons
+
+function homePlayButton(){
+    document.getElementById("homeRooms").style.display="block"
+    document.getElementById("homeAccount").style.display="none"
+
+    document.getElementById("homePlayButton").disabled = true;
+    document.getElementById("homeAccountButton").disabled = false;
 }
 
-function rebuyRoom(id, buyin) {
-    console.log("Emitted: rebuyRoom ("+id+","+buyin+")")
-    socket.emit("rebuyRoom", [id,buyin])
+function homeAccountButton(){
+    document.getElementById("homeRooms").style.display="none"
+    document.getElementById("homeAccount").style.display="block"
+
+    document.getElementById("homePlayButton").disabled = false;
+    document.getElementById("homeAccountButton").disabled = true;;
 }
 
-function homeLeaveRoom() {
-    console.log("Emitted: leaveRoom")
-    socket.emit("leaveRoom")
-    document.getElementById("game").style.display = "none";
-    document.getElementById("home").style.display = "block";
+function homeRefreshButton(){
+    var myNode = document.getElementById("containerRooms");
+    myNode.innerHTML = '';
 
     console.log("Emitted: lookingForRooms")
-    socket.emit("lookingForRooms");
-}
-
-function homeRebuyButton() {
-    console.log("Clicked rebuy button")
-
-    var actualMax = Math.min(myBalance, cur_max_buy_in - playerStacks[0])
-    rebuyRange.min = cur_min_buy_in - playerStacks[0]
-    rebuyRange.max = actualMax
-    rebuyRange.value = rebuyRange.max
-    rebuyRange.disabled =  false;
-
-    var rebuyNumberField = document.getElementById("rebuyNumberField");
-
-    rebuyNumberField.min = cur_min_buy_in - playerStacks[0]
-    rebuyNumberField.max = actualMax
-    rebuyNumberField.value = rebuyRange.max
-
-    modalRebuy.style.display = "block";
+    socket.emit("lookingForRooms")
 }
 
 function homeWithdrawButton() {
@@ -925,6 +915,7 @@ function homeTipButton(){
 
 function changeEmailButton(){
     console.log("Clicked email button")
+    document.getElementById("errorLabelModalEmail").innerHTML = "";
 
     modalEmail.style.display = "block";
 }
@@ -940,6 +931,26 @@ function changePasswordButton(){
 }
 
 
+//Game buttons
+
+function homeLeaveRoom() {
+    console.log("Emitted: leaveRoom")
+    socket.emit("leaveRoom")
+    document.getElementById("game").style.display = "none";
+    document.getElementById("home").style.display = "block";
+
+    console.log("Emitted: lookingForRooms")
+    socket.emit("lookingForRooms");
+}
+
+function soundCheckboxClicked(){
+    if(mute){
+        mute = 0;
+    } else {
+        console.log("Muted")
+        mute = 1;
+    }
+}
 
 function homeFoldButton() {
     console.log("Emitted: actionRequest(fold)")
@@ -973,6 +984,37 @@ function homeRaiseButton() {
     document.getElementById("homeFoldButton").disabled = true;
 }
 
+function homeRebuyButton() {
+    console.log("Clicked rebuy button")
+
+    var actualMax = Math.min(myBalance, cur_max_buy_in - playerStacks[0])
+    rebuyRange.min = cur_min_buy_in - playerStacks[0]
+    rebuyRange.max = actualMax
+    rebuyRange.value = rebuyRange.max
+    rebuyRange.disabled =  false;
+
+    var rebuyNumberField = document.getElementById("rebuyNumberField");
+
+    rebuyNumberField.min = cur_min_buy_in - playerStacks[0]
+    rebuyNumberField.max = actualMax
+    rebuyNumberField.value = rebuyRange.max
+
+    modalRebuy.style.display = "block";
+}
+
+//Dynamic
+function joinRoom(id, buyin) {
+    console.log("Emitted: joinRoom ("+id+","+buyin+")")
+    socket.emit("joinRoom", [id,buyin])
+}
+
+function rebuyRoom(id, buyin) {
+    console.log("Emitted: rebuyRoom ("+id+","+buyin+")")
+    socket.emit("rebuyRoom", [id,buyin])
+}
+
+
+//Range on change
 function rangeChange() {
     var val = document.getElementById("raiseRange").value;
     if((parseInt(val) + Math.max(...playerBets)-playerBets[0])==playerStacks[0]){
@@ -1003,6 +1045,7 @@ function rangeTipChange() {
     document.getElementById("tipNumberField").value = val;
 }
 
+//Number input on change
 function numberBuyinChange(){
     var val = document.getElementById("buyInNumberField").value;
     document.getElementById("buyInRange").value = val;
@@ -1023,6 +1066,27 @@ function numberTipChange(){
     document.getElementById("tipRange").value = val;
 }
 
+//NOTIFICATIONS
+showSuccess = function(message){
+    var success = document.getElementById("success");
+    success.style.display = "block";
+    success.innerHTML = message
+
+    success.style.opacity = "1"; 
+
+    setTimeout(function(){ 
+        success.style.opacity = "0"; 
+    }, 1500);
+
+    setTimeout(function(){ 
+        success.style.display = "none"; 
+    }, 3000);
+}
+
+/*
+* DRAWING FUNCTIONS
+* 
+*/
 function drawGame(){
     drawTable();
     drawMyCards();
@@ -1327,4 +1391,13 @@ function drawNumbers(){
         var textWidth = ctx.measureText(message).width;
         ctx.fillText(message, width*0.5 - textWidth/2, height * 0.32);
     }
+}
+
+/*
+* Helper
+* 
+*/
+function validateEmail(email) {
+    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
 }
