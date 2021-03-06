@@ -494,10 +494,10 @@ async function runServer(){
 		rooms.push(new Room.Room(io,1, 1, 40,100,6, "Braham's Lodge", pidRoomMap));
 		rooms.push(new Room.Room(io,2, 1, 80,200,6, "Rytlock's Tent" , pidRoomMap));
 		rooms.push(new Room.Room(io,3, 2, 80,200,6, "Zojja's Lab" , pidRoomMap));
-		rooms.push(new Room.Room(io,4, 2, 160,400,6, "Lord Fahren's Quarters", pidRoomMap));
+		rooms.push(new Room.Room(io,4, 2, 160,400,6, "Lord Fahren's Chamber", pidRoomMap));
 
-		//rooms.push(new Room.Room(io,5, 2, 100, 500,6, "Bla", pidRoomMap));
-		//rooms.push(new Room.Room(io,6, 2, 100, 500,6, "Bla", pidRoomMap));
+		rooms.push(new Room.Room(io,5, 2, 100, 500,6, "Bla", pidRoomMap));
+		rooms.push(new Room.Room(io,6, 2, 100, 500,6, "Bla", pidRoomMap));
 
 
 		setInterval(function(){

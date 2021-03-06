@@ -183,7 +183,7 @@ socket.on("accountStats", (arg) => {
     document.getElementById("homeAccountWithdrawPending").innerHTML = arg[4]
 
     if(arg[5]){
-        document.getElementById("emailLabel").innerHTML = ": " + arg[5]
+        document.getElementById("emailLabel").innerHTML = "Email: " + arg[5]
     }
 });
 
@@ -340,9 +340,9 @@ socket.on('roomList', (arg) =>{
 
         label_room_1.innerHTML = roomName;
 
-        label_stakes = "Stakes: "+sb+"/"+2*sb
-        label_buyin = "Buy-in: "+minBuyIn+"-"+maxBuyIn
-        label_players = "Players: "+numplayers+"/"+numseats
+        label_stakes.innerHTML = "Stakes: "+sb+"/"+2*sb
+        label_buyin.innerHTML = "Buy-in: "+minBuyIn+"/"+maxBuyIn
+        label_players.innerHTML = "Players: "+numplayers+"/"+numseats
 
         tableTd1.append(label_stakes)
         tableTd2.append(label_buyin)

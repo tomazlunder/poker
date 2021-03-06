@@ -35,6 +35,9 @@ html, body{
     display: none;
 }
 
+#homeAccount{
+}
+
 .containerTitle{
     /* background: green; */ 
     width: 100%;
@@ -188,7 +191,6 @@ button {
 }
 
 #buttonTip {
-  min-width: 12vw;
   float: right;
 
   background-color:#32d589;
@@ -471,9 +473,15 @@ input:checked + .slider2:before {
 
   overflow-y:auto;
   overflow-x:none;
-  width: 100%;
+  width: 66%;
   max-height: 63vh;
   float: left;
+}
+
+.containerDiscordWidget{
+  width: 33%;
+  height: 63vh;
+  float: right;
 }
 
 .room{
@@ -653,7 +661,7 @@ input:checked + .slider2:before {
 
 }
 
-@media (max-width: 700px) {
+@media (max-width: 900px) {
   .containerTitle{
     height: 7.5%;
   }
@@ -704,5 +712,17 @@ input:checked + .slider2:before {
 
   .containerRooms{
     width: 99%;
+  }
+  
+  .containerDiscordWidget{
+    display: none;
+  }
+
+  label{
+    font-size: 14px;
+  }
+
+  .accountButton{
+    width: 50%;
   }
 }
