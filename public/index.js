@@ -237,6 +237,51 @@ socket.on('changePasswordFailed', (arg) => {
     //TODO: add popup
 });
 
+socket.on('leaderboard', (arg)=>{
+    console.log("Received: leaderboard")
+    console.log(arg)
+    var table = document.getElementById("tableLeaderboard");
+
+    table.innerHTML =  "<tr> <th></th>   <th>Name</th> <th>Winnings</th><th>Rounds played</th></tr>"
+
+
+    for(var i in arg){
+        var row = document.createElement("tr")
+        var td0 = document.createElement("td")
+        var td1 = document.createElement("td")
+        var td2 = document.createElement("td")
+        var td3 = document.createElement("td")
+
+        row.classList.add("tableLeaderboardRow");
+
+        td0.classList.add("tdLeaderboardRank")
+        td1.classList.add("tdLeaderboard")
+        td2.classList.add("tdLeaderboard")
+        td3.classList.add("tdLeaderboard")
+
+        var label_rank = document.createElement("label")
+        var label_name = document.createElement("label")
+        var label_winnings = document.createElement("label")
+        var label_roundsPlayed = document.createElement("label")
+
+        label_rank.innerHTML = (parseInt(i)+1);
+        label_name.innerHTML = arg[i].account_name;
+        label_winnings.innerHTML = arg[i].winnings;
+        label_roundsPlayed.innerHTML = arg[i].roundsPlayed;
+
+        td0.append(label_rank)
+        td1.append(label_name)
+        td2.append(label_winnings)
+        td3.append(label_roundsPlayed)
+
+        row.append(td0)
+        row.append(td1)
+        row.append(td2)
+        row.append(td3)
+
+        table.append(row)
+    }
+});
 
 socket.on('roomList', (arg) =>{
     console.log("Received: RoomList");
@@ -866,17 +911,34 @@ function registrationBackButton() {
 function homePlayButton(){
     document.getElementById("homeRooms").style.display="block"
     document.getElementById("homeAccount").style.display="none"
+    document.getElementById("homeLeaderboard").style.display="none"
 
     document.getElementById("homePlayButton").disabled = true;
     document.getElementById("homeAccountButton").disabled = false;
+    document.getElementById("homeLeaderboardButton").disabled = false;;
 }
 
 function homeAccountButton(){
     document.getElementById("homeRooms").style.display="none"
     document.getElementById("homeAccount").style.display="block"
+    document.getElementById("homeLeaderboard").style.display="none"
+
 
     document.getElementById("homePlayButton").disabled = false;
     document.getElementById("homeAccountButton").disabled = true;;
+    document.getElementById("homeLeaderboardButton").disabled = false;;
+}
+
+function homeLeaderboardButton(){
+    socket.emit("getLeaderboard");
+
+    document.getElementById("homeRooms").style.display="none"
+    document.getElementById("homeAccount").style.display="none"
+    document.getElementById("homeLeaderboard").style.display="block"
+
+    document.getElementById("homePlayButton").disabled = false;
+    document.getElementById("homeAccountButton").disabled = false;;
+    document.getElementById("homeLeaderboardButton").disabled = true;;
 }
 
 function homeRefreshButton(){

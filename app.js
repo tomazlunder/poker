@@ -57,6 +57,18 @@ io.on('connection', function(socket) {
 	socket.on('accountStats', accountStats);
 	socket.on('changePassword', changePassword);
 	socket.on('changeEmail', changeEmail);
+	socket.on('getLeaderboard', getLeaderboard);
+
+	async function getLeaderboard(){
+		try{
+			const result = await db.topTenWinnings();
+			
+			socket.emit('leaderboard', result)
+
+		} catch(err) {
+
+		}
+	}
 
 
 	async function changePassword(newPassword){

@@ -315,6 +315,23 @@ function insertTip(id_person, amount){
     });
 }
 
+function topTenWinnings(){
+    return new Promise((resolve,reject) => {    
+        var query = con.query("SELECT account_name, winnings, roundsPlayed FROM person ORDER BY winnings DESC LIMIT 10;",
+            null,
+            function(err, result){
+                if (err) {
+                    console.log(err)
+                    reject()
+                }
+                console.log(query.sql); 
+                console.log(result);
+                resolve(result)
+            }
+        );
+    });
+}
+
 module.exports = connectDatabase();
 module.exports.getPerson = getPerson;
 module.exports.tryDecreaseBalance = tryDecreaseBalance;
@@ -329,6 +346,7 @@ module.exports.getPendingWithdrawals = getPendingWithdrawals;
 module.exports.insertTip = insertTip;
 module.exports.setPersonPassword = setPersonPassword;
 module.exports.setPersonEmail = setPersonEmail;
+module.exports.topTenWinnings = topTenWinnings;
 
 
 

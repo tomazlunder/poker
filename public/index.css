@@ -283,8 +283,36 @@ button:hover:disabled {
   width: 100%;
 }
 
+#tableLeaderboard{
+  background: #cccccc;
+  border-radius: 0.5vw;
+  width: 100%
+}
+
 .tdRoom {
   width: 33% ;
+}
+
+.tableLeaderboard{
+  width: 100%
+}
+
+.tdLeaderboardRank {
+  width: 10% ;
+  text-align: center;
+}
+
+.tdLeaderboard {
+  width: 30% ;
+}
+
+.tableLeaderboardRow{
+  height: 6vh;
+}
+
+th{
+  font-size: 1.5vmax;
+  text-align: left;
 }
 
 #roomButtons{
