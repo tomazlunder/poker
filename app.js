@@ -149,8 +149,8 @@ io.on('connection', function(socket) {
 					socketUserMap.set(socket, user)
 				}
 
-				const response2 = await db.getSumTips()
-				const response3 = await db.getPendingWithdrawals()
+				const response2 = await db.getSumTips(response.id_person)
+				const response3 = await db.getPendingWithdrawals(response.id_person)
 
 				console.log(response2)
 				console.log(response3)

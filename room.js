@@ -376,15 +376,6 @@ class Room{
 
 	//Result calculation
 	calculateResults(){
-		if(this.fold_win){
-			this.winner[0].stack+=this.roundState.pot
-			this.state++;
-			console.log(this.winner[0].name + " wins " + this.roundState.pot + " by folds")
-			this.io.to(this.room_id).emit('winner', [this.winner[0].name, this.roundState.pot, "folds"]);
-
-			return
-		}
-
 		var handUserMap = new Map()
 		var userHandMap = new Map()
 		var hands = []
