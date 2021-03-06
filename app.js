@@ -50,6 +50,7 @@ io.on('connection', function(socket) {
 	socket.on('actionRequest', actionRequest);
 	socket.on('withdraw',withdraw);
 	socket.on('reconnect', reconnect);
+	socket.on('accountStats', accountStats)
 
 	async function withdraw(amount){
 		try{
@@ -60,6 +61,7 @@ io.on('connection', function(socket) {
 			user.balance -= amount
 			socket.emit("withdrawOk")
 			user.socket.emit("newBalance", user.balance)
+			accountStats();
 
 		} catch (err){
 			console.log("withdrawFailed")
@@ -159,6 +161,7 @@ io.on('connection', function(socket) {
 				console.log(response.account_name + " logged in")
 				console.log('Number of users: '+ users.length);
 				socket.emit("loginOk",[response.account_name, response.balance]);
+
 				socket.emit("accountStats", [response.balance, response.winnings, response2, response.roundsPlayed, response3] )
 			}
 			else{
@@ -170,6 +173,23 @@ io.on('connection', function(socket) {
 			console.log("Account not registered")
 			socket.emit("loginFailed", "Account not registered");
 
+		}
+	}
+
+	async function accountStats(){
+		try{
+			var user = socketUserMap.get(socket)
+
+			const response = await db.getPerson(user.name)
+			const response2 = await db.getSumTips(response.id_person)
+			const response3 = await db.getPendingWithdrawals(response.id_person)
+
+			console.log(response2)
+			console.log(response3)
+			socket.emit("accountStats", [response.balance, response.winnings, response2, response.roundsPlayed, response3] )
+			
+		} catch (err) {
+			console.log("[ERROR] accountStats")
 		}
 	}
 
@@ -402,18 +422,14 @@ async function runServer(){
 	try{
 		const p = await db.transferAllPersonStackToBalance();
 
-		rooms.push(new Room.Room(io,1, 1, 40,100,6, "Lord Fahren's Quarters", pidRoomMap));
-		rooms.push(new Room.Room(io,2, 1, 40,100,6, "Zojja's Lab", pidRoomMap));
-		rooms.push(new Room.Room(io,3, 2, 80, 200,6, "Braham's Lodge", pidRoomMap));
-		rooms.push(new Room.Room(io,4, 2, 80, 200,6, "Rytlock's Tent", pidRoomMap));
+		rooms.push(new Room.Room(io,1, 1, 40,100,6, "Braham's Lodge", pidRoomMap));
+		rooms.push(new Room.Room(io,2, 1, 80,200,6, "Rytlock's Tent" , pidRoomMap));
+		rooms.push(new Room.Room(io,3, 2, 80,200,6, "Zojja's Lab" , pidRoomMap));
+		rooms.push(new Room.Room(io,4, 2, 160,400,6, "Lord Fahren's Quarters", pidRoomMap));
 
-		rooms.push(new Room.Room(io,5, 2, 100, 500,6, "Bla", pidRoomMap));
-		rooms.push(new Room.Room(io,6, 2, 100, 500,6, "Bla, pidRoomMap"));
-		rooms.push(new Room.Room(io,7, 2, 100, 500,6, "Bla", pidRoomMap));
-		rooms.push(new Room.Room(io,8, 2, 100, 500,6, "Bla", pidRoomMap));
-		rooms.push(new Room.Room(io,9, 2, 100, 500,6, "Bla", pidRoomMap));
-		rooms.push(new Room.Room(io,10, 2, 100, 500,6, "Bla", pidRoomMap));
-		rooms.push(new Room.Room(io,11, 2, 100, 500,6, "Bla", pidRoomMap));
+		//rooms.push(new Room.Room(io,5, 2, 100, 500,6, "Bla", pidRoomMap));
+		//rooms.push(new Room.Room(io,6, 2, 100, 500,6, "Bla", pidRoomMap));
+
 
 		setInterval(function(){
 			for(var i in rooms){

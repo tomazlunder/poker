@@ -211,13 +211,11 @@ socket.on('roomList', (arg) =>{
         div_col80.classList.add("col80")
         div_row50_1.classList.add("row50")
         div_row50_2.classList.add("row50")
-        //label_room_1.classList.add("labelRoom")
-        //label_room_2.classList.add("labelRoom")
         div_col20.classList.add("col20")
         button_join.classList.add("buttonJoin")
 
         label_room_1.innerHTML = roomName;
-        label_room_2.innerHTML = "Stakes: "+sb+"/"+2*sb+"&#160&#160&#160&#160&#160Buy-in: "+20*sb*2+"-"+50*sb*2+ "&#160&#160&#160&#160&#160Players: "+numplayers+"/"+numseats
+        label_room_2.innerHTML = "Stakes: "+sb+"/"+2*sb+"&#160&#160&#160&#160&#160Buy-in: "+minBuyIn+"-"+maxBuyIn+ "&#160&#160&#160&#160&#160Players: "+numplayers+"/"+numseats
         div_row50_1.append(label_room_1)
         div_row50_2.append(label_room_2)
 
