@@ -60,6 +60,13 @@ io.on('connection', function(socket) {
 	socket.on('getLeaderboard', getLeaderboard);
 
 	async function getLeaderboard(){
+		if(!socketUserMap.has(socket)){
+			console.log("Tried something but is not logged in")
+			socket.emit('dc')
+			socket.disconnect;
+			return;
+		}
+
 		try{
 			const result = await db.topTenWinnings();
 			
@@ -70,14 +77,17 @@ io.on('connection', function(socket) {
 		}
 	}
 
-
 	async function changePassword(newPassword){
+		if(!socketUserMap.has(socket)){
+			console.log("Tried something but is not logged in")
+			socket.emit('dc')
+			socket.disconnect;
+			return;
+		}
+
 		var user = socketUserMap.get(socket)
 
-		//console.log(newPassword)
-		//console.log(user.name)
 		var hash = crypto.createHash('sha256').update(newPassword + user.name).digest('base64');
-		//console.log(hash)
 
 		try{
 			const response = await db.setPersonPassword(user.id_person, hash);
@@ -92,7 +102,15 @@ io.on('connection', function(socket) {
 	}
 
 	async function changeEmail(newEmail){
+		if(!socketUserMap.has(socket)){
+			console.log("Tried something but is not logged in")
+			socket.emit('dc')
+			socket.disconnect;
+			return;
+		}
+
 		var user = socketUserMap.get(socket);
+
 		try{
 			const response = await db.setPersonEmail(user.id_person, newEmail);
 
@@ -107,6 +125,13 @@ io.on('connection', function(socket) {
 	}
 
 	async function withdraw(amount){
+		if(!socketUserMap.has(socket)){
+			console.log("Tried something but is not logged in")
+			socket.emit('dc')
+			socket.disconnect;
+			return;
+		}
+
 		try{
 			var user = socketUserMap.get(socket)
 			const a = await db.tryDecreaseBalance(user.id_person, amount)
@@ -125,6 +150,13 @@ io.on('connection', function(socket) {
 	}
 
 	async function tip(amount){
+		if(!socketUserMap.has(socket)){
+			console.log("Tried something but is not logged in")
+			socket.emit('dc')
+			socket.disconnect;
+			return;
+		}
+
 		try{
 			var user = socketUserMap.get(socket)
 			const a = await db.tryDecreaseBalance(user.id_person, amount)
@@ -143,6 +175,13 @@ io.on('connection', function(socket) {
 	}
 
 	function lookingForRooms(){
+		if(!socketUserMap.has(socket)){
+			console.log("Tried something but is not logged in")
+			socket.emit('dc')
+			socket.disconnect;
+			return;
+		}
+
 		var alreadyInRoom
 		var user = socketUserMap.get(socket)
 
@@ -167,6 +206,13 @@ io.on('connection', function(socket) {
 	}
 
 	function actionRequest(data){
+		if(!socketUserMap.has(socket)){
+			console.log("Tried something but is not logged in")
+			socket.emit('dc')
+			socket.disconnect;
+			return;
+		}
+
 		//console.log("AR :" + data)
 	    var room_id = data[0]
 	    var action = data[1];
@@ -248,6 +294,13 @@ io.on('connection', function(socket) {
 	}
 
 	async function accountStats(){
+		if(!socketUserMap.has(socket)){
+			console.log("Tried something but is not logged in")
+			socket.emit('dc')
+			socket.disconnect;
+			return;
+		}
+
 		try{
 			var user = socketUserMap.get(socket)
 
@@ -321,6 +374,13 @@ io.on('connection', function(socket) {
     }
 
 	async function joinRoom(arg){
+		if(!socketUserMap.has(socket)){
+			console.log("Tried something but is not logged in")
+			socket.emit('dc')
+			socket.disconnect;
+			return;
+		}
+
 		var room_id = arg[0]
 		var buy_in = arg[1]
 
@@ -417,6 +477,13 @@ io.on('connection', function(socket) {
 	}
 	
 	async function rebuyRoom(arg){
+		if(!socketUserMap.has(socket)){
+			console.log("Tried something but is not logged in")
+			socket.emit('dc')
+			socket.disconnect;
+			return;
+		}
+
 		var buy_in = parseInt(arg[0])
 		var user = socketUserMap.get(socket)
 
@@ -496,8 +563,8 @@ async function runServer(){
 		rooms.push(new Room.Room(io,3, 2, 80,200,6, "Zojja's Lab" , pidRoomMap));
 		rooms.push(new Room.Room(io,4, 2, 160,400,6, "Lord Fahren's Chamber", pidRoomMap));
 
-		rooms.push(new Room.Room(io,5, 2, 100, 500,6, "Bla", pidRoomMap));
-		rooms.push(new Room.Room(io,6, 2, 100, 500,6, "Bla", pidRoomMap));
+		//rooms.push(new Room.Room(io,5, 2, 100, 500,6, "Bla", pidRoomMap));
+		//rooms.push(new Room.Room(io,6, 2, 100, 500,6, "Bla", pidRoomMap));
 
 
 		setInterval(function(){
