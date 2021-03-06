@@ -163,7 +163,7 @@ button {
   font-family: "Tahoma", Times, serif;
 }
 
-#modalBuyInButton,#modalRebuyButton,#modalWithdrawButton {
+#modalBuyInButton,#modalRebuyButton,#modalWithdrawButton, #modalTipButton {
   position: absolute;
   right: 2vh;
   bottom: 2vh;
@@ -176,7 +176,6 @@ button {
 
   background-color:#32d589;
   color: #ffffff;
-
 }
 
 #buttonDiscord {
@@ -214,7 +213,6 @@ button {
   padding: 0 0.5vw;
 }
 
-
 button:disabled {
   background: #6d6d6d;
 }
@@ -228,6 +226,12 @@ button:hover:disabled {
   background-color: #444444;
   color:rgb(255, 255, 255);
 }
+
+#buttonTip:hover{
+  background-color: #fdea5a;
+  color:black;
+}
+
 
 .row {
     width: 100%;

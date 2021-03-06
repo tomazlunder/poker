@@ -18,7 +18,7 @@
 
 <body>
 
-
+  <!-- User -->
   <div class="userWrapper" id="userWrapper">
     <div class="userContainer">
       <table id="tableUser">
@@ -32,40 +32,7 @@
     </div>
   </div>
 
-<!-- The Modal -->
-  <div id="modalBuyIn" class="modal" style="display:none">
-    <!-- Modal content -->
-    <div class="modal-content" id="modal-content">
-      <span class="close" id = "closeBuyIn">&times;</span>
-      <p>Buy-in size</p>
-      <input type="range"  id="buyInRange" class="sliderBuyIn" name="raise" min="0" max="50" oninput="rangeBuyinChange()">
-      <input type="number" id="buyInNumberField"  oninput="numberBuyinChange()" onkeydown="return false"></input>
-      <button id="modalBuyInButton" class="Button">BUY IN</button>
-    </div>
-  </div>
-
-  <div id="modalRebuy" class="modal" style="display:none">
-    <!-- Modal content -->
-    <div class="modal-content" id="modal-content">
-      <span class="close" id = "closeRebuy">&times;</span>
-      <p>Rebuy size</p>
-      <input type="range"  id="rebuyRange" class="sliderBuyIn" name="raise" min="0" max="50" oninput="rangeRebuyChange()">
-      <input type="number" id="rebuyNumberField"  oninput="numberRebuyChange()" onkeydown="return false" ></input>
-      <button id="modalRebuyButton" class="Button" onclick="modalRebuyClicked()">Rebuy</button>
-    </div>
-  </div>
-
-  <div id="modalWithdraw" class="modal" style="display:none">
-    <!-- Modal content -->
-    <div class="modal-content" id="modal-content">
-      <span class="close" id = "closeWithdraw">&times;</span>
-      <p>Withdraw</p>
-      <input type="range"  id="withdrawRange" class="sliderBuyIn" name="raise" min="0" max="50" oninput="rangeWithdrawChange()">
-      <input type="number" id="withdrawNumberField"  oninput="numberWithdrawChange()" onkeydown="return false" ></input>
-      <button id="modalWithdrawButton" class="Button" onclick="modalWithdrawClicked()">Withdraw</button>
-    </div>
-  </div>
-
+  <!-- Main content -->
   <div class="wrapper1" id="mainWrapper">
     <div class="containerTitle">
       <div class="containerTitleImage">
@@ -122,7 +89,7 @@
 
       <!-- account-->
       <div class="containerMain" id="homeAccount" style="display:none;">
-        <label class="labelTitle">Name.1234</label><br><br>
+        <label class="labelTitle" id="homeAccountName">Name.1234</label><br><br>
           <table >
             <tr>
               <td class="tdAccount1"><label> Balance</label></td>
@@ -157,21 +124,19 @@
           <button onclick="homeWithdrawButton()" class="navButton" id="homeWithdrawButton" >Withdraw</button>
           <br><br>
 
-          <label class="labelTitle">Settings</label>
+          <label class="labelTitle">Account settings</label>
           <br><br>
           <button onclick="changeEmailButton()" class="navButton" id="changeEmailButton" >Change email</button>
+          <label id="emailLabel">Email not set</input> 
+          <br><br>
           <button onclick="changePasswordButton()" class="navButton" id="changePasswordButton" >Change password</button>
 
-
-
-          
       </div>
 
       <div class="containerFoot">
 
         <button onclick="discordButton()" id="buttonDiscord" >Discord</button>
-        <button onclick="tipButton()" id="buttonTip" >Tip the house</button>
-
+        <button onclick="homeTipButton()" id="buttonTip" >Tip the house</button>
 
       </div>  
     </div>
@@ -212,7 +177,51 @@
       </div>
 
     </div> 
-  <div>
+  </div>
+
+  <!-- Modal BuyIn -->
+  <div id="modalBuyIn" class="modal" style="display:none">
+    <div class="modal-content" id="modal-content">
+      <span class="close" id = "closeBuyIn">&times;</span>
+      <p>Buy-in size</p>
+      <input type="range"  id="buyInRange" class="sliderBuyIn" name="raise" min="0" max="50" oninput="rangeBuyinChange()">
+      <input type="number" id="buyInNumberField"  oninput="numberBuyinChange()" onkeydown="return false"></input>
+      <button id="modalBuyInButton" class="Button">BUY IN</button>
+    </div>
+  </div>
+
+  <!-- Modal Rebuy -->
+  <div id="modalRebuy" class="modal" style="display:none">
+    <div class="modal-content" id="modal-content">
+      <span class="close" id = "closeRebuy">&times;</span>
+      <p>Rebuy size</p>
+      <input type="range"  id="rebuyRange" class="sliderBuyIn" name="raise" min="0" max="50" oninput="rangeRebuyChange()">
+      <input type="number" id="rebuyNumberField"  oninput="numberRebuyChange()" onkeydown="return false" ></input>
+      <button id="modalRebuyButton" class="Button" onclick="modalRebuyClicked()">Rebuy</button>
+    </div>
+  </div>
+
+  <!-- Modal Withdraw -->
+  <div id="modalWithdraw" class="modal" style="display:none">
+    <div class="modal-content" id="modal-content">
+      <span class="close" id = "closeWithdraw">&times;</span>
+      <p>Withdraw</p>
+      <input type="range"  id="withdrawRange" class="sliderBuyIn" name="raise" min="0" max="50" oninput="rangeWithdrawChange()">
+      <input type="number" id="withdrawNumberField"  oninput="numberWithdrawChange()" onkeydown="return false" ></input>
+      <button id="modalWithdrawButton" class="Button" onclick="modalWithdrawClicked()">Withdraw</button>
+    </div>
+  </div>
+
+    <!-- Modal Withdraw -->
+    <div id="modalTip" class="modal" style="display:none">
+      <div class="modal-content" id="modal-content">
+        <span class="close" id = "closeTip">&times;</span>
+        <p>Tip</p>
+        <input type="range"  id="tipRange" class="sliderBuyIn" name="raise" min="0" max="50" oninput="rangeTipChange()">
+        <input type="number" id="tipNumberField"  oninput="numberTipChange()" onkeydown="return false" ></input>
+        <button id="modalTipButton" class="Button" onclick="modalTipClicked()">Tip</button>
+      </div>
+    </div>
 
 </body>
 

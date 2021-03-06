@@ -38,9 +38,9 @@ var timeToAct;
 var startTime;
 var intervalId;
 
-var modalBuyIn, modalRebuy, modalWithdraw;
-var span1, span2, span3;
-var buyInRange, rebuyRange, withdrawRange;
+var modalBuyIn, modalRebuy, modalWithdraw, modalTip;
+var span1, span2, span3, span4;
+var buyInRange, rebuyRange, withdrawRange, tipRange;
 
 var myBalance;
 
@@ -53,15 +53,17 @@ var cur_max_buy_in;
 modalBuyIn = document.getElementById("modalBuyIn");
 modalRebuy = document.getElementById("modalRebuy");
 modalWithdraw = document.getElementById("modalWithdraw")
+modalTip = document.getElementById("modalTip")
 
 span1 = document.getElementById("closeBuyIn");
 span2 = document.getElementById("closeRebuy");
 span3 = document.getElementById("closeWithdraw");
-
+span4 = document.getElementById("closeTip")
 
 buyInRange = document.getElementById("buyInRange");
 rebuyRange = document.getElementById("rebuyRange");
 withdrawRange = document.getElementById("withdrawRange");
+tipRange =  document.getElementById("tipRange")
 
 
 
@@ -81,6 +83,9 @@ window.onload = function(){
         else if (event.target == modalWithdraw) {
             modalWithdraw.style.display = "none";
         }
+        else if (event.target == modalTip) {
+            modalTip.style.display = "none";
+        }
     } 
 };
 
@@ -98,6 +103,10 @@ span3.onclick = function() {
     modalWithdraw.style.display = "none";
 }
   
+span4.onclick = function() {
+    modalTip.style.display = "none";
+}
+
 socket.on("dc", (arg) => {
     location.reload();
 });
@@ -137,11 +146,17 @@ socket.on('loginOk', (arg) => {
 });
 
 socket.on("accountStats", (arg) => {
+    document.getElementById("homeAccountName").innerHTML = myName;
+    document.getElementById("homeAccountBalance").innerHTML = arg[0]
     document.getElementById("homeAccountBalance").innerHTML = arg[0]
     document.getElementById("homeAccountWinnings").innerHTML = arg[1]
     document.getElementById("homeAccountTipped").innerHTML = arg[2]
     document.getElementById("homeAccountRoundsplayed").innerHTML = arg[3]
     document.getElementById("homeAccountWithdrawPending").innerHTML = arg[4]
+
+    if(arg[5]){
+        document.getElementById("emailLabel").innerHTML = arg[4]
+    }
 })
 
 socket.on('newBalance', (arg) => {
@@ -160,18 +175,16 @@ socket.on('withdrawFailed', (arg) => {
     //TODO: add popup
 });
 
+socket.on('tipOk', (arg) => {
+    document.getElementById("homeWithdrawButton").disabled = false;
+    //TODO: add popup
+});
 
-/*
-    <div class="room">
-    <div class="col80">
-        <div class="row50"><label>a</label></div>
-        <div class="row50"><label>b</label></div>
-    </div>
-    <div class="col20">
-        <button class="buttonJoin"> TEST </button>
-    </div>
-    </div>
-*/
+socket.on('tipFailed', (arg) => {
+    document.getElementById("homeWithdrawButton").disabled = false;
+    //TODO: add popup
+});
+
 socket.on('roomList', (arg) =>{
     console.log("Received: RoomList");
     console.log(arg)
@@ -203,7 +216,6 @@ socket.on('roomList', (arg) =>{
         var div_row50_1 = document.createElement("div");
         var div_row50_2 = document.createElement("div");
         var label_room_1 = document.createElement("label");
-        //var label_room_2 = document.createElement("label");
         var div_col20 = document.createElement("div");
         var button_join = document.createElement("button");
 
@@ -217,9 +229,6 @@ socket.on('roomList', (arg) =>{
         var label_buyin = document.createElement("label");
         var label_players = document.createElement("label");
 
-        label_stakes = 
-
-
         div_room.classList.add("room")
         div_col80.classList.add("col80")
         div_row50_1.classList.add("row50")
@@ -230,7 +239,6 @@ socket.on('roomList', (arg) =>{
         tableTd1.classList.add("tdRoom")
         tableTd2.classList.add("tdRoom")
         tableTd3.classList.add("tdRoom")
-
 
         label_room_1.innerHTML = roomName;
 
@@ -248,12 +256,8 @@ socket.on('roomList', (arg) =>{
 
         table.append(tableTr)
 
-
-        //label_room_2.innerHTML = "Stakes: "+sb+"/"+2*sb+"&#160&#160&#160&#160&#160Buy-in: "+minBuyIn+"-"+maxBuyIn+ "&#160&#160&#160&#160&#160Players: "+numplayers+"/"+numseats
         div_row50_1.append(label_room_1)
         div_row50_2.append(table)
-
-        //div_row50_2.append(label_room_2)
 
         div_col80.append(div_row50_1)
         div_col80.append(div_row50_2)
@@ -636,6 +640,17 @@ function modalWithdrawClicked(){
     modalWithdraw.style.display = "none";
 }
 
+function modalTipClicked(){
+    var rangeSlider = document.getElementById("tipRange");
+
+    socket.emit("tip", rangeSlider.value)
+
+    var withdrawButton = document.getElementById("homeTipButton");
+    withdrawButton.disabled = true;
+
+    modalWithdraw.style.display = "none";
+}
+
 function soundCheckboxClicked(){
     if(mute){
         mute = 0;
@@ -832,6 +847,22 @@ function homeWithdrawButton() {
     modalWithdraw.style.display = "block";
 }
 
+function homeTipButton(){
+    console.log("Clicked withdraw button")
+
+    tipRange.min = 0
+    tipRange.max = myBalance
+    tipRange.value = tipRange.min
+    tipRange.disabled =  false
+
+    var tipNumberField = document.getElementById("tipNumberField")
+    tipNumberField.min = 0;
+    tipNumberField. max = myBalance
+    tipNumberField.value = tipNumberField.min
+
+    modalTip.style.display = "block";
+}
+
 
 function homeFoldButton() {
     console.log("Emitted: actionRequest(fold)")
@@ -890,6 +921,11 @@ function rangeWithdrawChange() {
     document.getElementById("withdrawNumberField").value = val;
 }
 
+function rangeTipChange() {
+    var val = document.getElementById("tipRange").value;
+    document.getElementById("tipNumberField").value = val;
+}
+
 function numberBuyinChange(){
     var val = document.getElementById("buyInNumberField").value;
     document.getElementById("buyInRange").value = val;
@@ -903,6 +939,11 @@ function numberRebuyChange(){
 function numberWithdrawChange(){
     var val = document.getElementById("withdrawNumberField").value;
     document.getElementById("withdrawRange").value = val;
+}
+
+function numberTipChange(){
+    var val = document.getElementById("tipNumberField").value;
+    document.getElementById("tipRange").value = val;
 }
 
 function drawGame(){

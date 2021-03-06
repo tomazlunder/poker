@@ -49,6 +49,7 @@ io.on('connection', function(socket) {
 	socket.on('lookingForRooms',lookingForRooms)
 	socket.on('actionRequest', actionRequest);
 	socket.on('withdraw',withdraw);
+	socket.on('tip', tip);
 	socket.on('reconnect', reconnect);
 	socket.on('accountStats', accountStats)
 
@@ -68,7 +69,24 @@ io.on('connection', function(socket) {
 			socket.emit("withdrawFailed")
 			console.log(err)
 		}
+	}
 
+	async function tip(amount){
+		try{
+			var user = socketUserMap.get(socket)
+			const a = await db.tryDecreaseBalance(user.id_person, amount)
+			const b = await db.insertTip(user.id_person, amount)
+			
+			user.balance -= amount
+			socket.emit("tipOk")
+			user.socket.emit("newBalance", user.balance)
+			accountStats();
+
+		} catch (err){
+			console.log("tipFailed")
+			socket.emit("tipFailed")
+			console.log(err)
+		}
 	}
 
 	function lookingForRooms(){
@@ -186,7 +204,7 @@ io.on('connection', function(socket) {
 
 			console.log(response2)
 			console.log(response3)
-			socket.emit("accountStats", [response.balance, response.winnings, response2, response.roundsPlayed, response3] )
+			socket.emit("accountStats", [response.balance, response.winnings, response2, response.roundsPlayed, response3, response.email] )
 			
 		} catch (err) {
 			console.log("[ERROR] accountStats")
