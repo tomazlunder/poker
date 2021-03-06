@@ -169,23 +169,39 @@ button {
   bottom: 2vh;
 }
 
-#buttonTip {
-  width: 12vw;
+.actionButton{
+  width: 15vw;
   height: 5vh;
   padding: 0 0;
+}
+
+.navButton{
+  min-width: 10vw;
+  height: 5vh;
+  padding: 0 0.5vw;
+}
+
+.accountButton{
+  min-width: 20vw;
+  height: 5vh;
+  padding: 0 0.5vw;
+}
+
+#buttonTip {
+  min-width: 12vw;
+  float: right;
 
   background-color:#32d589;
   color: #ffffff;
 }
 
 #buttonDiscord {
-  width: 10vw;
-  height: 5vh;
-  padding: 0 0;
+  min-width: 10vw;
+  float: right;
+  margin-right: 0.5vw;
 
   background-color: #7289da;
   color: #ffffff;
-
 }
   
 .buttonJoin {
@@ -201,17 +217,6 @@ button {
   transform: translate(-50%, -50%);
 }
   
-.actionButton{
-  width: 15vw;
-  height: 5vh;
-  padding: 0 0;
-}
-
-.navButton{
-  min-width: 10vw;
-  height: 5vh;
-  padding: 0 0.5vw;
-}
 
 button:disabled {
   background: #6d6d6d;
@@ -267,6 +272,7 @@ button:hover:disabled {
 
 .tdAccount1{
   float: left;
+  min-width:20vw;
 }
 
 .tdAccount2{

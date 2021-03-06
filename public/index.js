@@ -126,6 +126,12 @@ span6.onclick = function(){
 }
 
 //Messages
+//TODO ADD MANAGER THAT CAN THROW THIS
+socket.io.on('connect_error', function(err) {
+    console.log('Error connecting to server');
+    location.reload();
+  });
+
 socket.on("dc", (arg) => {
     location.reload();
 });
@@ -177,7 +183,7 @@ socket.on("accountStats", (arg) => {
     document.getElementById("homeAccountWithdrawPending").innerHTML = arg[4]
 
     if(arg[5]){
-        document.getElementById("emailLabel").innerHTML = arg[5]
+        document.getElementById("emailLabel").innerHTML = ": " + arg[5]
     }
 });
 
@@ -736,8 +742,8 @@ function modalTipClicked(){
 
     socket.emit("tip", rangeSlider.value)
 
-    var withdrawButton = document.getElementById("homeTipButton");
-    withdrawButton.disabled = true;
+    var tipButton = document.getElementById("modalTipButton");
+    tipButton.disabled = true;
 
     modalTip.style.display = "none";
 }

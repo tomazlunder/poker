@@ -71,8 +71,12 @@
     <div class ="containerPage" id="home">
       <div class="containerNav">
         <button onclick="homePlayButton()" class="navButton" id="homePlayButton" disabled >Rooms</button>
-        <button onclick="homeAccountButton()" class="navButton" id="homeAccountButton" style="float: right;">Account</button>
+        <button onclick="homeAccountButton()" class="navButton" id="homeAccountButton">Account</button>
         <button onclick="homeLeaderboardButton()" class="navButton" id="homeLeaderboardButton">Leaderboard</button>
+
+        <button onclick="homeTipButton()"  class="navButton" id="buttonTip">Tip the house</button>
+        <button onclick="discordButton()" class="navButton" id="buttonDiscord">Discord</button>
+
 
       </div>
 
@@ -121,23 +125,19 @@
           </table>
 
           <br>
-          <button onclick="homeWithdrawButton()" class="navButton" id="homeWithdrawButton" >Withdraw</button>
+          <button onclick="homeWithdrawButton()" class="accountButton" id="homeWithdrawButton" >Withdraw</button>
           <br><br>
 
           <label class="labelTitle">Account settings</label>
           <br><br>
-          <button onclick="changeEmailButton()" class="navButton" id="changeEmailButton" >Change email</button>
-          <label id="emailLabel">Email not set</label> 
+          <button onclick="changeEmailButton()" class="accountButton" id="changeEmailButton" >Change email</button>
+          <label id="emailLabel">: Email not set</label> 
           <br><br>
-          <button onclick="changePasswordButton()" class="navButton" id="changePasswordButton" >Change password</button>
+          <button onclick="changePasswordButton()" class="accountButton" id="changePasswordButton" >Change password</button>
 
       </div>
 
       <div class="containerFoot">
-
-        <button onclick="discordButton()" id="buttonDiscord" >Discord</button>
-        <button onclick="homeTipButton()" id="buttonTip" >Tip the house</button>
-
       </div>  
     </div>
 
