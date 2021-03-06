@@ -212,7 +212,8 @@ socket.on('tipOk', (arg) => {
 
 socket.on('tipFailed', (arg) => {
     document.getElementById("homeWithdrawButton").disabled = false;
-    //TODO: add popup
+    
+    showSuccess("Tip failed!",1)
 });
 
 socket.on('changeEmailOk', (arg) => {
@@ -1135,7 +1136,15 @@ function numberTipChange(){
 }
 
 //NOTIFICATIONS
-showSuccess = function(message){
+showSuccess = function(message, type = 0){
+    var success = document.getElementById("success");
+
+    if(type == 0){
+        success.style.backgroundColor = "#4CAF50"
+    } else {
+        success.style.backgroundColor = "#f44336"
+    }
+
     var success = document.getElementById("success");
     success.style.display = "block";
     success.innerHTML = message
@@ -1150,6 +1159,7 @@ showSuccess = function(message){
         success.style.display = "none"; 
     }, 3000);
 }
+
 
 /*
 * DRAWING FUNCTIONS

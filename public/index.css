@@ -473,13 +473,13 @@ input:checked + .slider2:before {
 
   overflow-y:auto;
   overflow-x:none;
-  width: 66%;
+  width: 79%;
   max-height: 63vh;
   float: left;
 }
 
 .containerDiscordWidget{
-  width: 33%;
+  width: 20%;
   height: 63vh;
   float: right;
 }
@@ -531,7 +531,6 @@ input:checked + .slider2:before {
   overflow: auto; /* Enable scroll if needed */
   background-color: rgb(0,0,0); /* Fallback color */
   background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-
 }
 
 /* Modal Content/Box */
@@ -645,8 +644,10 @@ input:checked + .slider2:before {
   display: none;
 }
 
-
-
+.modalTitle{
+  font-size: 3vmax;
+  text-align: center;
+}
 
 
 

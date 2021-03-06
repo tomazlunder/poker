@@ -192,7 +192,7 @@
   <div id="modalBuyIn" class="modal" style="display:none">
     <div class="modal-content" id="modal-content">
       <span class="close" id = "closeBuyIn">&times;</span>
-      <p>Buy-in size</p>
+      <div class="modalTitle">Buy-in</div>
       <input type="range"  id="buyInRange" class="sliderBuyIn" name="raise" min="0" max="50" oninput="rangeBuyinChange()">
       <input type="number" id="buyInNumberField"  oninput="numberBuyinChange()" onkeydown="return false"></input>
       <button id="modalBuyInButton" class="Button">BUY IN</button>
@@ -203,7 +203,7 @@
   <div id="modalRebuy" class="modal" style="display:none">
     <div class="modal-content" id="modal-content">
       <span class="close" id = "closeRebuy">&times;</span>
-      <p>Rebuy size</p>
+      <div class="modalTitle">Rebuy</div>
       <input type="range"  id="rebuyRange" class="sliderBuyIn" name="raise" min="0" max="50" oninput="rangeRebuyChange()">
       <input type="number" id="rebuyNumberField"  oninput="numberRebuyChange()" onkeydown="return false" ></input>
       <button id="modalRebuyButton" class="Button" onclick="modalRebuyClicked()">Rebuy</button>
@@ -214,7 +214,7 @@
   <div id="modalWithdraw" class="modal" style="display:none">
     <div class="modal-content" id="modal-content">
       <span class="close" id = "closeWithdraw">&times;</span>
-      <p>Withdraw</p>
+      <div class="modalTitle">Withdraw</div>
       <input type="range"  id="withdrawRange" class="sliderBuyIn" name="raise" min="0" max="50" oninput="rangeWithdrawChange()">
       <input type="number" id="withdrawNumberField"  oninput="numberWithdrawChange()" onkeydown="return false" ></input>
       <button id="modalWithdrawButton" class="Button" onclick="modalWithdrawClicked()">Withdraw</button>
@@ -225,7 +225,7 @@
   <div id="modalTip" class="modal" style="display:none">
     <div class="modal-content" id="modal-content">
       <span class="close" id = "closeTip">&times;</span>
-      <p>Tip</p>
+      <div class="modalTitle">Tip the house</div>
       <input type="range"  id="tipRange" class="sliderBuyIn" name="raise" min="0" max="50" oninput="rangeTipChange()">
       <input type="number" id="tipNumberField"  oninput="numberTipChange()" onkeydown="return false" ></input>
       <button id="modalTipButton" class="Button" onclick="modalTipClicked()">Tip</button>
@@ -236,7 +236,7 @@
   <div id="modalEmail" class="modal" style="display:none">
     <div class="modal-content" id="modal-content">
       <span class="close" id = "closeEmail">&times;</span>
-      <p>Enter email</p>
+      <div class="modalTitle">Change email</div>
       <input type="text" id="emailTextField"></input>
       <button id="modalEmailButton" class="Button" onclick="modalEmailClicked()">Change</button>
       <br>
@@ -248,7 +248,7 @@
   <div id="modalPassword" class="modal" style="display:none">
     <div class="modal-content" id="modal-content">
       <span class="close" id = "closePassword">&times;</span>
-      <p>Enter new password</p>
+      <div class="modalTitle">Change password</div>
       <input type="password" id="password1"></input>
       <input type="password" id="password2"></input>
 
