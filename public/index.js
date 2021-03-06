@@ -203,9 +203,22 @@ socket.on('roomList', (arg) =>{
         var div_row50_1 = document.createElement("div");
         var div_row50_2 = document.createElement("div");
         var label_room_1 = document.createElement("label");
-        var label_room_2 = document.createElement("label");
+        //var label_room_2 = document.createElement("label");
         var div_col20 = document.createElement("div");
         var button_join = document.createElement("button");
+
+        var table = document.createElement("table")
+        var tableTr = document.createElement("tr")
+        var tableTd1 = document.createElement("td")
+        var tableTd2 = document.createElement("td")
+        var tableTd3 = document.createElement("td")
+
+        var label_stakes = document.createElement("label");
+        var label_buyin = document.createElement("label");
+        var label_players = document.createElement("label");
+
+        label_stakes = 
+
 
         div_room.classList.add("room")
         div_col80.classList.add("col80")
@@ -213,11 +226,34 @@ socket.on('roomList', (arg) =>{
         div_row50_2.classList.add("row50")
         div_col20.classList.add("col20")
         button_join.classList.add("buttonJoin")
+        table.classList.add("tableRoom")
+        tableTd1.classList.add("tdRoom")
+        tableTd2.classList.add("tdRoom")
+        tableTd3.classList.add("tdRoom")
+
 
         label_room_1.innerHTML = roomName;
-        label_room_2.innerHTML = "Stakes: "+sb+"/"+2*sb+"&#160&#160&#160&#160&#160Buy-in: "+minBuyIn+"-"+maxBuyIn+ "&#160&#160&#160&#160&#160Players: "+numplayers+"/"+numseats
+
+        label_stakes = "Stakes: "+sb+"/"+2*sb
+        label_buyin = "Buy-in: "+minBuyIn+"-"+maxBuyIn
+        label_players = "Players: "+numplayers+"/"+numseats
+
+        tableTd1.append(label_stakes)
+        tableTd2.append(label_buyin)
+        tableTd3.append(label_players)
+
+        tableTr.append(tableTd1)
+        tableTr.append(tableTd2)
+        tableTr.append(tableTd3)
+
+        table.append(tableTr)
+
+
+        //label_room_2.innerHTML = "Stakes: "+sb+"/"+2*sb+"&#160&#160&#160&#160&#160Buy-in: "+minBuyIn+"-"+maxBuyIn+ "&#160&#160&#160&#160&#160Players: "+numplayers+"/"+numseats
         div_row50_1.append(label_room_1)
-        div_row50_2.append(label_room_2)
+        div_row50_2.append(table)
+
+        //div_row50_2.append(label_room_2)
 
         div_col80.append(div_row50_1)
         div_col80.append(div_row50_2)

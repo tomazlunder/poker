@@ -269,6 +269,14 @@ button:hover:disabled {
   float: left;
 }
 
+.tableRoom{
+  width: 100%;
+}
+
+.tdRoom {
+  width: 33% ;
+}
+
 #roomButtons{
     text-align: left;
     max-height: 75%;
