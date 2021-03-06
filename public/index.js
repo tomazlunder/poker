@@ -119,6 +119,7 @@ socket.on("loginFailed", (arg) => {
 
 socket.on('loginOk', (arg) => {
     console.log("Received: Loing OK");
+    console.log(arg)
 
     document.getElementById("welcome").style.display = "none";
     document.getElementById("registration").style.display = "none";
@@ -134,6 +135,14 @@ socket.on('loginOk', (arg) => {
     console.log("Emitted: lookingForRooms")
     socket.emit("lookingForRooms");
 });
+
+socket.on("accountStats", (arg) => {
+    document.getElementById("homeAccountBalance").innerHTML = arg[0]
+    document.getElementById("homeAccountWinnings").innerHTML = arg[1]
+    document.getElementById("homeAccountTipped").innerHTML = arg[2]
+    document.getElementById("homeAccountRoundsplayed").innerHTML = arg[3]
+    document.getElementById("homeAccountWithdrawPending").innerHTML = arg[4]
+})
 
 socket.on('newBalance', (arg) => {
     console.log("Received: New balance ("+arg+")");

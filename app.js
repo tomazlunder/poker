@@ -149,9 +149,17 @@ io.on('connection', function(socket) {
 					socketUserMap.set(socket, user)
 				}
 
+				const response2 = await db.getSumTips()
+				const response3 = await db.getPendingWithdrawals()
+
+				console.log(response2)
+				console.log(response3)
+
+
 				console.log(response.account_name + " logged in")
 				console.log('Number of users: '+ users.length);
 				socket.emit("loginOk",[response.account_name, response.balance]);
+				socket.emit("accountStats", [response.balance, response.winnings, response2, response.roundsPlayed, response3] )
 			}
 			else{
 				console.log("Incorrect login info")

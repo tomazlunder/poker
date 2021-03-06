@@ -1,3 +1,4 @@
+const { response } = require('express');
 var mysql = require('mysql');
 var con;
 
@@ -30,7 +31,10 @@ function getPerson(account_name){
         var query = con.query("SELECT * FROM person WHERE account_name = ?",
 				[account_name],
 				function(err, result){
-					if (err) throw err;
+					if (err) {
+                        console.log(err)
+                        reject()
+                    }
 					console.log(query.sql); 
 					console.log(result);
 					if(result.length == 1){
@@ -144,7 +148,7 @@ function transferStackToBalance(user){
 
 function changeWinnings(id_person, change_by){
     return new Promise((resolve,reject) => {    
-        var query = con.query("UPDATE person SET winnings = winnings + ? WHERE id_person = ?",
+        var query = con.query("UPDATE person SET winnings = winnings + ?, roundsPlayed = roundsPlayed + 1 WHERE id_person = ?",
             [change_by, id_person],
             function(err, result){
                 if (err) {
@@ -204,8 +208,73 @@ function transferAllPersonStackToBalance(){
     });
 }
 
-function insertTip(id_person, amount){
+function getSumTips(id_person){
+    return new Promise((resolve,reject) => {    
+        var query = con.query("SELECT SUM(amount) as result_sum FROM tip WHERE id_person = ?;",
+            [id_person],
+            function(err, result){
+                if (err) {
+                    console.log(err)
+                    reject()
+                }
+                console.log(query.sql)
+                console.log(result)
+                if(result.length == 1){
+                    console.log(result[0])
+                    if(result[0].result_sum){
+                        resolve(result[0].result_sum)
+                    } else {
+                        resolve(0)
+                    }
+                }
+            }
+        );
+    });
+}
 
+function getPendingWithdrawals(id_person){
+    return new Promise((resolve,reject) => {    
+        var query = con.query("SELECT SUM(amount) as result_sum FROM withdraw WHERE id_person = ? AND completed = 0;",
+            [id_person],
+            function(err, result){
+                if (err) {
+                    console.log(err)
+                    reject()
+                }
+                console.log(query.sql)
+                console.log(result)
+                if(result.length == 1){
+                    console.log(result[0])
+                    if(result[0].result_sum){
+                        resolve(result[0].result_sum)
+                    } else {
+                        resolve(0)
+                    }
+                }
+            }
+        );
+    });
+}
+
+function insertTip(id_person, amount){
+    return new Promise((resolve,reject) => {    
+        var query = con.query("INSERT INTO tip(id_person, amount) VALUE (?,?)",
+            [id_person, amount],
+            function(err, result){
+                if (err) {
+                    console.log(err)
+                    reject()
+                }
+                console.log(query.sql); 
+                console.log(result);
+                if(result.affectedRows == 1){
+                    resolve()
+                }else{
+                    reject()
+                }
+            }
+        );
+    });
 }
 
 module.exports = connectDatabase();
@@ -217,5 +286,8 @@ module.exports.transferStackToBalance = transferStackToBalance;
 module.exports.changeWinnings = changeWinnings;
 module.exports.insertWithdraw = insertWithdraw;
 module.exports.transferAllPersonStackToBalance = transferAllPersonStackToBalance;
+module.exports.getSumTips = getSumTips;
+module.exports.getPendingWithdrawals = getPendingWithdrawals;
+module.exports.insertTip = insertTip;
 
 
