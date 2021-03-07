@@ -8,10 +8,9 @@ const allCards = ["2h", "3h", "4h", "5h", "6h", "7h", "8h", "9h", "Th", "Jh", "Q
 
 const timeForAction = 22000;
 const timeAtEnd = 12000;
-const showdownTime = 2000;
 
 class Room{
-    constructor(io, room_id, sb_size, min_buy_in, max_buy_in, numPlayers, name, pidRoomMap){
+    constructor(io, room_id,  name, numPlayers,  sb_size, min_buy_in, max_buy_in,pidRoomMap){
         this.io = io;
         this.room_id = "room"+room_id
 		this.min_buy_in = min_buy_in;
@@ -38,7 +37,26 @@ class Room{
 
 		this.running = 0;
 		this.markedForShutdown = 0;
+
+		this.isTournament = 0;
+		this.entry_fee;
+		this.chips_per;
+		this.loops_till_increase;
+		this.rewards;
+		this.bustedPlayers;
+
     }
+
+	static Tournament(io, tournament_id, name, numPlayers, entry_fee, chips_per, sb_start, loops_till_increase, rewards, pidRoomMap){
+		var ret = new Room(io, tournament_id, name, numPlayers, sb_start, null, null, pidRoomMap)
+		ret.isTournament = 1;
+		ret.entry_fee = entry_fee;
+		ret.chips_per = chips_per;
+		ret.loops_till_increase = loops_till_increase;
+		ret.rewards = rewards;
+
+		return ret;
+	}
 
 	/* Functions for sending data */
 
@@ -75,7 +93,7 @@ class Room{
 	}
 
 	//Removes zombie players from the game and updates DB
-	async removeZomibePlayers(){
+	async removeAppropriatePlayers(){
 		var promises = []
 		
 		for(var i = 0; i < this.seats.length; i++){
@@ -120,11 +138,58 @@ class Room{
 		})
 	}
 
+	async removePlayersTournamentLobby(){
+		var promises = []
+		
+		for(var i = 0; i < this.seats.length; i++){
+			if(this.seats[i]){
+				if(this.seats[i].zombie == 1 || this.markedForShutdown == 1){
+					var user = this.seats[i]
+					
+					promises.push(db.tryIncreaseBalance(user.id_person, sb_start))
+
+					user.balance = parseInt(user.balance)
+					user.balance += parseInt(sb_start);
+					user.stack = 0;
+		
+					user.socket.emit("newBalance", user.balance)
+					this.seats[i].socket.emit("roomKick");
+
+					console.log(this.room_id + ": removed zombie player ("+ user.name+").")
+					this.pidRoomMap.delete(user.id_person)
+
+					user.socket.emit("listOutdated")
+					this.seats[i] = null;
+				}
+			}
+		}
+
+
+		Promise.all([...promises]).then(values => {
+
+			this.sendNamesStacks()
+		}).catch((err) => {
+			console.log(err)
+		})
+	}
+
 	numberOfPlayers(){
 		var ret = 0;
 		for(var i in this.seats){
 			if(this.seats[i]){
 				ret++;
+			}
+		}
+		return ret;
+	}
+
+	numberOfNonBustedPlayers(){
+		var ret = 0;
+		for(var i in this.seats){
+			if(this.seats[i]){
+				if(this.seats[i].busted == 0){
+					ret++;
+				}
 			}
 		}
 		return ret;
@@ -182,6 +247,8 @@ class Room{
 		if(count == 1){
 			if(this.roundState.to_act.bet == this.roundState.bet_size){
 				console.log(this.room_id + ": " + this.roundState.to_act.name + "forced check (everyone else all_in)");
+				this.state++;
+				this.updateState();
 				return;
 			}
 		}
@@ -452,7 +519,11 @@ class Room{
 		switch(this.state){
 			case 0:{
 				console.log(this.room_id + ": (state0) waiting for players.")
-				this.removeZomibePlayers();
+				if(!this.isTournament){
+					this.removeAppropriatePlayers();
+				} else {
+					this.removePlayersTournamentLobby();
+				}
 
 				if(this.markedForShutdown){
 					this.running = 0;
@@ -463,12 +534,18 @@ class Room{
 				this.sendWaitingForPlayer();
 				this.sendNamesStacks();
 			
-
-				if(this.numberOfPlayers()<2){
-					break;
+				if(!this.isTournament){
+					if(this.numberOfPlayers()<2){
+						break;
+					}
+				} else {
+					if(this.numberOfPlayers()<numPlayers){
+						break;
+					}
 				}
 				this.state = 1;
-
+			}
+			case 1:{
 				//Setting up game (state = 1)
 				// Blinds and stuff
 				console.log(this.room_id + ": (state1) round starting.")
@@ -571,7 +648,7 @@ class Room{
 				this.cardTurns(1);
 				resetPlayersHasActed(this.seats);
 				this.betting();
-			}
+			} break;
 
 			case 6:{
 				//Showdown
@@ -608,17 +685,39 @@ class Room{
 
 	resetGame() {
 		console.log("Resetting game")
-		for(var i in this.seats){
-			if(this.seats[i]){
-				db.setPersonStack(this.seats[i].id_person, this.seats[i].stack)
-			} 
-		}
-
 		console.log(this.room_id)
 		this.io.to(this.room_id).emit('resetGame');
 
 		//Also removes all players if room is marked for shutdown
-		this.removeZomibePlayers()
+		if(!this.isTournament){
+			for(var i in this.seats){
+				if(this.seats[i]){
+					db.setPersonStack(this.seats[i].id_person, this.seats[i].stack)
+				} 
+			}
+
+			this.removeAppropriatePlayers()
+
+		} 
+		//TOURNAMENT MODE (Don't remove players, just mark them as busted if they don't have chips. Then check if winner is found)
+		else {
+			for(var i in this.seats){
+				if(this.seats[i]){
+					if(this.seats[i].stack < this.sb_size * 2){
+						this.seats[i].busted = 1;
+						bustedPlayers.push(busted);
+					}
+				}
+			}
+			if(this.numberOfNonBustedPlayers(this.seats) == 1){
+				this.endTournament();
+				return;
+			} else {
+				this.state = 1;
+				this.updateState();
+			}
+		}
+
 
 		console.log("Round ended")
 
@@ -663,6 +762,10 @@ function resetPlayers(seats){
 		seats[i].total_bet_size = 0;
 		seats[i].all_in = 0;
 		seats[i].has_acted = 0;
+
+		if(seats[i].busted){
+			seats[i].alive = 0;
+		}
 	  }
 	}
 }
@@ -686,7 +789,9 @@ function resetPlayerBets(seats){
 function firstNonNullPlayer(seats){
 	for(var i in seats){
 	  if(seats[i]){
-		return seats[i]
+		  if(seats[i].alive){
+			return seats[i]
+		  }
 	  }
   }
 }

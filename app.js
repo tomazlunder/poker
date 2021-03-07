@@ -395,6 +395,10 @@ io.on('connection', function(socket) {
 					if(rooms[i].seats[j].socket == socket){
 						rooms[i].seats[j].zombie = 1;
 						console.log(rooms[i].room_id + ": marked "+rooms[i].seats[j].name+" as zombie.")
+
+						if(rooms[i].state == 0){
+							rooms[i].updateState();
+						}
 					}
 				}
 			}
@@ -623,6 +627,8 @@ function User(socket, id_person, name, balance){
 	this.disconnected = 0;
 
 	this.has_acted;
+
+	this.busted = 0;
 }
 
 async function depositCheck(){
@@ -701,10 +707,10 @@ async function runServer(){
 		*/
 		const a = await depositCheck();
 
-		rooms.push(new Room.Room(io,1, 1, 40,100,6, "Braham's Lodge", pidRoomMap));
-		rooms.push(new Room.Room(io,2, 1, 80,200,6, "Rytlock's Tent" , pidRoomMap));
-		rooms.push(new Room.Room(io,3, 2, 80,200,6, "Zojja's Lab" , pidRoomMap));
-		rooms.push(new Room.Room(io,4, 2, 160,400,6, "Lord Fahren's Chamber", pidRoomMap));
+		rooms.push(new Room.Room(io,1,"Braham's Lodge",6,  1, 40,100,pidRoomMap));
+		rooms.push(new Room.Room(io,2, "Rytlock's Tent", 6, 1, 80,200,  pidRoomMap));
+		rooms.push(new Room.Room(io,3, "Zojja's Lab", 6, 2, 80,200,  pidRoomMap));
+		rooms.push(new Room.Room(io,4, "Lord Fahren's Chamber", 6, 2, 160,400,  pidRoomMap));
 		//rooms.push(new Room.Room(io,5, 2, 100, 500,6, "Bla", pidRoomMap));
 		//rooms.push(new Room.Room(io,6, 2, 100, 500,6, "Bla", pidRoomMap));
 

@@ -641,7 +641,7 @@ socket.on('roomKick', (arg) =>{
 });
 
 socket.on('waitingForNewGame', (arg) => {
-    if(playerStacks[0] < cur_min_buy_in){
+    if(playerStacks[0] + playerResults[0] < cur_min_buy_in){
         if(myBalance > 0){
             document.getElementById("homeRebuyButton").disabled = false;
         }
@@ -1135,15 +1135,17 @@ function homeRaiseButton() {
 function homeRebuyButton() {
     console.log("Clicked rebuy button")
 
-    var actualMax = Math.min(myBalance, cur_max_buy_in - playerStacks[0])
-    rebuyRange.min = cur_min_buy_in - playerStacks[0]
+    var temp = playerStacks[0] + playerResults[0]
+
+    var actualMax = Math.min(myBalance, cur_max_buy_in - temp)
+    rebuyRange.min = cur_min_buy_in - temp
     rebuyRange.max = actualMax
     rebuyRange.value = rebuyRange.max
     rebuyRange.disabled =  false;
 
     var rebuyNumberField = document.getElementById("rebuyNumberField");
 
-    rebuyNumberField.min = cur_min_buy_in - playerStacks[0]
+    rebuyNumberField.min = cur_min_buy_in - temp
     rebuyNumberField.max = actualMax
     rebuyNumberField.value = rebuyRange.max
 
