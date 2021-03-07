@@ -45,6 +45,9 @@ class Room{
 		this.timer = 0;
 
 		this.markedForShutdown = 0;
+
+		this.timeoutID;
+
     }
 
 	/* Functions for sending data */
@@ -150,98 +153,93 @@ class Room{
 
 	//Betting states
     betting(){
-		if(!this.message_sent){
+		this.sendGamestate();
 
-			//IF PLAYER TO ACT IS ALL IN
-			if(this.roundState.to_act.all_in){
-				//Skip calling for action, force him to check
-				console.log(this.room_id + ": " + this.roundState.to_act.name + "(all_in) forced skip");
-
-				//If he is not last to act
-				if(this.roundState.to_act != this.roundState.last_to_act){
-					this.roundState.to_act = nextPlayer(this.seats.indexOf(this.roundState.to_act), this.seats)
-                    this.message_sent = 0;
-                    return;
-				}
-
-				//If he is last to act
-				this.state++;
-				return;
-			} 
-
-			//IF EVERYONE ELSE IS ALL IN AND DOESN'T HAVE TO CALL
-			var count = 0;
-			for(var i in this.seats){
-				if(this.seats[i]){
-					if(this.seats[i].alive & this.seats[i].all_in == 0){
-						count++;
-					}
-				}
-			}
-			if(count == 1){
-				console.log(this.roundState.bet_size)
-				if(this.roundState.to_act.bet == this.roundState.bet_size){
-					console.log(this.room_id + ": " + this.roundState.to_act.name + "forced check (everyone else all_in)");
-					this.message_sent = 0;
-					this.state++;
-					return;
-				}
-			}
-            
-			//IF TO ACT IS A ZOMBIE (LEFT THE TABLE SCREEN)
-			if(this.roundState.to_act.zombie){
-				//Skip calling for action, force check/fold
-				console.log(this.room_id + ": " + this.roundState.to_act.name + "(zomibe) forced to act");
-				this.message_sent = 1;
-				this.timer = timeForAction+1; //fake timer runout
-			}
-
-			//SEND PLAYER THE ACTION REQUIRED MESSAGE
-			else{                
-				this.io.to(this.room_id).emit('actionRequired', [this.roundState.to_act.name, timeForAction, this.roundState.bet_size]);
-				console.log(this.room_id + ": " + this.roundState.to_act.name + " called to act");
-				this.message_sent = 1;
-				this.acted = 0;
-				this.timer = 0;
-			}
+		if(alivePlayers(this.seats) == 1){
+			this.state = 7;
+			this.updateState();
+			return;
 		}
-		//IF Message was already sent, increase timer to forced action
-		else{
-			this.timer += this.deltaTime;
-		}
-	
-		if(this.timer > timeForAction){
-			this.message_sent = 0;
-			this.acted = 0;
-			this.timer = 0;
 
+		if(this.roundState.to_act.has_acted){
+			this.state++;
+			this.updateState();
+			return;
+		}
+
+		//IF PLAYER TO ACT IS ALL IN
+		if(this.roundState.to_act.all_in){
+
+			//Skip calling for action, force him to check
+			console.log(this.room_id + ": " + this.roundState.to_act.name + "(all_in) forced skip");
+			this.roundState.to_act.has_acted = 1;
+			this.roundState.to_act = nextPlayer(this.seats.indexOf(this.roundState.to_act), this.seats)
+			this.betting();
+			return;
 			
-			//AUTO FOLD
-			if(this.roundState.to_act.bet < this.roundState.bet_size){
-				console.log(this.room_id + ": " + this.roundState.to_act.name + " autofold (timeout)");
+		} 
 
-				this.roundState.to_act.alive = 0;
-
-				if(alivePlayers(this.seats) == 1){
-					this.winner.push(nextPlayer(this.seats.indexOf(this.roundState.to_act), this.seats))
-					this.fold_win = true;
-					this.state = 12;
-					
-					this.sendGamestate();
-					return;
+		//IF EVERYONE ELSE IS ALL IN AND DOESN'T HAVE TO CALL
+		var count = 0;
+		for(var i in this.seats){
+			if(this.seats[i]){
+				if(this.seats[i].alive & this.seats[i].all_in == 0){
+					count++;
 				}
-			} 
-			//AUTO CHECK
-			else {
-				console.log(this.room_id + ": " + this.roundState.to_act.name + " autocheck (timeout)");
 			}
-	
-			if(this.roundState.to_act == this.roundState.last_to_act){
-				this.state++;
-			} else {
-				this.roundState.to_act = nextPlayer(this.seats.indexOf(this.roundState.to_act), this.seats)
+		}
+		if(count == 1){
+			if(this.roundState.to_act.bet == this.roundState.bet_size){
+				console.log(this.room_id + ": " + this.roundState.to_act.name + "forced check (everyone else all_in)");
+				return;
 			}
-		}	
+		}
+            
+		var actualTimeForAction = timeForAction;
+
+		//IF TO ACT IS A ZOMBIE (LEFT THE TABLE SCREEN) TODO
+		if(this.roundState.to_act.zombie){
+			//Skip calling for action, force check/fold
+			console.log(this.room_id + ": " + this.roundState.to_act.name + "(zomibe) forced to act");
+			actualTimeForAction = 0;
+		}
+
+		//SEND PLAYER THE ACTION REQUIRED MESSAGE
+		else{
+			//this.sendGamestate();
+			this.io.to(this.room_id).emit('actionRequired', [this.roundState.to_act.name, actualTimeForAction, this.roundState.bet_size]);
+			this.acted = 0;
+			console.log(this.room_id + ": " + this.roundState.to_act.name + " called to act");
+		}
+
+		//Default action after timeout (canceled by clearning interval when acting)
+
+		this.timeoutID = setTimeout(() => {this.autoCheckFold()},
+		actualTimeForAction);
+
+	}
+
+	autoCheckFold(){
+		this.roundState.to_act.has_acted = 1;
+
+		//AUTO FOLD
+		if(this.roundState.to_act.bet < this.roundState.bet_size){
+			console.log(this.room_id + ": " + this.roundState.to_act.name + " autofold (timeout)");
+
+			this.roundState.to_act.alive = 0;
+		} 
+		//AUTO CHECK
+		else {
+			console.log(this.room_id + ": " + this.roundState.to_act.name + " autocheck (timeout)");
+		}
+
+		if(this.roundState.to_act == this.roundState.last_to_act){
+		} else {
+			this.roundState.to_act = nextPlayer(this.seats.indexOf(this.roundState.to_act), this.seats)
+		}
+
+		clearInterval(this.timeoutID)
+		this.betting();
 	}
 
 	//Handle received player action
@@ -254,8 +252,6 @@ class Room{
 			this.acted = 1;
 
 			console.log(this.room_id + ": " + this.roundState.to_act.name + " " + action + " " +raise_number);
-			this.message_received = 1;
-			this.message_sent = 0;
 
 			if(action == "raise"){
 				var callsize = (this.roundState.bet_size - this.roundState.to_act.bet) //If raising into a raise
@@ -265,6 +261,11 @@ class Room{
 
 				if(this.roundState.to_act.stack >= callsize){
 					console.log(this.room_id + ": " +this.roundState.to_act.name + " raises ("+raise_number+").")
+					clearInterval(this.timeoutID) //Clear timeout
+
+					resetPlayersHasActed(this.seats);
+					this.roundState.to_act.has_acted = 1;
+
 					this.roundState.to_act.stack -= callsize
 					this.roundState.to_act.bet += callsize
 					this.roundState.to_act.total_bet_size += callsize
@@ -277,28 +278,25 @@ class Room{
 						this.roundState.to_act.all_in = 1;
 					}
 
-					this.roundState.last_to_act = prevPlayer(this.seats.indexOf(this.roundState.to_act),this.seats)
 					this.roundState.to_act = nextPlayer(this.seats.indexOf(this.roundState.to_act), this.seats)
 
-					this.sendGamestate();
+					this.betting();
 					return
 				}else{
 					console.log(this.room_id + ": " + this.roundState.to_act.name + "tried to raise but doensn't have enough money.");
+					this.acted = 0; //Can try to send a new action (this should not happen)
 				}
 			}
 
 			if(action == "fold"){
 				console.log(this.roundState.to_act.name + " folds.")
-
+				clearInterval(this.timeoutID) //Clear timeout
+				this.roundState.to_act.has_acted = 1;
 				this.roundState.to_act.alive = 0;
-				if(alivePlayers(this.seats) == 1){
-					this.winner.push(nextPlayer(this.seats.indexOf(this.roundState.to_act), this.seats))
-					this.fold_win = 1;
-					this.state = 12;
 
-					this.sendGamestate();
-					return;
-				}
+				this.roundState.to_act = nextPlayer(this.seats.indexOf(this.roundState.to_act), this.seats)
+				this.betting();
+				return
 			}
 
 			if(action == "checkcall"){
@@ -306,6 +304,7 @@ class Room{
 					var callsize = (this.roundState.bet_size - this.roundState.to_act.bet)
 
 					if(this.roundState.to_act.stack >= callsize){
+						//CALL
 						console.log(this.room_id + ": " +this.roundState.to_act.name + " calls (" + callsize + ").")
 						this.roundState.pot += callsize
 						this.roundState.to_act.total_bet_size += callsize
@@ -323,13 +322,11 @@ class Room{
 						this.roundState.to_act.all_in = 1;
 						callsize = this.roundState.to_act.stack;
 						console.log(this.room_id + ": " +this.roundState.to_act.name + " part-calls all in(" + callsize + ").")
-
 						this.roundState.pot += callsize
 						this.roundState.to_act.total_bet_size += callsize
 						this.roundState.to_act.stack -= callsize
 						this.roundState.to_act.bet = this.roundState.bet_size
 					}
-					this.sendGamestate();
 				}
 				else{
 					//check
@@ -337,17 +334,15 @@ class Room{
 				}
 			}
 
-			if(this.roundState.to_act == this.roundState.last_to_act){
-				this.state++;
-			} else {
-				this.roundState.to_act = nextPlayer(this.seats.indexOf(this.roundState.to_act), this.seats)
-			}
+			clearInterval(this.timeoutID) //Clear timeout
+			this.roundState.to_act.has_acted = 1;
 
+			this.roundState.to_act = nextPlayer(this.seats.indexOf(this.roundState.to_act), this.seats)
+			this.betting()
 		}
 		else{
 			console.log(this.room_id + ": " + id_person + "tried to act but it is not his turn.");
 		}
-
     }
 
     //Card turn states
@@ -356,7 +351,6 @@ class Room{
 		resetPlayerBets(this.seats)
 
 		this.roundState.to_act = nextPlayer(this.seats.indexOf(this.roundState.dealer), this.seats);
-		this.roundState.last_to_act = prevPlayer(this.seats.indexOf(this.roundState.to_act), this.seats)
 
 		//burn a card
 		this.roundState.deckCounter++;
@@ -369,9 +363,7 @@ class Room{
 
 		console.log(this.roundState.revealedCards)
 
-		this.state++;
 		this.sendRevealedCards();
-		this.sendGamestate();
 	}
 
 	//Result calculation
@@ -455,58 +447,55 @@ class Room{
 				}
 			}
 		}
+		
 		this.state++;
+		this.updateState();
 	}
 
-	//Game updating big boi
-    updateGame(){
-		var now = Date.now();
-		this.deltaTime = now - this.last_update;
-		this.last_update = now;
+	startRoom(){
+		this.state = 0;
+		this.updateState();
+	}
 
-		var gameStateChanged = (this.lastUpdateState != this.state)
-		this.lastUpdateState = this.state;
-
+	async updateState(){
 		switch(this.state){
-			//state 0 - Waiting for at least two players (LOOP)
 			case 0:{
-				this.removeZomibePlayers()
+				console.log(this.room_id + ": (state0) waiting for players.")
+				this.removeZomibePlayers();
 
-				if(gameStateChanged){
-					console.log(this.room_id + ": (state0) waiting for players.")
-					
-					this.sendWaitingForPlayer();
-					this.sendNamesStacks();
+				this.sendWaitingForPlayer();
+				this.sendNamesStacks();
+			
+
+				if(this.numberOfPlayers()<2){
+					break;
 				}
+				this.state = 1;
 
-				if(this.numberOfPlayers()>=2){
-					this.state++;
-				}
-			} break;
-
-			//state 1 - Round started
-			case 1:{
-				console.log(this.room_id + ": (state1) round started.")
-				//Set SB,BB,Action,FTA, LTA
+				//Setting up game (state = 1)
+				// Blinds and stuff
+				console.log(this.room_id + ": (state1) round starting.")
+				this.io.to(this.room_id).emit('roundStarted');
 				resetPlayers(this.seats)
 
-				var dealer, sb, bb, fta, lta
-				
+				var dealer, sb, fta, bb, lta;
+
 				if(this.dealer_prev < 0){
 					dealer = firstNonNullPlayer(this.seats)
 				}
 				else{
 					dealer = nextPlayer(this.dealer_prev, this.seats)
 				}
+				this.dealer_prev = this.seats.indexOf(dealer);
 
-				//Heads-up 2 player mode
+				//  Heads-up 2 player mode
 				if(alivePlayers(this.seats) == 2){
 					sb = dealer
 					fta = sb
 					bb = nextPlayer(this.seats.indexOf(dealer), this.seats)
 					lta = bb
 				}
-				//Normal 3+ player poker
+				//  Normal 3+ player poker
 				else{
 					sb = nextPlayer(this.seats.indexOf(dealer), this.seats)
 					bb = nextPlayer(this.seats.indexOf(sb), this.seats)
@@ -514,211 +503,133 @@ class Room{
 					lta = bb
 				}
 
-				var deck = [...allCards]
-				shuffleArray(deck)
-				this.roundState = new RoundState(dealer,sb,bb,fta,lta,deck)
-
-				//Send roundStarted to players
-				this.io.to(this.room_id).emit('roundStarted');
-
-				this.state = 2;
-			} //no break... continue into next case
-
-			//state 2 compulsory bets
-			case 2:{
-				console.log(this.room_id + ": (state2) compulsory bets.")
-				//Set Pot, Take from SB/BB, set starting bet size
-				this.roundState.pot = 3*this.sb_size;
-				this.roundState.sb.stack -= this.sb_size;
-				this.roundState.bb.stack -= 2*this.sb_size;
+				//Compulsory bets
+				console.log(this.room_id + ": (state1) compulsory bets.")
+				sb.stack -= this.sb_size;
+				bb.stack -= 2*this.sb_size;
 				
-				this.roundState.sb.bet = this.sb_size;
-				this.roundState.bb.bet = 2*this.sb_size;
-				this.roundState.sb.total_bet_size =  this.sb_size;
-				this.roundState.bb.total_bet_size = 2*this.sb_size;
+				sb.bet = this.sb_size;
+				bb.bet = 2*this.sb_size;
 
+				sb.total_bet_size =  this.sb_size;
+				bb.total_bet_size = 2*this.sb_size;
 
+				//Create new round 
+				this.roundState = new RoundState(dealer,sb,bb,fta,lta)
+
+				this.roundState.pot = 3*this.sb_size;
 				this.roundState.bet_size = 2*this.sb_size;
-
-				this.io.to(this.room_id).emit('compulsoryBets');
 
 				this.sendGamestate();
 
-				this.state = 3;
-			} //no break... continue into next case
-
-			//state 3 - dealing
-			case 3: {
-				console.log(this.room_id + ": (state3) dealing.")
+				//Dealing
+				console.log(this.room_id + ": (state1) dealing.")
 				for(var i in this.seats){
 					var player = this.seats[i]
 					if(player){
-					   player.cards.push(this.roundState.deck[this.roundState.deckCounter])
-					   this.roundState.deckCounter++;
-					   player.cards.push(this.roundState.deck[this.roundState.deckCounter])
-					   this.roundState.deckCounter++;
+						player.cards.push(this.roundState.deck[this.roundState.deckCounter])
+						this.roundState.deckCounter++;
+						player.cards.push(this.roundState.deck[this.roundState.deckCounter])
+						this.roundState.deckCounter++;
 						console.log(this.room_id + ": " + player.name + " => " + player.cards)
 
-					   //Send cards to players
-					   this.io.to(player.socket.id).emit("drawnCards", player.cards);				
+						//Send cards to players
+						this.io.to(player.socket.id).emit("drawnCards", player.cards);				
 					}
 				}
-				this.state = 4;
-			} break;
 
-			//state 4 - betting 1
-			case 4:{
-				if(gameStateChanged){
-					console.log(this.room_id + ": (state4) betting1 (preflop).")
-				}
+				//Betting (preflop)
+				this.state = 2;
+				console.log(this.room_id + ": (state2) betting1 [preflop].")
 				this.betting()
 			} break;
 
-			//state 5 - flop
+			case 3:{
+				console.log("Betting complete")
+				if(alivePlayers(this.seats) == 1){
+					this.calculateResults();
+					return;
+				} 
+				this.cardTurns(3);
+				resetPlayersHasActed(this.seats);
+				this.betting();
+			} break;
+
+			case 4:{
+				console.log("Betting complete")
+				if(alivePlayers(this.seats) == 1){
+					this.calculateResults();
+					return;
+				} 
+				this.cardTurns(1);
+				resetPlayersHasActed(this.seats);
+				this.betting();
+			} break;
+
 			case 5:{
-				console.log(this.room_id + ": (state5) flop.")
-				this.cardTurns(3)
-			} break;
+				if(alivePlayers(this.seats) == 1){
+					this.calculateResults();
+					return;
+				} 
+				this.cardTurns(1);
+				resetPlayersHasActed(this.seats);
+				this.betting();
+			}
 
-			//state 6 - betting 2
 			case 6:{
-				if(gameStateChanged){
-					console.log(this.room_id + ": (state6) betting2.")
-				}
-				this.betting();
-			} break;
-
-			//state 7 - turn
-			case 7:{
-				console.log(this.room_id + ": (state7) turn.")
-				this.cardTurns(1)
-			} break;
-
-			//state 8 - betting 3
-			case 8:{
-				if(gameStateChanged){
-					console.log(this.room_id + ": (state8) betting3.")
-				}
-				this.betting();
-			}break;
-
-			//state 9 - river
-			case 9:{
-				console.log(this.room_id + ": (state9) river.")
-
-				this.cardTurns(1)
-			} break;
-
-			//state 10 - betting 4
-			case 10:{
-				if(gameStateChanged){
-					console.log(this.room_id + ": (state10) betting4.")
-				}
-				this.betting();
-			} break;
-
-			//state 11 - showdown
-			case 11:{
-				if(gameStateChanged){
-					console.log(this.room_id + ": (state11) showdown.")
-					this.timer = 0;
-
-					var hands = [];
-					for(var i in this.seats){
-						if(this.seats[i]){
-							if(this.seats[i].alive){
-								hands.push(this.seats[i].cards)
-							}else{
-								hands.push(null)
-							}
+				//Showdown
+				var hands = [];
+				for(var i in this.seats){
+					if(this.seats[i]){
+						if(this.seats[i].alive){
+							hands.push(this.seats[i].cards)
 						}else{
 							hands.push(null)
 						}
+					}else{
+						hands.push(null)
 					}
-
-					this.io.to(this.room_id).emit('showdown', hands)
-
-				}
-				else{
-					this.timer+= this.deltaTime;
 				}
 
-				if(this.timer > showdownTime){
-					this.state++;
-					this.timer = 0;
-				}
+				this.io.to(this.room_id).emit('showdown', hands)
 
+				this.state = 7;
+			}
+
+			case 7:{
+				this.calculateResults();
 			} break;
 
-			//state 12 - winner calc
-			case 12:{
-				if(gameStateChanged){
-					console.log(this.room_id + ": (state12) Winner calculation.")
-					this.calculateResults();
-				}
-			} break;
+			case 8:{
+				console.log(this.room_id + ": (state8) Waiting for new game....")
+				this.io.to(this.room_id).emit("waitingForNewGame",timeAtEnd/1000)
 
-			//state 13 - cleanup
-			case 13:{
-				console.log(this.room_id + ": (state13) Cleanup.")
-
-				this.sendGamestate()
-
-				this.winner = []
-				this.message_sent = 0;
-				this.fold_win = 0;
-
-				this.state++;
-
-				this.dealer_prev = this.seats.indexOf(this.roundState.dealer)
-			} break;
-
-			//state 14 waiting for new game... 
-			case 14:{
-				if(gameStateChanged){
-					console.log(this.room_id + ": (state14) Waiting for new game....")
-					this.io.to(this.room_id).emit("waitingForNewGame",timeAtEnd/1000)
-					this.timer = 0;
-				}
-				else {
-					this.timer+=this.deltaTime;
-				}
-
-				if(this.timer >= timeAtEnd){
-
-                    for(var i in this.seats){
-                        if(this.seats[i]){
-                            //updateUserStack(this.seats[i])
-							db.setPersonStack(this.seats[i].id_person, this.seats[i].stack)
-    
-                            if(this.seats[i].stack < this.sb_size){
-                                //Remove player
-                                this.seats[i].socket.emit("roomKick");
-                                this.seats[i].zombie = 1;
-                            }
-                        } 
-                    }
-
-					this.timer = 0;
-					this.state++;
-
-					this.io.to(this.room_id).emit('resetGame');
-				}
-			} break;
-
-			//Waiting for zombie players to be removed and their balances updated
-			case 15:{
-				if(gameStateChanged){
-					console.log(this.room_id + ": (state15) Updating db....")
-					this.removeZomibePlayers()
-				}
-			} break;
-
-			default:{
-				console.log("[ERR]"+this.room_id+" Unknown state :" + this.state)
-			} break;
-
+				setTimeout(() => {this.resetGame()}, timeAtEnd)
+			}
 		}
+	}
+
+	resetGame() {
+		console.log("Resetting game")
+		for(var i in this.seats){
+			if(this.seats[i]){
+				db.setPersonStack(this.seats[i].id_person, this.seats[i].stack)
+
+				if(this.seats[i].stack < this.sb_size){
+					this.seats[i].socket.emit("roomKick");
+					this.seats[i].zombie = 1;
+				}
+			} 
+		}
+
+		console.log(this.room_id)
+		this.io.to(this.room_id).emit('resetGame');
+
+		this.removeZomibePlayers()
+
+		console.log("Start")
+
+		this.startRoom()
 	}
 }
 
@@ -752,6 +663,15 @@ function resetPlayers(seats){
 		seats[i].cards = []
 		seats[i].total_bet_size = 0;
 		seats[i].all_in = 0;
+		seats[i].has_acted = 0;
+	  }
+	}
+}
+
+function resetPlayersHasActed(seats){
+	for(var i in seats){
+	  if(seats[i]){
+		seats[i].has_acted = 0;
 	  }
 	}
 }
@@ -788,6 +708,10 @@ function alivePlayers(seats){
 function nextPlayer(currentIndex, seats){	  
 	var next = currentIndex+1
 	while(1){
+	  if(next == currentIndex){
+		  console.err("["+this.room_id+"] next player not found!")
+	  }
+
 	  if(next >= seats.length){
 		next = 0;
 	  }
@@ -807,28 +731,6 @@ function nextPlayer(currentIndex, seats){
 	}
 }
 
-function prevPlayer(currentIndex, seats){	  
-	var prev = currentIndex-1
-	while(1){
-	  if(prev < 0){
-		prev = seats.length - 1;
-	  }
-	  if(!seats[prev]){
-		prev = prev-1
-		continue;
-	  }
-	  else{
-		if(seats[prev].alive == 0){
-		  prev = prev-1
-		  continue;
-		}
-		else{
-		  return seats[prev]
-		}
-	  }
-	}
-}
-
 function shuffleArray(array) {
 	for (var i = array.length - 1; i > 0; i--) {
 		var j = Math.floor(Math.random() * (i + 1));
@@ -839,15 +741,17 @@ function shuffleArray(array) {
 }
 
 class RoundState{
-    constructor(dealer, sb, bb, to_act, last_to_act, deck){
+    constructor(dealer, sb, bb, to_act, last_to_act){
         this.dealer = dealer; 
         this.sb = sb;
         this.bb = bb;
     
         this.to_act = to_act;
         this.last_to_act = last_to_act;
-    
-        this.deck = deck;
+
+		var newDeck = [...allCards]
+		shuffleArray(newDeck)
+        this.deck = newDeck;
         this.deckCounter = 0;
         this.revealedCards = [];    
 

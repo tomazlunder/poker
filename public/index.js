@@ -596,8 +596,8 @@ socket.on('waitingForNewGame', (arg) => {
     if(!intervalId){
         intervalId = window.setInterval(function(){
             /// call your function here
-            if(this.timeToAct > 0){
-                this.timeToAct -= 1;
+            if(timeToAct > 0){
+                timeToAct -= 1;
                 drawGame()
             } else {
                 clearInterval(intervalId);
@@ -617,8 +617,8 @@ socket.on('actionRequired', (arg) => {
     if(!intervalId){
         intervalId = window.setInterval(function(){
             /// call your function here
-            if(this.timeToAct > 0){
-                this.timeToAct -= 1;
+            if(timeToAct > 0){
+                timeToAct -= 1;
                 drawGame()
             } else {
                 clearInterval(intervalId);
@@ -1245,7 +1245,7 @@ function drawProfile(x,y,id){
     ctx.font = "65px Tahoma";
     ctx.fillStyle =  "#EE42DA";
 
-    if(state == 1 & playerBets[id]){
+    if(state == 1 & playerBets[id]>0){
 
         var betWidth = ctx.measureText(playerBets[id]).width;
 

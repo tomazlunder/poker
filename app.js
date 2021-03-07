@@ -440,6 +440,9 @@ io.on('connection', function(socket) {
 
 				pidRoomMap.set(user.id_person, room)
 
+				if(room.state == 0){
+					room.updateState();
+				}
 				room.sendNamesStacks()
 				room.sendGamestate();
 			} catch (err) {
@@ -458,22 +461,24 @@ io.on('connection', function(socket) {
 
 
 		if(room){
+			var seatId = room.seats.indexOf(user);
+
+			socket.join(room.room_id);
+	
+			socket.emit("roomJoined",[room.room_id, seatId, user.balance, room.min_buy_in, room.max_buy_in])
+	
+			io.to(user.socket.id).emit("drawnCards", user.cards);				
+			room.sendNamesStacks();
+			room.sendGamestate();
+			socket.emit("reconnectOK");
+
 			user.zombie = 0;
-			if(room.roundState.to_act == user){
-				room.message_sent = 0;
+			if(room.roundState.to_act == user & room.state >= 2 & room.state <= 5){
+				clearInterval(room.timeOutID)
+				room.betting();
 			}
 		}
 
-		var seatId = room.seats.indexOf(user);
-
-		socket.join(room.room_id);
-
-		socket.emit("roomJoined",[room.room_id, seatId, user.balance, room.min_buy_in, room.max_buy_in])
-
-		io.to(user.socket.id).emit("drawnCards", user.cards);				
-		room.sendNamesStacks();
-		room.sendGamestate();
-		socket.emit("reconnectOK");
 	}
 	
 	async function rebuyRoom(arg){
@@ -489,7 +494,7 @@ io.on('connection', function(socket) {
 
 		if(pidRoomMap.has(user.id_person)){
 			var the_room = pidRoomMap.get(user.id_person);
-			if(the_room.state == 0 || the_room.state == 14){
+			if(the_room.state == 0 || the_room.state == 8){
 				if(buy_in <= the_room.max_buy_in - user.stack & buy_in != 0 & user.stack < the_room.min_buy_in){
 					//checkAccountBalance(user,room, null, buy_in, completeRebuy);
 					try{
@@ -549,6 +554,8 @@ function User(socket, id_person, name, balance){
 	this.result = 0;
 
 	this.disconnected = 0;
+
+	this.has_acted;
 }
 
 async function depositCheck(){
@@ -631,19 +638,17 @@ async function runServer(){
 		rooms.push(new Room.Room(io,2, 1, 80,200,6, "Rytlock's Tent" , pidRoomMap));
 		rooms.push(new Room.Room(io,3, 2, 80,200,6, "Zojja's Lab" , pidRoomMap));
 		rooms.push(new Room.Room(io,4, 2, 160,400,6, "Lord Fahren's Chamber", pidRoomMap));
-
 		//rooms.push(new Room.Room(io,5, 2, 100, 500,6, "Bla", pidRoomMap));
 		//rooms.push(new Room.Room(io,6, 2, 100, 500,6, "Bla", pidRoomMap));
 
+		//Starting rooms
+		for(var i in rooms){
+			rooms[i].startRoom();
+		}
 
+		//Removing disconnected users from the user list
 		setInterval(function(){
-			for(var i in rooms){
-				rooms[i].updateGame();
-			}
-
 			for(var i =0;i<users.length;i++){
-
-
 				if(users[i].disconnect & pidRoomMap.has(users[i].id_person)){
 				  //socket.broadcast.to(users[i].room).emit("opponentDisconnect");
 				  users.splice(i,1);
