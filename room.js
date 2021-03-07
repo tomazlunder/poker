@@ -17,6 +17,7 @@ class Room{
 		this.max_buy_in = max_buy_in;
         this.sb_size = sb_size
 		this.name = name;
+		this.numPlayers = numPlayers;
 
 		this.pidRoomMap = pidRoomMap;
 
@@ -49,6 +50,8 @@ class Room{
 
 	static Tournament(io, tournament_id, name, numPlayers, entry_fee, chips_per, sb_start, loops_till_increase, rewards, pidRoomMap){
 		var ret = new Room(io, tournament_id, name, numPlayers, sb_start, null, null, pidRoomMap)
+
+		this.room_id = "tournament" + tournament_id
 		ret.isTournament = 1;
 		ret.entry_fee = entry_fee;
 		ret.chips_per = chips_per;
@@ -539,7 +542,7 @@ class Room{
 						break;
 					}
 				} else {
-					if(this.numberOfPlayers()<numPlayers){
+					if(this.numberOfPlayers()<this.numPlayers){
 						break;
 					}
 				}

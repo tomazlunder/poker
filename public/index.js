@@ -49,6 +49,7 @@ var myBalance;
 
 //to pass to buy in modal functions
 var buttonRoomdataMap = new Map()
+var buttonTournamentDataMap = new Map()
 
 var cur_min_buy_in;
 var cur_max_buy_in;
@@ -455,6 +456,167 @@ socket.on('roomList', (arg) =>{
     }
 });
 
+socket.on('tournamentList', (arg) => {
+    console.log("Received: tournamentList");
+    console.log(arg)
+
+    var myNode = document.getElementById("containerTournaments");
+    myNode.innerHTML = '';
+
+    var alreadyInRoom = arg[0];
+    document.getElementById("labelRoomMessage").innerHTML= ""
+
+    if(alreadyInRoom){
+        document.getElementById("labelRoomMessage").innerHTML= "&#160&#160&#160&#160 Waiting for previous round to finish."
+    }
+
+    //buttonRoomdataMap = new Map()
+    buttonTournamentDataMap = new Map()
+
+    var tournament_list = arg[1];
+    for(var i in tournament_list){
+        var id = tournament_list[i][0]
+        var buyin = tournament_list[i][1]
+        var numplayers = tournament_list[i][4]
+        var numseats = tournament_list[i][5]
+        var tournamentName = tournament_list[i][6]
+
+        var tournamentRunning = tournament_list[i][7]
+        var tournamentMarkedForShutdown = tournament_list[i][8]
+        var tournamentRewards = tournament_list[i][9]
+
+        var div_tournament = document.createElement("div");
+        var div_col80 = document.createElement("div");
+        var div_row50_1 = document.createElement("div");
+        var div_row50_2 = document.createElement("div");
+        var label_room_1 = document.createElement("label");
+        var div_col20 = document.createElement("div");
+        var button_join = document.createElement("button");
+
+        var button_stop = document.createElement("button");
+        var button_start = document.createElement("button");
+
+        var table = document.createElement("table")
+        var tableTr = document.createElement("tr")
+        var tableTd1 = document.createElement("td")
+        var tableTd2 = document.createElement("td")
+
+        var label_rewards = document.createElement("label");
+        var label_players = document.createElement("label");
+
+        div_tournament.classList.add("tournament")
+        div_col80.classList.add("col80")
+        div_row50_1.classList.add("row50")
+        div_row50_2.classList.add("row50")
+        div_col20.classList.add("col20")
+
+        button_stop.classList.add("buttonRoomStop")
+        button_start.classList.add("buttonRoomStart")
+
+        button_join.classList.add("buttonJoin")
+
+        table.classList.add("tableRoom")
+        tableTd1.classList.add("tdTournament1")
+        tableTd2.classList.add("tdTournament2")
+
+        label_room_1.innerHTML = tournamentName;
+
+        label_rewards.innerHTML = "Rewards (TODO)"
+        label_players.innerHTML = "Players: "+numplayers+"/"+numseats
+
+        tableTd1.append(label_rewards)
+        tableTd2.append(label_players)
+
+        tableTr.append(tableTd1)
+        tableTr.append(tableTd2)
+
+        table.append(tableTr)
+
+        div_row50_1.append(label_room_1)
+        div_row50_2.append(table)
+
+        div_col80.append(div_row50_1)
+        div_col80.append(div_row50_2)
+        button_join.innerHTML = "Join ("+buyin+")"
+        if(buyin == 0){
+            button_join.innerHTML = "Join (FREE)"
+        }
+
+        button_stop.innerHTML = "Stop"
+        button_start.innerHTML = "Start"
+
+        if(adminMode){
+            div_col20.append(button_stop)
+            div_col20.append(button_start)
+
+            button_start.disabled = true;
+            if(tournamentRunning == 0 || tournamentMarkedForShutdown == 1){
+                button_stop.disabled = true;
+
+                if(tournamentRunning == 1){
+                    button_stop.innerHTML = "Shutting down..."
+                }
+            } 
+            if(tournamentRunning == 0){
+                button_start.disabled = false;
+            }
+            
+
+        } else {
+            div_col20.append(button_join)
+
+            if(tournamentRunning == 0 || tournamentMarkedForShutdown == 1){
+                button_join.disabled = true;
+                button_join.innerHTML = "Room closed"
+            }
+
+            if(myBalance<buyin){
+                button_join.disabled = true;
+            }
+        }
+
+        div_tournament.append(div_col80)
+        div_tournament.append(div_col20)
+
+        buttonTournamentDataMap.set(button_join, id)
+        buttonTournamentDataMap.set(button_stop, id)
+        buttonTournamentDataMap.set(button_start, id)
+
+
+        button_join.onclick = function(){
+            buttonJoinTournamentClicked(buttonTournamentDataMap.get(this)[0])
+        }
+
+        button_stop.onclick = function(){
+            buttonStopTournamentClicked(buttonTournamentDataMap.get(this)[0])
+            this.disabled = true;
+        }
+
+        button_start.onclick = function(){
+            buttonStartTournamentClicked(buttonTournamentDataMap.get(this)[0])
+            this.disabled = true;
+        }
+
+        if(arg[0]){
+            button_join.disabled = true;
+            console.log("Waiting for last round to end")
+        }
+
+        if(arg[0] == id){
+            button_join.innerHTML = "Reconnect";
+            button_join.disabled = false;
+
+            button_join.onclick = function(){
+                socket.emit("reconnect");
+            }
+        }
+
+        var containerRooms = document.getElementById("containerTournaments");
+        containerRooms.append(div_tournament)
+        containerRooms.append(document.createElement("br"))
+    }
+});
+
 socket.on('listOutdated', (arg) => {
     console.log("Received: Room list outdated");
     console.log("Emitted: lookingForRooms");
@@ -772,6 +934,11 @@ function buttonJoinRoomClicked(room_id, room_min, room_max){
     modalBuyIn.style.display = "block";
 }
 
+function buttonJoinTournamentClicked(tournament_id){
+    //TODO:
+    socket.emit("joinTournament", tournament_id)
+}
+
 
 function buttonStopRoomClicked(room_id){
     socket.emit("adminRoomStop", room_id)
@@ -780,6 +947,15 @@ function buttonStopRoomClicked(room_id){
 function buttonStartRoomClicked(room_id){
     socket.emit("adminRoomStart", room_id)
 }
+
+function buttonStopTournamentClicked(room_id){
+    socket.emit("adminTournamentStop", room_id)
+}
+
+function buttonStartTournamentClicked(room_id){
+    socket.emit("adminTournamentStart", room_id)
+}
+
 
 //Buttons in modals
 
@@ -981,15 +1157,36 @@ function registrationBackButton() {
 
 //Home buttons
 
-function homePlayButton(){
+function homeRoomsButton(){
     document.getElementById("homeRooms").style.display="block"
+    document.getElementById("containerRooms").style.display="block"
+    document.getElementById("containerTournaments").style.display="none"
+
     document.getElementById("homeAccount").style.display="none"
     document.getElementById("homeLeaderboard").style.display="none"
 
-    document.getElementById("homePlayButton").disabled = true;
+    document.getElementById("homeRoomsButton").disabled = true;
+    document.getElementById("homeTournamentsButton").disabled = false;
+
     document.getElementById("homeAccountButton").disabled = false;
-    document.getElementById("homeLeaderboardButton").disabled = false;;
+    document.getElementById("homeLeaderboardButton").disabled = false;
 }
+
+function homeTournamentsButton(){
+    document.getElementById("homeRooms").style.display="block"
+    document.getElementById("containerRooms").style.display="none"
+    document.getElementById("containerTournaments").style.display="block"
+
+    document.getElementById("homeAccount").style.display="none"
+    document.getElementById("homeLeaderboard").style.display="none"
+
+    document.getElementById("homeRoomsButton").disabled = false;
+    document.getElementById("homeTournamentsButton").disabled = true;
+
+    document.getElementById("homeAccountButton").disabled = false;
+    document.getElementById("homeLeaderboardButton").disabled = false;
+}
+
 
 function homeAccountButton(){
     document.getElementById("homeRooms").style.display="none"
@@ -997,9 +1194,10 @@ function homeAccountButton(){
     document.getElementById("homeLeaderboard").style.display="none"
 
 
-    document.getElementById("homePlayButton").disabled = false;
-    document.getElementById("homeAccountButton").disabled = true;;
-    document.getElementById("homeLeaderboardButton").disabled = false;;
+    document.getElementById("homeRoomsButton").disabled = false;
+    document.getElementById("homeTournamentsButton").disabled = false;
+    document.getElementById("homeAccountButton").disabled = true;
+    document.getElementById("homeLeaderboardButton").disabled = false;
 }
 
 function homeLeaderboardButton(){
@@ -1009,12 +1207,13 @@ function homeLeaderboardButton(){
     document.getElementById("homeAccount").style.display="none"
     document.getElementById("homeLeaderboard").style.display="block"
 
-    document.getElementById("homePlayButton").disabled = false;
-    document.getElementById("homeAccountButton").disabled = false;;
-    document.getElementById("homeLeaderboardButton").disabled = true;;
+    document.getElementById("homeRoomsButton").disabled = false;
+    document.getElementById("homeTournamentsButton").disabled = false;
+    document.getElementById("homeAccountButton").disabled = false;
+    document.getElementById("homeLeaderboardButton").disabled = true;
 }
 
-function homeRefreshButton(){
+function roomRefreshButton(){
     var myNode = document.getElementById("containerRooms");
     myNode.innerHTML = '';
 

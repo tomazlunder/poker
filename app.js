@@ -24,6 +24,7 @@ const { Socket } = require('dgram');
 //Server vars
 var users = []
 var rooms = []
+var tournaments = []
 
 const tickTime = 2000;
 const timeForAction = 25000;
@@ -265,6 +266,15 @@ io.on('connection', function(socket) {
 			ret.push([room.room_id,room.sb_size,room.min_buy_in, room.max_buy_in, rooms[i].numberOfPlayers(), room.seats.length, room.name, room.running, room.markedForShutdown])
 		}
 		socket.emit("roomList",[alreadyInRoom,ret]);
+
+		var tournament;
+		ret = []
+		for(var i in tournaments){
+			tournament = tournaments[i]
+			ret.push(([tournament.room_id, tournament.entry_fee, tournament.numberOfPlayers(), tournament.numPlayers, tournament.name, tournament.running, tournament.markedForShutdown, tournament.rewards]))
+		}
+
+		socket.emit("tournamentList",[alreadyInRoom, ret])
 	}
 
 	function actionRequest(data){
@@ -693,6 +703,7 @@ async function depositCheck(){
 async function runServer(){
 	users = []
 	rooms = []
+	tournaments = []
 	
 	try{
 		/*
@@ -714,9 +725,17 @@ async function runServer(){
 		//rooms.push(new Room.Room(io,5, 2, 100, 500,6, "Bla", pidRoomMap));
 		//rooms.push(new Room.Room(io,6, 2, 100, 500,6, "Bla", pidRoomMap));
 
+		var t1 = Room.Room.Tournament(io, 1, "Test tournament", 6, 50, 250, 2, 1, [100,50,25,0,0,0], pidRoomMap);
+		tournaments.push(t1)
+
 		//Starting rooms
 		for(var i in rooms){
 			rooms[i].startRoom();
+		}
+
+		//Starting tournaments
+		for(var i in tournaments){
+			tournaments[i].startRoom();
 		}
 
 		//Removing disconnected users from the user list
@@ -733,7 +752,7 @@ async function runServer(){
 
 
 	} catch (err) {
-		console.err("[SERVER] CRITICAL ERROR")
+		console.log("[SERVER] CRITICAL ERROR")
 		console.log(err)
 	}
 }

@@ -70,11 +70,15 @@
 
     <div class ="containerPage" id="home">
       <div class="containerNav">
-        <button onclick="homePlayButton()" class="navButton" id="homePlayButton" disabled >Rooms</button>
+        <button onclick="homeRoomsButton()" class="navButton" id="homeRoomsButton" disabled >Rooms</button>
+        <button onclick="homeTournamentsButton()" class="navButton" id="homeTournamentsButton">Tournaments</button>
+
         <button onclick="homeAccountButton()" class="navButton" id="homeAccountButton">Account</button>
         <button onclick="homeLeaderboardButton()" class="navButton" id="homeLeaderboardButton">Leaderboard</button>
 
+        <button onclick="homeLogoffButton()"  class="navButton" id="homeLogOffButton">Log off</button>
         <button onclick="homeTipButton()"  class="navButton" id="buttonTip">Tip the house</button>
+
 
         <!-- <button onclick="discordButton()" class="navButton" id="buttonDiscord">Discord</button> -->
 
@@ -86,12 +90,13 @@
         <!--  <label class="labelTitle">Room List</label> -->
         <label class="roomListRefreshRow" id="labelRoomMessage" style="display:none;">aa</label>
         <div class="containerRooms" id="containerRooms"></div>
+        <div class="containerRooms" id="containerTournaments" style="display:none;"></div>
         <div class="containerDiscordWidget" id="containerRooms">
         <iframe src="https://discord.com/widget?id=817786951909638156&theme=dark" width="100%" height="100%" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
         </div>
         <div class="clear" style="clear: both;"></div>
 
-        <button onclick="homeRefreshButton()" class="navButton"  >Refresh</button>
+        <button onclick="roomRefreshButton()" class="navButton"  >Refresh</button>
       </div>
 
       <!-- account-->
@@ -153,7 +158,6 @@
     </div>
 
     <div class="containerPage" id="game">
-
       <div id="canvasContainer">
         <canvas width=1800 height=1200 id="canvas"></canvas>
       </div>

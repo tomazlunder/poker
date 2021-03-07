@@ -209,6 +209,11 @@ button {
   color: #ffffff;
 }
 
+#homeLogOffButton{
+  float: right;
+  margin-left: 0.5vw;
+}
+
 #buttonDiscord {
   min-width: 10vw;
   float: right;
