@@ -19,6 +19,7 @@ var db = require('./db.js');
 var api = require('./api.js')
 
 const { RSA_PKCS1_PADDING } = require('constants');
+const { Socket } = require('dgram');
 
 //Server vars
 var users = []
@@ -63,6 +64,17 @@ io.on('connection', function(socket) {
 
 
 	function adminRoomStop(room_id){
+		if(!socketUserMap.has(socket)){
+			console.log("Tried something but is not logged in")
+			socket.emit('dc')
+			socket.disconnect;
+			return;
+		}
+		if(socketUserMap.get(Socket).is_admin == 0){
+			console.log("Tried admin cmd but is not an admin.")
+			return;
+		}
+
 		for(var i in rooms){
 			if(rooms[i].room_id == room_id){
 				if(rooms[i].running == 0 || rooms[i].markedForShutdown == 1){
@@ -84,6 +96,17 @@ io.on('connection', function(socket) {
 	}
 
 	function adminRoomStart(room_id){
+		if(!socketUserMap.has(socket)){
+			console.log("Tried something but is not logged in")
+			socket.emit('dc')
+			socket.disconnect;
+			return;
+		}
+		if(socketUserMap.get(Socket).is_admin == 0){
+			console.log("Tried admin cmd but is not an admin.")
+			return;
+		}
+
 		for(var i in rooms){
 			if(rooms[i].room_id == room_id){
 				if(rooms[i].running == 1 ){
