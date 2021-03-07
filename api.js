@@ -51,7 +51,7 @@ function getGuildLog(key_guild, key_api, since = null){
         url = url + "access_token="
         url = url + key_api
 
-        console.log(url)
+        //console.log(url)
 
         https.get(url, (resp) => {
             let api_data = '';

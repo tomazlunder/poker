@@ -28,26 +28,15 @@ class Room{
 
         this.dealer_prev = -1
 
-        this.message_sent = 0;
-
-        this.winner = [];
 	    this.acted = 0;
-	    this.fold_win = 0
 
         this.state = 0;
 		this.roundState = new RoundState();
 
-        //Delta time for update loop
-	    this.last_update = Date.now()
-	    this.deltaTime = 0;
-
-		this.lastUpdateState = -1
-		this.timer = 0;
-
-		this.markedForShutdown = 0;
-
+		//Timeout for player action
 		this.timeoutID;
 
+		this.markedForShutdown = 0;
     }
 
 	/* Functions for sending data */
@@ -233,11 +222,7 @@ class Room{
 			console.log(this.room_id + ": " + this.roundState.to_act.name + " autocheck (timeout)");
 		}
 
-		if(this.roundState.to_act == this.roundState.last_to_act){
-		} else {
-			this.roundState.to_act = nextPlayer(this.seats.indexOf(this.roundState.to_act), this.seats)
-		}
-
+		this.roundState.to_act = nextPlayer(this.seats.indexOf(this.roundState.to_act), this.seats)
 		clearInterval(this.timeoutID)
 		this.betting();
 	}
@@ -515,7 +500,7 @@ class Room{
 				bb.total_bet_size = 2*this.sb_size;
 
 				//Create new round 
-				this.roundState = new RoundState(dealer,sb,bb,fta,lta)
+				this.roundState = new RoundState(dealer,fta)
 
 				this.roundState.pot = 3*this.sb_size;
 				this.roundState.bet_size = 2*this.sb_size;
@@ -741,16 +726,14 @@ function shuffleArray(array) {
 }
 
 class RoundState{
-    constructor(dealer, sb, bb, to_act, last_to_act){
+    constructor(dealer, to_act){
         this.dealer = dealer; 
-        this.sb = sb;
-        this.bb = bb;
     
         this.to_act = to_act;
-        this.last_to_act = last_to_act;
 
 		var newDeck = [...allCards]
 		shuffleArray(newDeck)
+
         this.deck = newDeck;
         this.deckCounter = 0;
         this.revealedCards = [];    

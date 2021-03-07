@@ -36,7 +36,7 @@ function getPerson(account_name){
                         reject()
                     }
 					console.log(query.sql); 
-					console.log(result);
+					//console.log(result);
 					if(result.length == 1){
                         resolve(result[0])
 					}
@@ -62,7 +62,7 @@ function tryDecreaseBalance(user_id, decrease_by){
             }
             
             console.log(query.sql); 
-			console.log(result);
+			//console.log(result);
 
 			if(result.changedRows == 1){
 				//Complete room join
@@ -87,7 +87,7 @@ function tryIncreaseBalance(id_person, increase_by){
             }
             
             console.log(query.sql); 
-			console.log(result);
+			//console.log(result);
 
 			if(result.changedRows == 1){
 				//Complete room join
@@ -198,7 +198,7 @@ function transferStackToBalance(user){
                     reject()
                 }
                 console.log(query.sql); 
-                console.log(result);
+                //console.log(result);
                 if(result.affectedRows == 1){
                     console.log("Transfered stack to balance.")
                     resolve()
@@ -220,7 +220,7 @@ function changeWinnings(id_person, change_by){
                     reject()
                 }
                 console.log(query.sql); 
-                console.log(result);
+                //console.log(result);
                 if(result.changedRows == 1){
                     console.log("Changed winnings.")
                     resolve()
@@ -242,7 +242,7 @@ function insertWithdraw(id_person, amount){
                     reject()
                 }
                 console.log(query.sql); 
-                console.log(result);
+                //console.log(result);
                 if(result.affectedRows == 1){
                     console.log("Created withdraw.")
                     resolve()
@@ -265,7 +265,7 @@ function transferAllPersonStackToBalance(){
                     reject()
                 }
                 console.log(query.sql)
-                console.log(result)
+                //console.log(result)
                 resolve()
             }
         );
@@ -282,7 +282,7 @@ function getSumTips(id_person){
                     reject()
                 }
                 console.log(query.sql)
-                console.log(result)
+                //console.log(result)
                 if(result.length == 1){
                     if(result[0].result_sum){
                         resolve(result[0].result_sum)
@@ -305,7 +305,7 @@ function getPendingWithdrawals(id_person){
                     reject()
                 }
                 console.log(query.sql)
-                console.log(result)
+                //console.log(result)
                 if(result.length == 1){
                     if(result[0].result_sum){
                         resolve(result[0].result_sum)
@@ -328,7 +328,7 @@ function insertTip(id_person, amount){
                     reject()
                 }
                 console.log(query.sql); 
-                console.log(result);
+                //console.log(result);
                 if(result.affectedRows == 1){
                     resolve()
                 }else{
@@ -349,7 +349,7 @@ function topTenWinnings(){
                     reject()
                 }
                 console.log(query.sql); 
-                console.log(result);
+                //console.log(result);
                 resolve(result)
             }
         );
@@ -366,7 +366,7 @@ function getGuilds(){
                     reject()
                 }
                 console.log(query.sql)
-                console.log(result)
+                //console.log(result)
                 if(result.length > 0){
                     resolve(result)
                 }

@@ -271,8 +271,8 @@ io.on('connection', function(socket) {
 				const response2 = await db.getSumTips(response.id_person)
 				const response3 = await db.getPendingWithdrawals(response.id_person)
 
-				console.log(response2)
-				console.log(response3)
+				//console.log(response2)
+				//console.log(response3)
 
 
 				console.log(response.account_name + " logged in")
