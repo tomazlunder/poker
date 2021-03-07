@@ -407,6 +407,10 @@ socket.on('roomList', (arg) =>{
                 button_join.disabled = true;
                 button_join.innerHTML = "Room closed"
             }
+
+            if(myBalance<minBuyIn){
+                button_join.disabled = true;
+            }
         }
 
         div_room.append(div_col80)
