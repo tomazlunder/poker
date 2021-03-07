@@ -70,7 +70,7 @@ io.on('connection', function(socket) {
 			socket.disconnect;
 			return;
 		}
-		if(socketUserMap.get(Socket).is_admin == 0){
+		if(socketUserMap.get(socket).is_admin == 0){
 			console.log("Tried admin cmd but is not an admin.")
 			return;
 		}
@@ -102,7 +102,7 @@ io.on('connection', function(socket) {
 			socket.disconnect;
 			return;
 		}
-		if(socketUserMap.get(Socket).is_admin == 0){
+		if(socketUserMap.get(socket).is_admin == 0){
 			console.log("Tried admin cmd but is not an admin.")
 			return;
 		}
