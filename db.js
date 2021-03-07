@@ -75,6 +75,30 @@ function tryDecreaseBalance(user_id, decrease_by){
     });
 }
 
+function tryIncreaseBalance(id_person, increase_by){
+    return new Promise((resolve,reject) => {
+        var query = con.query("UPDATE person SET balance = balance + ? WHERE id_person = ?",
+        [increase_by, id_person],
+		function(err, result){
+            if (err){
+                console.log(err)
+                reject();
+                return;
+            }
+            
+            console.log(query.sql); 
+			console.log(result);
+
+			if(result.changedRows == 1){
+				//Complete room join
+				resolve()
+			}
+			else{
+				reject()
+			}
+        });
+    });
+}
 function setPersonStack(user_id, new_stack){
     return new Promise((resolve,reject) => {
         var query = con.query("UPDATE person SET stack = ? WHERE id_person = ?",
@@ -332,9 +356,81 @@ function topTenWinnings(){
     });
 }
 
+function getGuilds(){
+    return new Promise((resolve,reject) => {    
+        var query = con.query("SELECT * FROM guild;",
+            null,
+            function(err, result){
+                if (err) {
+                    console.log(err)
+                    reject()
+                }
+                console.log(query.sql)
+                console.log(result)
+                if(result.length > 0){
+                    resolve(result)
+                }
+                else{
+                    resolve(null)
+                }
+            }
+        );
+    });
+}
+
+function setGuildSince(id_guild, new_since){
+    return new Promise((resolve,reject) => {
+        var query = con.query("UPDATE guild SET since = ? WHERE id_guild = ?",
+        [new_since, id_guild],
+		function(err, result){
+            if (err){
+                console.log(err)
+                reject();
+                return;
+            }
+
+			if(result.changedRows == 1){
+				resolve()
+			}
+			else{
+				reject()
+			}
+        });
+    });
+}
+
+function insertDeposit(id_guild, acc_name, amount, completed, api_id){
+    return new Promise((resolve,reject) => {    
+        var query = con.query("INSERT INTO deposit(id_guild, account_name, amount, completed, api_id) VALUES (?,?,?,?,?)",
+            [id_guild,
+            acc_name,
+            amount,
+            completed,
+            api_id
+            ],
+            function(err, result){
+                if (err){
+                    console.log(err)
+                    reject();
+                    return;
+                }
+
+                if(result.affectedRows == 1){
+                    resolve()
+                }
+                else{
+                    reject()
+                }            
+            }
+        );
+        
+    });
+}
+
 module.exports = connectDatabase();
 module.exports.getPerson = getPerson;
 module.exports.tryDecreaseBalance = tryDecreaseBalance;
+module.exports.tryIncreaseBalance = tryIncreaseBalance;
 module.exports.setPersonStack = setPersonStack;
 module.exports.insertPerson = insertPerson;
 module.exports.transferStackToBalance = transferStackToBalance;
@@ -347,6 +443,11 @@ module.exports.insertTip = insertTip;
 module.exports.setPersonPassword = setPersonPassword;
 module.exports.setPersonEmail = setPersonEmail;
 module.exports.topTenWinnings = topTenWinnings;
+module.exports.getGuilds = getGuilds;
+module.exports.setGuildSince = setGuildSince;
+module.exports.insertDeposit = insertDeposit;
+
+
 
 
 

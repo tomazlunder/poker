@@ -551,12 +551,79 @@ function User(socket, id_person, name, balance){
 	this.disconnected = 0;
 }
 
+
+
 async function runServer(){
 	users = []
 	rooms = []
 	
 	try{
+		/*
+		* If some of the players stacks are non zero (served crashed mid-game):
+		* Transfer that players playing stack to balance
+		*/
 		const p = await db.transferAllPersonStackToBalance();
+
+		/*
+		* Checking guild bank deposits on GW2 API
+		*
+		*/
+
+		const guilds = await db.getGuilds()
+		if(guilds){
+			for(var i in guilds){
+				var guild = guilds[i]
+				var log = await api.getGuildLog(guild.api_id, guild.access_token,guild.since)
+
+                console.log(log)
+
+
+				if(log.length == 0){
+					continue;
+				}
+
+				var filtered = log.filter(function (log) {
+                    return log.type === "stash";
+                });
+				console.log(filtered)
+
+                filtered = filtered.filter(function (log) {
+                    return log.operation === "deposit";
+                });
+				console.log(filtered)
+
+
+                filtered = filtered.filter(function (log) {
+                    return log.item_id === 19721;
+                });
+
+                console.log(filtered)
+
+				for(var j in filtered){
+					try{
+						var person = await db.getPerson(filtered[j].user)
+
+						var response = await db.tryIncreaseBalance(person.id_person, filtered[j].count)
+
+						var response2 = await db.insertDeposit(guild.id_guild, person.account_name, filtered[j].count, 1, filtered[j].id)
+
+						console.log("Deposit found and completed")
+					
+					}
+					catch(err){
+						var response2 = await db.insertDeposit(guild.id_guild, filtered[j].user, filtered[j].count, 0, filtered[j].id)
+
+						console.log("Deposit found but not completed")
+
+					}
+				}
+
+				//Guild update since
+				var a = await db.setGuildSince(guild.id_guild, log[0].id)
+
+			}
+		}
+		return;
 
 		rooms.push(new Room.Room(io,1, 1, 40,100,6, "Braham's Lodge", pidRoomMap));
 		rooms.push(new Room.Room(io,2, 1, 80,200,6, "Rytlock's Tent" , pidRoomMap));
@@ -591,6 +658,7 @@ async function runServer(){
 }
 
 runServer();
+//api.getGuildLog("4AC19AC4-2A0A-E411-A3F0-AC162DC05865","7FF064DF-44EA-B049-915C-C6E30D559EC3C409B7E7-4CD9-4601-8B3B-40A74C1AC284")
 //GAME LOOP  
 
 /*
