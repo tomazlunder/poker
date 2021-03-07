@@ -36,6 +36,7 @@ class Room{
 		//Timeout for player action
 		this.timeoutID;
 
+		this.running = 0;
 		this.markedForShutdown = 0;
     }
 
@@ -79,7 +80,7 @@ class Room{
 		
 		for(var i = 0; i < this.seats.length; i++){
 			if(this.seats[i]){
-				if(this.seats[i].zombie == 1 || this.seats[i].stack < this.sb_size*2){
+				if(this.seats[i].zombie == 1 || this.seats[i].stack < this.sb_size*2 || this.markedForShutdown == 1){
 					var user = this.seats[i]
 					
 					promises.push(db.transferStackToBalance(user))
@@ -89,6 +90,7 @@ class Room{
 					user.stack = 0;
 		
 					user.socket.emit("newBalance", user.balance)
+					this.seats[i].socket.emit("roomKick");
 
 					console.log(this.room_id + ": removed zombie player ("+ user.name+").")
 					this.pidRoomMap.delete(user.id_person)
@@ -438,6 +440,10 @@ class Room{
 	}
 
 	startRoom(){
+		console.log(this.room_id + ": started.")
+
+		this.running = 1;
+		this.markedForShutdown = 0;
 		this.state = 0;
 		this.updateState();
 	}
@@ -447,6 +453,12 @@ class Room{
 			case 0:{
 				console.log(this.room_id + ": (state0) waiting for players.")
 				this.removeZomibePlayers();
+
+				if(this.markedForShutdown){
+					this.running = 0;
+					console.log(this.room_id + ": has shut down.")
+					return;
+				}
 
 				this.sendWaitingForPlayer();
 				this.sendNamesStacks();
@@ -599,22 +611,24 @@ class Room{
 		for(var i in this.seats){
 			if(this.seats[i]){
 				db.setPersonStack(this.seats[i].id_person, this.seats[i].stack)
-
-				if(this.seats[i].stack < this.sb_size){
-					this.seats[i].socket.emit("roomKick");
-					this.seats[i].zombie = 1;
-				}
 			} 
 		}
 
 		console.log(this.room_id)
 		this.io.to(this.room_id).emit('resetGame');
 
+		//Also removes all players if room is marked for shutdown
 		this.removeZomibePlayers()
 
-		console.log("Start")
+		console.log("Round ended")
 
-		this.startRoom()
+		if(!this.markedForShutdown){
+			this.startRoom()
+		} else {
+			console.log(this.room_id + ": has shut down.")
+			this.running = 0;
+			this.markedForShutdown = 0;
+		}
 	}
 }
 

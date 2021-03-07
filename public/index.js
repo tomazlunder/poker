@@ -23,6 +23,9 @@ var playerAlive = []
 var playerResults = [0,0,0,0,0,0]
 var playerResultReason = [null,null,null,null,null,null]
 
+var isAdmin = false;
+var adminMode = false;
+
 var buttonRoomMap = new Map()
 
 var playerToAct;
@@ -162,6 +165,11 @@ socket.on('loginOk', (arg) => {
 
     myName = arg[0]
     myBalance = arg[1]
+    isAdmin = arg[2]
+
+    if(isAdmin){
+        document.getElementById("buttonAdminMode").style.display = "block";
+    }
 
     document.getElementById("home_label_user").innerHTML = arg[0]
     document.getElementById("home_label_balance").innerHTML = "Balance: " + arg[1]
@@ -310,6 +318,9 @@ socket.on('roomList', (arg) =>{
         var numseats = room_list[i][5]
         var roomName = room_list[i][6]
 
+        var roomRunning = room_list[i][7]
+        var roomMarkedForShutdown = room_list[i][8]
+
         var div_room = document.createElement("div");
         var div_col80 = document.createElement("div");
         var div_row50_1 = document.createElement("div");
@@ -317,6 +328,9 @@ socket.on('roomList', (arg) =>{
         var label_room_1 = document.createElement("label");
         var div_col20 = document.createElement("div");
         var button_join = document.createElement("button");
+
+        var button_stop = document.createElement("button");
+        var button_start = document.createElement("button");
 
         var table = document.createElement("table")
         var tableTr = document.createElement("tr")
@@ -333,6 +347,10 @@ socket.on('roomList', (arg) =>{
         div_row50_1.classList.add("row50")
         div_row50_2.classList.add("row50")
         div_col20.classList.add("col20")
+
+        button_stop.classList.add("buttonRoomStop")
+        button_start.classList.add("buttonRoomStart")
+
         button_join.classList.add("buttonJoin")
         table.classList.add("tableRoom")
         tableTd1.classList.add("tdRoom")
@@ -362,14 +380,55 @@ socket.on('roomList', (arg) =>{
         div_col80.append(div_row50_2)
         button_join.innerHTML = "Join"
 
-        div_col20.append(button_join)
+        button_stop.innerHTML = "Stop"
+        button_start.innerHTML = "Start"
+
+        if(adminMode){
+            div_col20.append(button_stop)
+            div_col20.append(button_start)
+
+            button_start.disabled = true;
+            if(roomRunning == 0 || roomMarkedForShutdown == 1){
+                button_stop.disabled = true;
+
+                if(roomRunning == 1){
+                    button_stop.innerHTML = "Shutting down..."
+                }
+            } 
+            if(roomRunning == 0){
+                button_start.disabled = false;
+            }
+            
+
+        } else {
+            div_col20.append(button_join)
+
+            if(roomRunning == 0 || roomMarkedForShutdown == 1){
+                button_join.disabled = true;
+                button_join.innerHTML = "Room closed"
+            }
+        }
+
         div_room.append(div_col80)
         div_room.append(div_col20)
 
         buttonRoomdataMap.set(button_join, [id, minBuyIn, maxBuyIn])
+        buttonRoomdataMap.set(button_stop, [id, minBuyIn, maxBuyIn])
+        buttonRoomdataMap.set(button_start, [id, minBuyIn, maxBuyIn])
+
 
         button_join.onclick = function(){
             buttonJoinRoomClicked(buttonRoomdataMap.get(this)[0], buttonRoomdataMap.get(this)[1], buttonRoomdataMap.get(this)[2])
+        }
+
+        button_stop.onclick = function(){
+            buttonStopRoomClicked(buttonRoomdataMap.get(this)[0])
+            this.disabled = true;
+        }
+
+        button_start.onclick = function(){
+            buttonStartRoomClicked(buttonRoomdataMap.get(this)[0])
+            this.disabled = true;
         }
 
         if(arg[0]){
@@ -709,6 +768,15 @@ function buttonJoinRoomClicked(room_id, room_min, room_max){
     modalBuyIn.style.display = "block";
 }
 
+
+function buttonStopRoomClicked(room_id){
+    socket.emit("adminRoomStop", room_id)
+}
+
+function buttonStartRoomClicked(room_id){
+    socket.emit("adminRoomStart", room_id)
+}
+
 //Buttons in modals
 
 function modalBuyInClicked(room_id){
@@ -999,6 +1067,17 @@ function changePasswordButton(){
     document.getElementById("errorLabelModalPassword").innerHTML = ""
 }
 
+function buttonAdminMode(){
+    console.log("Clicked admin mode")
+
+    if(adminMode){
+        adminMode = 0;
+    } else {
+        adminMode = 1;
+    }
+
+    socket.emit("lookingForRooms");
+}
 
 //Game buttons
 

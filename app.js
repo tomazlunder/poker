@@ -58,6 +58,45 @@ io.on('connection', function(socket) {
 	socket.on('changePassword', changePassword);
 	socket.on('changeEmail', changeEmail);
 	socket.on('getLeaderboard', getLeaderboard);
+	socket.on('adminRoomStop', adminRoomStop);
+	socket.on('adminRoomStart', adminRoomStart);
+
+
+	function adminRoomStop(room_id){
+		for(var i in rooms){
+			if(rooms[i].room_id == room_id){
+				if(rooms[i].running == 0 || rooms[i].markedForShutdown == 1){
+					console.log("Received room stop but room already stopped/marked for stopping");
+					return;
+				}
+
+				rooms[i].markedForShutdown = 1;
+				if(rooms[i].state == 0){
+					rooms[i].updateState();
+				}
+
+				socket.emit("listOutdated")
+
+				break;
+			}
+		}
+		
+	}
+
+	function adminRoomStart(room_id){
+		for(var i in rooms){
+			if(rooms[i].room_id == room_id){
+				if(rooms[i].running == 1 ){
+					console.log("Received room start but room already running");
+					return;
+				}
+
+				socket.emit("listOutdated")
+
+				rooms[i].startRoom();
+			}
+		}
+	}
 
 	async function getLeaderboard(){
 		if(!socketUserMap.has(socket)){
@@ -200,7 +239,7 @@ io.on('connection', function(socket) {
 		var room;
 		for(var i in rooms){
 			room = rooms[i]
-			ret.push([room.room_id,room.sb_size,room.min_buy_in, room.max_buy_in, rooms[i].numberOfPlayers(), room.seats.length, room.name])
+			ret.push([room.room_id,room.sb_size,room.min_buy_in, room.max_buy_in, rooms[i].numberOfPlayers(), room.seats.length, room.name, room.running, room.markedForShutdown])
 		}
 		socket.emit("roomList",[alreadyInRoom,ret]);
 	}
@@ -277,7 +316,7 @@ io.on('connection', function(socket) {
 
 				console.log(response.account_name + " logged in")
 				console.log('Number of users: '+ users.length);
-				socket.emit("loginOk",[response.account_name, response.balance]);
+				socket.emit("loginOk",[response.account_name, response.balance, response.is_admin]);
 
 				socket.emit("accountStats", [response.balance, response.winnings, response2, response.roundsPlayed, response3, response.email] )
 			}
@@ -417,6 +456,11 @@ io.on('connection', function(socket) {
 			console.log(room.min_buy_in)
 			console.log("Buy in too small for room")
 			return
+		}
+
+		if(room.running == 0 || room.markedForShutdown == 1){
+			console.log("Room is shutting down or already shut down")
+			return;
 		}
 
 		var seatId = rooms[i].getEmptySeatID()
