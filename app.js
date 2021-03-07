@@ -551,7 +551,64 @@ function User(socket, id_person, name, balance){
 	this.disconnected = 0;
 }
 
+async function depositCheck(){
+	console.log("[server] Doing a deposit check")
+	try{
+		const guilds = await db.getGuilds()
+		if(guilds){
+			for(var i in guilds){
+				var guild = guilds[i]
+				console.log("[server] guild1: guild.guild_name")
 
+				var log = await api.getGuildLog(guild.api_id, guild.access_token,guild.since)
+
+				if(log.length == 0){
+					console.log("[server] "+guild.guild_name+": no logs found.")
+					continue;
+				}
+
+				console.log("[server] "+guild.guild_name+": found " + log.length + " logs since " + guild.since)
+
+				var filtered = log.filter(function (log) {
+					return log.type === "stash";
+				});
+
+				filtered = filtered.filter(function (log) {
+					return log.operation === "deposit";
+				});
+				console.log(filtered)
+
+				filtered = filtered.filter(function (log) {
+					return log.item_id === 19721;
+				});
+
+				console.log("[server] "+guild.guild_name+": ..."+filtered.length+" of them are Ecto deposits:");
+				//console.log(filtered)
+
+				for(var j in filtered){
+					try{
+						var person = await db.getPerson(filtered[j].user)
+
+						var response = await db.tryIncreaseBalance(person.id_person, filtered[j].count)
+
+						var response2 = await db.insertDeposit(guild.id_guild, person.account_name, filtered[j].count, 1, filtered[j].id)
+
+						console.log("[server] Deposit inserted and completed ("+person.account_name+","+filtered[j].count+")")
+					} catch (err) {
+						var response2 = await db.insertDeposit(guild.id_guild, filtered[j].user, filtered[j].count, 0, filtered[j].id)
+						console.log("[server] Deposit inserted but not completed (user probably not registered)")
+					}
+				}
+				//Guild update since
+				var a = await db.setGuildSince(guild.id_guild, log[0].id)
+			}
+
+		}
+	} catch(err){
+		console.log("[Server] Deposit check error:")
+		console.log(err)
+	}
+}
 
 async function runServer(){
 	users = []
@@ -568,62 +625,7 @@ async function runServer(){
 		* Checking guild bank deposits on GW2 API
 		*
 		*/
-
-		const guilds = await db.getGuilds()
-		if(guilds){
-			for(var i in guilds){
-				var guild = guilds[i]
-				var log = await api.getGuildLog(guild.api_id, guild.access_token,guild.since)
-
-                console.log(log)
-
-
-				if(log.length == 0){
-					continue;
-				}
-
-				var filtered = log.filter(function (log) {
-                    return log.type === "stash";
-                });
-				console.log(filtered)
-
-                filtered = filtered.filter(function (log) {
-                    return log.operation === "deposit";
-                });
-				console.log(filtered)
-
-
-                filtered = filtered.filter(function (log) {
-                    return log.item_id === 19721;
-                });
-
-                console.log(filtered)
-
-				for(var j in filtered){
-					try{
-						var person = await db.getPerson(filtered[j].user)
-
-						var response = await db.tryIncreaseBalance(person.id_person, filtered[j].count)
-
-						var response2 = await db.insertDeposit(guild.id_guild, person.account_name, filtered[j].count, 1, filtered[j].id)
-
-						console.log("Deposit found and completed")
-					
-					}
-					catch(err){
-						var response2 = await db.insertDeposit(guild.id_guild, filtered[j].user, filtered[j].count, 0, filtered[j].id)
-
-						console.log("Deposit found but not completed")
-
-					}
-				}
-
-				//Guild update since
-				var a = await db.setGuildSince(guild.id_guild, log[0].id)
-
-			}
-		}
-		return;
+		const a = await depositCheck();
 
 		rooms.push(new Room.Room(io,1, 1, 40,100,6, "Braham's Lodge", pidRoomMap));
 		rooms.push(new Room.Room(io,2, 1, 80,200,6, "Rytlock's Tent" , pidRoomMap));
@@ -653,6 +655,7 @@ async function runServer(){
 
 
 	} catch (err) {
+		console.err("[SERVER] CRITICAL ERROR")
 		console.log(err)
 	}
 }
