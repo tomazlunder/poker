@@ -477,13 +477,13 @@ socket.on('tournamentList', (arg) => {
     for(var i in tournament_list){
         var id = tournament_list[i][0]
         var buyin = tournament_list[i][1]
-        var numplayers = tournament_list[i][4]
-        var numseats = tournament_list[i][5]
-        var tournamentName = tournament_list[i][6]
+        var numplayers = tournament_list[i][2]
+        var numseats = tournament_list[i][3]
+        var tournamentName = tournament_list[i][4]
 
-        var tournamentRunning = tournament_list[i][7]
-        var tournamentMarkedForShutdown = tournament_list[i][8]
-        var tournamentRewards = tournament_list[i][9]
+        var tournamentRunning = tournament_list[i][5]
+        var tournamentMarkedForShutdown = tournament_list[i][6]
+        var tournamentRewards = tournament_list[i][7]
 
         var div_tournament = document.createElement("div");
         var div_col80 = document.createElement("div");
@@ -584,16 +584,16 @@ socket.on('tournamentList', (arg) => {
 
 
         button_join.onclick = function(){
-            buttonJoinTournamentClicked(buttonTournamentDataMap.get(this)[0])
+            buttonJoinTournamentClicked(buttonTournamentDataMap.get(this))
         }
 
         button_stop.onclick = function(){
-            buttonStopTournamentClicked(buttonTournamentDataMap.get(this)[0])
+            buttonStopTournamentClicked(buttonTournamentDataMap.get(this))
             this.disabled = true;
         }
 
         button_start.onclick = function(){
-            buttonStartTournamentClicked(buttonTournamentDataMap.get(this)[0])
+            buttonStartTournamentClicked(buttonTournamentDataMap.get(this))
             this.disabled = true;
         }
 
@@ -670,6 +670,42 @@ socket.on('roomJoined', (arg) => {
 
     message = "";
 });
+
+/*
+socket.on('tournamentJoined', (arg) => {
+    console.log("Received: Room Joined ("+arg+")")
+
+
+    var rid = arg[0]
+    var seat_id = arg[1]
+    myBalance = arg[2]
+    cur_min_buy_in = arg[3]
+    cur_max_buy_in = arg[4]
+    document.getElementById("home_label_balance").innerHTML = "Balance: " + arg[2]
+
+    room_id = rid
+
+    mySeat = seat_id;
+
+    document.getElementById("welcome").style.display = "none";
+    document.getElementById("registration").style.display = "none";
+    document.getElementById("home").style.display = "none";
+
+    document.getElementById("game").style.display = "block";
+
+    document.getElementById("raiseRange").disabled = true;
+    document.getElementById('homeRaiseButton').disabled = true;
+    document.getElementById('homeCallButton').disabled = true;
+    document.getElementById('homeFoldButton').disabled = true;
+
+    document.getElementById('homeRebuyButton').disabled = true;
+
+    var myNode = document.getElementById("containerRooms");
+    myNode.innerHTML = '';
+
+    message = "";
+});
+*/
 
 socket.on('reconnectOK', (arg) => {
 });

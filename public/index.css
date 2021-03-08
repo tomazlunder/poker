@@ -312,6 +312,13 @@ button:hover:disabled {
   width: 33% ;
 }
 
+.tdTournament1{
+  width: 66%;
+}
+.tdTournament2{
+  width: 33%;
+}
+
 .tableLeaderboard{
   width: 100%
 }
@@ -502,6 +509,14 @@ input:checked + .slider2:before {
 }
 
 .room{
+  background: #cccccc;
+  border-radius: 0.5vw;
+  /*border: 2px solid #3E3E3E;*/
+  width: 100%;
+  height: 10vh;
+}
+
+.tournament{
   background: #cccccc;
   border-radius: 0.5vw;
   /*border: 2px solid #3E3E3E;*/

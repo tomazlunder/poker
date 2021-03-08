@@ -58,9 +58,8 @@ class Tournament extends ARoom.AbstractRoom{
 		}
     }
 
-    async joinRoom(user, buy_in){
-
-        if(roomState != 0){
+    async joinRoom(user){
+        if(this.roomState != 0){
             console.log("Tournament already started");
             //TODO: Emit
 
@@ -73,7 +72,7 @@ class Tournament extends ARoom.AbstractRoom{
 				console.log(user.id_person)
 				const response = await db.tryDecreaseBalance(user.id_person, this.entry_fee)
 
-				user.balance -= buy_in
+				user.balance -= this.entry_fee
 
 				user.stack = this.chips_per;
 				user.zombie = 0
@@ -85,7 +84,7 @@ class Tournament extends ARoom.AbstractRoom{
 
 				this.seats[seatId] = user
 				console.log(this.room_id + ": join room sucessful ("+user.name+")")
-				user.socket.emit("roomJoined",[this.room_id, seatId, user.balance, this.min_buy_in, this.max_buy_in])
+				user.socket.emit("roomJoined",[this.room_id, seatId, user.balance])
 				user.socket.join(this.room_id);
 
 				this.playerRoomMap.set(user.id_person, this)
@@ -96,6 +95,7 @@ class Tournament extends ARoom.AbstractRoom{
 				this.sendNamesStacks()
 				this.sendGamestate();
 			} catch (err) {
+                console.log("Room join error")
 				console.log(err)
 			}
 		}
@@ -107,7 +107,7 @@ class Tournament extends ARoom.AbstractRoom{
 
     async removePlayers(){
         //If tournament has not started yet
-        if(roomState == 0){
+        if(this.roomState == 0){
             var promises = []
 		
             for(var i = 0; i < this.seats.length; i++){
@@ -126,7 +126,7 @@ class Tournament extends ARoom.AbstractRoom{
                         this.seats[i].socket.emit("roomKick");
     
                         console.log(this.room_id + ": removed zombie player ("+ user.name+").")
-                        this.pidRoomMap.delete(user.id_person)
+                        this.playerRoomMap.delete(user.id_person)
     
                         user.socket.emit("listOutdated")
                         this.seats[i] = null;
@@ -136,8 +136,9 @@ class Tournament extends ARoom.AbstractRoom{
     
     
             Promise.all([...promises]).then(values => {
-    
-                this.sendNamesStacks()
+                if(promises.length > 0){
+                    this.sendNamesStacks()
+                }
             }).catch((err) => {
                 console.log(err)
             })
@@ -145,4 +146,4 @@ class Tournament extends ARoom.AbstractRoom{
 	}
 }
 
-exports.NewRoom = NewRoom;
+exports.Tournament = Tournament;

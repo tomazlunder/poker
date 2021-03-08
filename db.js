@@ -62,9 +62,9 @@ function tryDecreaseBalance(user_id, decrease_by){
             }
             
             console.log(query.sql); 
-			//console.log(result);
+			console.log(result);
 
-			if(result.changedRows == 1){
+			if(result.affectedRows == 1){
 				//Complete room join
 				resolve()
 			}
@@ -89,7 +89,7 @@ function tryIncreaseBalance(id_person, increase_by){
             console.log(query.sql); 
 			//console.log(result);
 
-			if(result.changedRows == 1){
+			if(result.affectedRows == 1){
 				//Complete room join
 				resolve()
 			}
@@ -110,7 +110,7 @@ function setPersonStack(user_id, new_stack){
                 return;
             }
 
-			if(result.changedRows == 1){
+			if(result.affectedRows == 1){
 				resolve()
 			}
 			else{

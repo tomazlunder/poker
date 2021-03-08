@@ -16,6 +16,8 @@ let pidRoomMap = new Map()
 var db = require('./db.js');
 var api = require('./api.js')
 var Room = require('./room.js');
+var Tournament = require('./tournament.js');
+
 
 
 const { RSA_PKCS1_PADDING } = require('constants');
@@ -49,6 +51,7 @@ io.on('connection', function(socket) {
 	socket.on('disconnect', disconnect);
 	socket.on('registration', registration);
 	socket.on('joinRoom', joinRoom);
+	socket.on('joinTournament', joinTournament);
 	socket.on('rebuyRoom', rebuyRoom);
 	socket.on('leaveRoom',leaveRoom)
 	socket.on('lookingForRooms',lookingForRooms)
@@ -397,18 +400,20 @@ io.on('connection', function(socket) {
 	}
 
 	function leaveRoom(){
-		for(var i = 0; i<rooms.length; i++){
-			for(var j = 0; j<rooms[i].seats.length; j++){
-				if(rooms[i].seats[j]){
-					if(rooms[i].seats[j].socket == socket){
-						rooms[i].seats[j].zombie = 1;
-						console.log(rooms[i].room_id + ": marked "+rooms[i].seats[j].name+" as zombie.")
+		if(!socketUserMap.has(socket)){
+			console.log("Tried something but is not logged in")
+			socket.emit('dc')
+			socket.disconnect;
+			return;
+		}
 
-						if(rooms[i].roomState == 0){
-							rooms[i].updateState();
-						}
-					}
-				}
+		var user = socketUserMap.get(socket)
+		var room = pidRoomMap.get(user.id_person)
+
+		if(room){
+			user.zombie = 1;
+			if(room.roomState == 0){
+				room.updateState()
 			}
 		}
 	}
@@ -499,6 +504,48 @@ io.on('connection', function(socket) {
 		}
 
 		the_room.joinRoom(user, buy_in);
+	}
+
+	async function joinTournament(arg){
+		if(!socketUserMap.has(socket)){
+			console.log("Tried something but is not logged in")
+			socket.emit('dc')
+			socket.disconnect;
+			return;
+		}
+
+		var tournament_id = arg
+
+		console.log(socketUserMap.get(socket).name + " requested to join " + tournament_id)
+		var user = socketUserMap.get(socket)
+
+		if(pidRoomMap.has(socketUserMap.get(socket).id_person)){
+			console.log("Already in a room... ("+pidRoomMap.has(socketUserMap.get(socket).id_person).room_id+")")
+
+			socket.emit("roomJoinFailed", "Already in a room!")
+			return;
+		}
+
+		var the_tournament = null;
+		for(var i in tournaments){
+			var t = tournaments[i]
+			if(t.room_id == tournament_id){
+				the_tournament = t;
+				break;
+			}
+		}
+
+		if(!the_tournament){
+			console.log("ERROR: Tournament not found");
+			return;
+		}
+
+		if(the_tournament.running == 0 || the_tournament.markedForShutdown == 1){
+			console.log("Room is shutting down or already shut down")
+			return;
+		}
+
+		the_tournament.joinRoom(user);
 	}
 
 	async function reconnect(){
@@ -699,6 +746,8 @@ async function runServer(){
 
 		//var t1 = Room.Room.Tournament(io, 1, "Test tournament", 6, 50, 250, 2, 1, [100,50,25,0,0,0], pidRoomMap);
 		//tournaments.push(t1)
+
+		tournaments.push(new Tournament.Tournament(io, "tour1", "Test tournament", 6, 6, pidRoomMap, 5, 0, 1000, 3, [111,22,3,0,0,0]))
 
 		//Starting rooms
 		for(var i in rooms){
