@@ -13,10 +13,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 let socketUserMap = new Map()
 let pidRoomMap = new Map()
 
-//var con = require('./db');
-var Room = require('./room.js');
 var db = require('./db.js');
 var api = require('./api.js')
+var NewRoom = require('./room.js');
+
 
 const { RSA_PKCS1_PADDING } = require('constants');
 const { Socket } = require('dgram');
@@ -76,6 +76,7 @@ io.on('connection', function(socket) {
 			return;
 		}
 
+		console.log("Received room stop ("+room_id+")")
 		for(var i in rooms){
 			if(rooms[i].room_id == room_id){
 				if(rooms[i].running == 0 || rooms[i].markedForShutdown == 1){
@@ -83,8 +84,8 @@ io.on('connection', function(socket) {
 					return;
 				}
 
-				rooms[i].markedForShutdown = 1;
-				if(rooms[i].state == 0){
+				rooms[i].markedToStop = 1;
+				if(rooms[i].roomState == 0){
 					rooms[i].updateState();
 				}
 
@@ -108,6 +109,7 @@ io.on('connection', function(socket) {
 			return;
 		}
 
+		console.log("Received room start ("+room_id+")")
 		for(var i in rooms){
 			if(rooms[i].room_id == room_id){
 				if(rooms[i].running == 1 ){
@@ -406,7 +408,7 @@ io.on('connection', function(socket) {
 						rooms[i].seats[j].zombie = 1;
 						console.log(rooms[i].room_id + ": marked "+rooms[i].seats[j].name+" as zombie.")
 
-						if(rooms[i].state == 0){
+						if(rooms[i].roomState == 0){
 							rooms[i].updateState();
 						}
 					}
@@ -500,6 +502,8 @@ io.on('connection', function(socket) {
 			return;
 		}
 
+		the_room.joinRoom(user, buy_in);
+		/*
 		var seatId = rooms[i].getEmptySeatID()
 		if(seatId >= 0){
 			try{
@@ -534,6 +538,7 @@ io.on('connection', function(socket) {
 			socket.emit("roomFull")
 			console.log("Selected room is full.");
 		}
+		*/
 	}
 
 	async function reconnect(){
@@ -718,15 +723,18 @@ async function runServer(){
 		*/
 		const a = await depositCheck();
 
+		/*
 		rooms.push(new Room.Room(io,1,"Braham's Lodge",6,  1, 40,100,pidRoomMap));
 		rooms.push(new Room.Room(io,2, "Rytlock's Tent", 6, 1, 80,200,  pidRoomMap));
 		rooms.push(new Room.Room(io,3, "Zojja's Lab", 6, 2, 80,200,  pidRoomMap));
 		rooms.push(new Room.Room(io,4, "Lord Fahren's Chamber", 6, 2, 160,400,  pidRoomMap));
+		*/
+		rooms.push(new NewRoom.NewRoom(io, "room1", "Braham's Lodge", 6, 2, pidRoomMap,  1, 40, 100) )
 		//rooms.push(new Room.Room(io,5, 2, 100, 500,6, "Bla", pidRoomMap));
 		//rooms.push(new Room.Room(io,6, 2, 100, 500,6, "Bla", pidRoomMap));
 
-		var t1 = Room.Room.Tournament(io, 1, "Test tournament", 6, 50, 250, 2, 1, [100,50,25,0,0,0], pidRoomMap);
-		tournaments.push(t1)
+		//var t1 = Room.Room.Tournament(io, 1, "Test tournament", 6, 50, 250, 2, 1, [100,50,25,0,0,0], pidRoomMap);
+		//tournaments.push(t1)
 
 		//Starting rooms
 		for(var i in rooms){
