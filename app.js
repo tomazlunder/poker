@@ -15,7 +15,7 @@ let pidRoomMap = new Map()
 
 var db = require('./db.js');
 var api = require('./api.js')
-var NewRoom = require('./room.js');
+var Room = require('./room.js');
 
 
 const { RSA_PKCS1_PADDING } = require('constants');
@@ -688,10 +688,10 @@ async function runServer(){
 		rooms.push(new Room.Room(io,3, "Zojja's Lab", 6, 2, 80,200,  pidRoomMap));
 		rooms.push(new Room.Room(io,4, "Lord Fahren's Chamber", 6, 2, 160,400,  pidRoomMap));
 		*/
-		rooms.push(new NewRoom.NewRoom(io, "room1", "Braham's Lodge", 6, 2, pidRoomMap,  1, 40, 100))
-		rooms.push(new NewRoom.NewRoom(io, "room2", "Rytlock's Tent", 6, 2, pidRoomMap,  1, 80, 200))
-		rooms.push(new NewRoom.NewRoom(io, "room3", "Zojja's Lab", 6, 2, pidRoomMap,  2, 80, 200))
-		rooms.push(new NewRoom.NewRoom(io, "room4", "Lord Fahren's Chamber", 6, 2, pidRoomMap,  2, 160, 400))
+		rooms.push(new Room.Room(io, "room1", "Braham's Lodge", 6, 2, pidRoomMap,  1, 40, 100))
+		rooms.push(new Room.Room(io, "room2", "Rytlock's Tent", 6, 2, pidRoomMap,  1, 80, 200))
+		rooms.push(new Room.Room(io, "room3", "Zojja's Lab", 6, 2, pidRoomMap,  2, 80, 200))
+		rooms.push(new Room.Room(io, "room4", "Lord Fahren's Chamber", 6, 2, pidRoomMap,  2, 160, 400))
 
 
 		//rooms.push(new Room.Room(io,5, 2, 100, 500,6, "Bla", pidRoomMap));

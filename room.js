@@ -127,4 +127,4 @@ class Room extends ARoom.AbstractRoom{
 	}
 }
 
-exports.NewRoom = NewRoom;
+exports.Room = Room;
