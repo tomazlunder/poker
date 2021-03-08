@@ -13,6 +13,7 @@ var mute = 0;
 var myName = ""
 var room_id;
 var mySeat
+var gameType
 
 var pot = 0;
 var revealedCards = []
@@ -639,14 +640,21 @@ socket.on('drawnCards', (arg) => {
 
 socket.on('roomJoined', (arg) => {
     console.log("Received: Room Joined ("+arg+")")
+    var type = arg[0]
+    var rid = arg[1]
+    var seat_id = arg[2]
+    myBalance = arg[3]
 
+    if(type == "room"){
+        gameType = 0;
+        cur_min_buy_in = arg[4]
+        cur_max_buy_in = arg[5]
+    }
+    else if (type == "tournament"){
+        gameType = 1;
+    }
 
-    var rid = arg[0]
-    var seat_id = arg[1]
-    myBalance = arg[2]
-    cur_min_buy_in = arg[3]
-    cur_max_buy_in = arg[4]
-    document.getElementById("home_label_balance").innerHTML = "Balance: " + arg[2]
+    document.getElementById("home_label_balance").innerHTML = "Balance: " + arg[3]
 
     room_id = rid
 
@@ -740,6 +748,15 @@ socket.on('roundStarted', (arg) => {
     }
 
     document.getElementById("homeRebuyButton").disabled = true;
+    document.getElementById("homeRebuyButton").style.display = 'none';
+
+    
+    if(gameType == 0){
+        document.getElementById("homeLeaveRoomButton").style.display = 'block';
+    }
+    if(gameType == 1){
+        document.getElementById("homeLeaveRoomButton").style.display = 'none';
+    }
 
     message = "Starting...";
 });
@@ -884,7 +901,8 @@ socket.on('tournamentEnd', (arg) =>{
 
 socket.on('waitingForNewGame', (arg) => {
     if(playerStacks[0] + playerResults[0] < cur_min_buy_in){
-        if(myBalance > 0){
+        if(myBalance > 0 && gameType == 0){
+            document.getElementById("homeRebuyButton").style.display = 'block';
             document.getElementById("homeRebuyButton").disabled = false;
         }
     }
@@ -910,6 +928,7 @@ socket.on('waitingForNewGame', (arg) => {
 
 socket.on('actionRequired', (arg) => {
     console.log("Received: Action required ("+arg+")")
+    message = ""
     playerToAct = arg[0]
     timeToAct = arg[1]/1000
     startTime = timeToAct;

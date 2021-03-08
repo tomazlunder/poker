@@ -59,6 +59,17 @@ class Tournament extends ARoom.AbstractRoom{
                 this.seats[this.seats.indexOf(player)] = null;
         }
 
+        /*
+        if(!this.markedForShutdown){
+			this.roomState = 0;
+            this.updateState();
+            return;
+		} else {
+			console.log(this.room_id + ": has shut down.")
+			this.running = 0;
+            return;
+		}*/
+
         //TODO: auto restart?
         this.running = 0;
     }
@@ -67,7 +78,6 @@ class Tournament extends ARoom.AbstractRoom{
         console.log("Resetting game")
         this.gameState.state = 0;
 
-        console.log(this.room_id)
         this.io.to(this.room_id).emit('resetGame');
 
         for(var i in this.seats){
@@ -85,22 +95,8 @@ class Tournament extends ARoom.AbstractRoom{
         } else {
             this.roomState = 1;
             this.updateState();
+            return;
         }
-    
-        //In tournaments players are not removed till the end
-        //this.removePlayers()
-
-        console.log("Round ended")
-
-		if(!this.markedForShutdown){
-			this.roomState = 0;
-            this.updateState();
-            return;
-		} else {
-			console.log(this.room_id + ": has shut down.")
-			this.running = 0;
-            return;
-		}
     }
 
     async joinRoom(user){
@@ -130,7 +126,7 @@ class Tournament extends ARoom.AbstractRoom{
 
 				this.seats[seatId] = user
 				console.log(this.room_id + ": join room sucessful ("+user.name+")")
-				user.socket.emit("roomJoined",[this.room_id, seatId, user.balance])
+				user.socket.emit("roomJoined",[this.type,this.room_id, seatId, user.balance])
 				user.socket.join(this.room_id);
 
 				this.playerRoomMap.set(user.id_person, this)

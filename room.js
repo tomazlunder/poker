@@ -72,7 +72,7 @@ class Room extends ARoom.AbstractRoom{
 
 				this.seats[seatId] = user
 				console.log(this.room_id + ": join room sucessful ("+user.name+")")
-				user.socket.emit("roomJoined",[this.room_id, seatId, user.balance, this.min_buy_in, this.max_buy_in])
+				user.socket.emit("roomJoined",[this.type,this.room_id, seatId, user.balance, this.min_buy_in, this.max_buy_in])
 				user.socket.join(this.room_id);
 
 				this.playerRoomMap.set(user.id_person, this)

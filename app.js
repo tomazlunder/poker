@@ -541,6 +541,13 @@ io.on('connection', function(socket) {
 	}
 
 	async function reconnect(){
+		if(!socketUserMap.has(socket)){
+			console.log("Tried something but is not logged in")
+			socket.emit('dc')
+			socket.disconnect;
+			return;
+		}
+
 		var user = socketUserMap.get(socket)
 		var room = pidRoomMap.get(user.id_person)
 
@@ -550,16 +557,21 @@ io.on('connection', function(socket) {
 
 			socket.join(room.room_id);
 	
-			socket.emit("roomJoined",[room.room_id, seatId, user.balance, room.min_buy_in, room.max_buy_in])
-	
+			if(room.type == "room"){
+				socket.emit("roomJoined",[room.type, room.room_id, seatId, user.balance, room.min_buy_in, room.max_buy_in])
+			}
+			else if(room.type == "tournament"){
+				user.socket.emit("roomJoined",[room.type,room.room_id, seatId, user.balance])
+			}
+
 			io.to(user.socket.id).emit("drawnCards", user.cards);				
 			room.sendNamesStacks();
 			room.sendGamestate();
 			socket.emit("reconnectOK");
 
 			user.zombie = 0;
-			if(room.roundState.to_act == user & room.state >= 2 & room.state <= 5){
-				clearInterval(room.timeOutID)
+			if(room.gameState.to_act == user & room.roomState == 1){
+				clearInterval(room.timeoutID)
 				room.betting();
 			}
 		}
