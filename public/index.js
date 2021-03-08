@@ -1270,6 +1270,10 @@ function changePasswordButton(){
     document.getElementById("errorLabelModalPassword").innerHTML = ""
 }
 
+function homeLogoffButton(){
+    location.reload();
+}
+
 function buttonAdminMode(){
     console.log("Clicked admin mode")
 
