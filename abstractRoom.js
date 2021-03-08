@@ -1,5 +1,4 @@
 var Hand = require('pokersolver').Hand;
-var db = require('./db');
 var gs = require('./gameState');
 
 const timeForAction = 22000;

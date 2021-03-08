@@ -345,10 +345,6 @@ io.on('connection', function(socket) {
 				const response2 = await db.getSumTips(response.id_person)
 				const response3 = await db.getPendingWithdrawals(response.id_person)
 
-				//console.log(response2)
-				//console.log(response3)
-
-
 				console.log(response.account_name + " logged in")
 				console.log('Number of users: '+ users.length);
 				socket.emit("loginOk",[response.account_name, response.balance, response.is_admin]);
@@ -503,42 +499,6 @@ io.on('connection', function(socket) {
 		}
 
 		the_room.joinRoom(user, buy_in);
-		/*
-		var seatId = rooms[i].getEmptySeatID()
-		if(seatId >= 0){
-			try{
-				console.log(user.id_person)
-				const response = await db.tryDecreaseBalance(user.id_person, buy_in)
-
-				user.balance -= buy_in
-
-				user.stack = buy_in
-				user.zombie = 0
-				user.alive = 0
-
-				const response2 = await db.setPersonStack(user.id_person, user.stack)
-
-				room.seats[seatId] = user
-				console.log(room.room_id + ": join room sucessful ("+user.name+")")
-				socket.emit("roomJoined",[room.room_id, seatId, user.balance, room.min_buy_in, room.max_buy_in])
-				socket.join(room.room_id);
-
-				pidRoomMap.set(user.id_person, room)
-
-				if(room.state == 0){
-					room.updateState();
-				}
-				room.sendNamesStacks()
-				room.sendGamestate();
-			} catch (err) {
-				console.log(err)
-			}
-		}
-		else{
-			socket.emit("roomFull")
-			console.log("Selected room is full.");
-		}
-		*/
 	}
 
 	async function reconnect(){
@@ -582,7 +542,6 @@ io.on('connection', function(socket) {
 			var the_room = pidRoomMap.get(user.id_person);
 			if(the_room.state == 0 || the_room.state == 8){
 				if(buy_in <= the_room.max_buy_in - user.stack & buy_in != 0 & user.stack < the_room.min_buy_in){
-					//checkAccountBalance(user,room, null, buy_in, completeRebuy);
 					try{
 						const response = db.tryDecreaseBalance(user.id_person, buy_in)
 
@@ -729,7 +688,12 @@ async function runServer(){
 		rooms.push(new Room.Room(io,3, "Zojja's Lab", 6, 2, 80,200,  pidRoomMap));
 		rooms.push(new Room.Room(io,4, "Lord Fahren's Chamber", 6, 2, 160,400,  pidRoomMap));
 		*/
-		rooms.push(new NewRoom.NewRoom(io, "room1", "Braham's Lodge", 6, 2, pidRoomMap,  1, 40, 100) )
+		rooms.push(new NewRoom.NewRoom(io, "room1", "Braham's Lodge", 6, 2, pidRoomMap,  1, 40, 100))
+		rooms.push(new NewRoom.NewRoom(io, "room2", "Rytlock's Tent", 6, 2, pidRoomMap,  1, 80, 200))
+		rooms.push(new NewRoom.NewRoom(io, "room3", "Zojja's Lab", 6, 2, pidRoomMap,  2, 80, 200))
+		rooms.push(new NewRoom.NewRoom(io, "room4", "Lord Fahren's Chamber", 6, 2, pidRoomMap,  2, 160, 400))
+
+
 		//rooms.push(new Room.Room(io,5, 2, 100, 500,6, "Bla", pidRoomMap));
 		//rooms.push(new Room.Room(io,6, 2, 100, 500,6, "Bla", pidRoomMap));
 
