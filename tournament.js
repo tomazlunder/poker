@@ -5,6 +5,8 @@ class Tournament extends ARoom.AbstractRoom{
     constructor(io, id, name, numPlayers, minPlayers, playerRoomMap,  sb_size, entry_fee, chips_per, loops_till_increase, rewards){
         super(io, id, name, numPlayers, minPlayers, sb_size, playerRoomMap);
 
+        this.type = "tournament"
+
         //Room specific 
 		this.entry_fee = entry_fee;
 		this.chips_per = chips_per;
@@ -37,6 +39,7 @@ class Tournament extends ARoom.AbstractRoom{
                 }
                 player.stack = 0;
 
+                //TODO: Change this to some kind of tournament kick (stays on game screen with results)
                 player.socket.emit("roomKick");
 
                 console.log(this.room_id + ": removed player ("+ player.name+").")

@@ -12,6 +12,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 let socketUserMap = new Map()
 let pidRoomMap = new Map()
+let roomidRoomMap = new Map()
 
 var db = require('./db.js');
 var api = require('./api.js')
@@ -22,11 +23,11 @@ var Tournament = require('./tournament.js');
 
 const { RSA_PKCS1_PADDING } = require('constants');
 const { Socket } = require('dgram');
+const { REPL_MODE_SLOPPY } = require('repl');
 
 //Server vars
 var users = []
 var rooms = []
-var tournaments = []
 
 const tickTime = 2000;
 const timeForAction = 25000;
@@ -80,6 +81,8 @@ io.on('connection', function(socket) {
 		}
 
 		console.log("Received room stop ("+room_id+")")
+		var the_room 
+
 		for(var i in rooms){
 			if(rooms[i].room_id == room_id){
 				if(rooms[i].running == 0 || rooms[i].markedForShutdown == 1){
@@ -252,34 +255,27 @@ io.on('connection', function(socket) {
 
 		var alreadyInRoom
 		var user = socketUserMap.get(socket)
-
-		for(var i = 0; i<rooms.length; i++){
-			for(var j = 0; j<rooms[i].seats.length; j++){
-				if(rooms[i].seats[j]){
-					if(rooms[i].seats[j].name == user.name ){
-						alreadyInRoom = rooms[i].room_id
-						break
-					}
-				}
-			}
+		if(pidRoomMap.has(user.id_person)){
+			alreadyInRoom = pidRoomMap.get(user.id_person).room_id;
 		}
 
-		var ret = []
-		var room;
+		var roomList = []
+		var tournamentList = []
+
 		for(var i in rooms){
-			room = rooms[i]
-			ret.push([room.room_id,room.sb_size,room.min_buy_in, room.max_buy_in, rooms[i].numberOfPlayers(), room.seats.length, room.name, room.running, room.markedForShutdown])
-		}
-		socket.emit("roomList",[alreadyInRoom,ret]);
+			var room = rooms[i]
+			if(room.type == "room"){
+				roomList.push([room.room_id,room.sb_size,room.min_buy_in, room.max_buy_in, room.numberOfPlayers(), room.seats.length, room.name, room.running, room.markedForShutdown])
+			}
+			else if(room.type == "tournament"){
+				tournamentList.push(([room.room_id, room.entry_fee, room.numberOfPlayers(), room.numPlayers, room.name, room.running, room.markedForShutdown, room.rewards]))
+			}
 
-		var tournament;
-		ret = []
-		for(var i in tournaments){
-			tournament = tournaments[i]
-			ret.push(([tournament.room_id, tournament.entry_fee, tournament.numberOfPlayers(), tournament.numPlayers, tournament.name, tournament.running, tournament.markedForShutdown, tournament.rewards]))
 		}
 
-		socket.emit("tournamentList",[alreadyInRoom, ret])
+		socket.emit("roomList",[alreadyInRoom, roomList]);
+
+		socket.emit("tournamentList",[alreadyInRoom, tournamentList])
 	}
 
 	function actionRequest(data){
@@ -513,9 +509,6 @@ io.on('connection', function(socket) {
 			return;
 		}
 
-		var tournament_id = arg
-
-		console.log(socketUserMap.get(socket).name + " requested to join " + tournament_id)
 		var user = socketUserMap.get(socket)
 
 		if(pidRoomMap.has(socketUserMap.get(socket).id_person)){
@@ -525,13 +518,13 @@ io.on('connection', function(socket) {
 			return;
 		}
 
+		var tournament_id = arg
+
+		console.log(socketUserMap.get(socket).name + " requested to join " + tournament_id)
+
 		var the_tournament = null;
-		for(var i in tournaments){
-			var t = tournaments[i]
-			if(t.room_id == tournament_id){
-				the_tournament = t;
-				break;
-			}
+		if(roomidRoomMap.has(tournament_id)){
+			the_tournament = roomidRoomMap.get(tournament_id)
 		}
 
 		if(!the_tournament){
@@ -734,28 +727,31 @@ async function runServer(){
 		rooms.push(new Room.Room(io,3, "Zojja's Lab", 6, 2, 80,200,  pidRoomMap));
 		rooms.push(new Room.Room(io,4, "Lord Fahren's Chamber", 6, 2, 160,400,  pidRoomMap));
 		*/
-		rooms.push(new Room.Room(io, "room1", "Braham's Lodge", 6, 2, pidRoomMap,  1, 40, 100))
-		rooms.push(new Room.Room(io, "room2", "Rytlock's Tent", 6, 2, pidRoomMap,  1, 80, 200))
-		rooms.push(new Room.Room(io, "room3", "Zojja's Lab", 6, 2, pidRoomMap,  2, 80, 200))
-		rooms.push(new Room.Room(io, "room4", "Lord Fahren's Chamber", 6, 2, pidRoomMap,  2, 160, 400))
+		var room1 = new Room.Room(io, "room1", "Braham's Lodge", 6, 2, pidRoomMap,  1, 40, 100)
+		var room2 = new Room.Room(io, "room2", "Rytlock's Tent", 6, 2, pidRoomMap,  1, 80, 200)
+		var room3 = new Room.Room(io, "room3", "Zojja's Lab", 6, 2, pidRoomMap,  2, 80, 200)
+		var room4 = new Room.Room(io, "room4", "Lord Fahren's Chamber", 6, 2, pidRoomMap,  2, 160, 400)
+
+		var tour1 = new Tournament.Tournament(io, "tour1", "Test tournament", 3, 3, pidRoomMap, 5, 0, 1000, 3, [333,0,0])
+
+		rooms.push(room1)
+		rooms.push(room2)
+		rooms.push(room3)
+		rooms.push(room4)
+
+		rooms.push(tour1)
+
+		roomidRoomMap.set("room1", room1);
+		roomidRoomMap.set("room2", room2);
+		roomidRoomMap.set("room3", room3);
+		roomidRoomMap.set("room4", room4);
+
+		roomidRoomMap.set("tour1", tour1);
 
 
-		//rooms.push(new Room.Room(io,5, 2, 100, 500,6, "Bla", pidRoomMap));
-		//rooms.push(new Room.Room(io,6, 2, 100, 500,6, "Bla", pidRoomMap));
-
-		//var t1 = Room.Room.Tournament(io, 1, "Test tournament", 6, 50, 250, 2, 1, [100,50,25,0,0,0], pidRoomMap);
-		//tournaments.push(t1)
-
-		tournaments.push(new Tournament.Tournament(io, "tour1", "Test tournament", 3, 3, pidRoomMap, 5, 0, 1000, 3, [333,0,0]))
-
-		//Starting rooms
+		//Starting rooms (... and tournaments)
 		for(var i in rooms){
 			rooms[i].startRoom();
-		}
-
-		//Starting tournaments
-		for(var i in tournaments){
-			tournaments[i].startRoom();
 		}
 
 		//Removing disconnected users from the user list

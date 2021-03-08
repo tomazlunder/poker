@@ -588,12 +588,12 @@ socket.on('tournamentList', (arg) => {
         }
 
         button_stop.onclick = function(){
-            buttonStopTournamentClicked(buttonTournamentDataMap.get(this))
+            buttonStopRoomClicked(buttonTournamentDataMap.get(this))
             this.disabled = true;
         }
 
         button_start.onclick = function(){
-            buttonStartTournamentClicked(buttonTournamentDataMap.get(this))
+            buttonStartRoomClicked(buttonTournamentDataMap.get(this))
             this.disabled = true;
         }
 
@@ -982,14 +982,6 @@ function buttonStopRoomClicked(room_id){
 
 function buttonStartRoomClicked(room_id){
     socket.emit("adminRoomStart", room_id)
-}
-
-function buttonStopTournamentClicked(room_id){
-    socket.emit("adminTournamentStop", room_id)
-}
-
-function buttonStartTournamentClicked(room_id){
-    socket.emit("adminTournamentStart", room_id)
 }
 
 

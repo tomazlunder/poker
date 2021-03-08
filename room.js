@@ -5,6 +5,8 @@ class Room extends ARoom.AbstractRoom{
     constructor(io, id, name, numPlayers, minPlayers, playerRoomMap,  sb_size, min_buy_in, max_buy_in){
         super(io, id, name, numPlayers, minPlayers, sb_size, playerRoomMap);
 
+		this.type = "room"
+
         //Room specific 
         this.min_buy_in = min_buy_in;
         this.max_buy_in = max_buy_in;
