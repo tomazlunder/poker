@@ -673,6 +673,11 @@ socket.on('roomJoined', (arg) => {
 
     document.getElementById('homeRebuyButton').disabled = true;
 
+    if(type == "tournament"){
+        document.getElementById('homeRebuyButton').style.display = 'none';
+        document.getElementById('homeLeaveRoomButton').style.display = 'none';
+    }
+
     var myNode = document.getElementById("containerRooms");
     myNode.innerHTML = '';
 
