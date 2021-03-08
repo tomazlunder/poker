@@ -202,7 +202,7 @@
       <div class="modalTitle">Buy-in</div>
       <input type="range"  id="buyInRange" class="sliderBuyIn" name="raise" min="0" max="50" oninput="rangeBuyinChange()">
       <input type="number" id="buyInNumberField"  oninput="numberBuyinChange()" onkeydown="return false"></input>
-      <button id="modalBuyInButton" class="Button">BUY IN</button>
+      <button id="modalBuyInButton" class="modalButton">BUY IN</button>
     </div>
   </div>
 
@@ -213,7 +213,7 @@
       <div class="modalTitle">Rebuy</div>
       <input type="range"  id="rebuyRange" class="sliderBuyIn" name="raise" min="0" max="50" oninput="rangeRebuyChange()">
       <input type="number" id="rebuyNumberField"  oninput="numberRebuyChange()" onkeydown="return false" ></input>
-      <button id="modalRebuyButton" class="Button" onclick="modalRebuyClicked()">Rebuy</button>
+      <button id="modalRebuyButton" class="modalButton" onclick="modalRebuyClicked()">Rebuy</button>
     </div>
   </div>
 
@@ -224,7 +224,7 @@
       <div class="modalTitle">Withdraw</div>
       <input type="range"  id="withdrawRange" class="sliderBuyIn" name="raise" min="0" max="50" oninput="rangeWithdrawChange()">
       <input type="number" id="withdrawNumberField"  oninput="numberWithdrawChange()" onkeydown="return false" ></input>
-      <button id="modalWithdrawButton" class="Button" onclick="modalWithdrawClicked()">Withdraw</button>
+      <button id="modalWithdrawButton" class="modalButton" onclick="modalWithdrawClicked()">Withdraw</button>
     </div>
   </div>
 
@@ -235,7 +235,7 @@
       <div class="modalTitle">Tip the house</div>
       <input type="range"  id="tipRange" class="sliderBuyIn" name="raise" min="0" max="50" oninput="rangeTipChange()">
       <input type="number" id="tipNumberField"  oninput="numberTipChange()" onkeydown="return false" ></input>
-      <button id="modalTipButton" class="Button" onclick="modalTipClicked()">Tip</button>
+      <button id="modalTipButton" class="modalButton" onclick="modalTipClicked()">Tip</button>
     </div>
   </div>
 
@@ -245,7 +245,7 @@
       <span class="close" id = "closeEmail">&times;</span>
       <div class="modalTitle">Change email</div>
       <input type="text" id="emailTextField"></input>
-      <button id="modalEmailButton" class="Button" onclick="modalEmailClicked()">Change</button>
+      <button id="modalEmailButton" class="modalButton" onclick="modalEmailClicked()">Change</button>
       <br>
       <label id="errorLabelModalEmail"></label>
     </div>
@@ -259,7 +259,7 @@
       <input type="password" id="password1"></input>
       <input type="password" id="password2"></input>
 
-      <button id="modalPasswordButton" class="Button" onclick="modalPasswordClicked()">Change</button>
+      <button id="modalPasswordButton" class="modalButton" onclick="modalPasswordClicked()">Change</button>
       <br>
       <label id="errorLabelModalPassword"></label>
     </div>
