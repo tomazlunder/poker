@@ -17,6 +17,37 @@ class Tournament extends ARoom.AbstractRoom{
     async endTournament(){
         console.log("End tournament TODO")
         //TODO
+        var reversed = this.bustedPlayers.reverse();
+
+        //Send tournament end to players
+
+        for(var i in reversed){
+                var player = reversed[i]
+            
+                if(rewards[i] > 0){
+                    try{
+                    db.tryIncreaseBalance(player.id_person, this.rewards[i])
+
+                    player.balance += this.rewards[i]
+                    user.socket.emit("newBalance", user.balance)
+                     } catch (err){
+                        console.log("Tournament reward error")
+                        console.log(err)
+                    }
+                }
+                player.stack = 0;
+
+                player.socket.emit("roomKick");
+
+                console.log(this.room_id + ": removed player ("+ player.name+").")
+                this.playerRoomMap.delete(player.id_person)
+
+                player.socket.emit("listOutdated")
+                this.seats[i] = null;
+        }
+
+        //TODO: auto restart?
+        this.running = 0;
     }
 
     async postGame(){
@@ -26,13 +57,14 @@ class Tournament extends ARoom.AbstractRoom{
 
         for(var i in this.seats){
             if(this.seats[i]){
-                if(this.seats[i].stack < this.sb_size * 2){
+                if(this.seats[i].stack < this.sb_size * 2 && this.seats[i].busted == 0){
                     this.seats[i].busted = 1;
-                    bustedPlayers.push(busted);
+                    this.bustedPlayers.push(busted);
                 }
             }
         }
         if(this.numberOfNonBustedPlayers(this.seats) == 1){
+            this.bustedPlayers.push(this.getLastPlayer())
             this.endTournament();
             return;
         } else {
@@ -144,6 +176,30 @@ class Tournament extends ARoom.AbstractRoom{
             })
         }
 	}
+
+    numberOfNonBustedPlayers(){
+        var ret = 0;
+        for(var i in this.seats){
+            if(this.seats[i]){
+                if(this.seats[i].busted == 0){
+                    ret++;
+                }
+            }
+        }
+        return ret;
+    }
+
+    getLastPlayer(){
+        var ret = null;
+        for(var i in this.seats){
+            if(this.seats[i]){
+                if(this.seats[i].busted == 0){
+                    ret = this.seats[i]
+                }
+            }
+        }
+        return ret;
+    }
 }
 
 exports.Tournament = Tournament;

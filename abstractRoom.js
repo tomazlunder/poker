@@ -375,7 +375,7 @@ class AbstractRoom{
 		if(count == 1){
 			if(this.gameState.to_act.bet == this.gameState.bet_size){
 				console.log(this.room_id + ": " + this.gameState.to_act.name + "forced check (everyone else all_in)");
-				this.gameState++;
+				this.gameState.state = 5;
 				this.updateState();
 				return;
 			}

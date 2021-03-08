@@ -301,10 +301,9 @@ io.on('connection', function(socket) {
 	    }
 
 	    var the_room;
-	    for(var i in rooms){
-			if(rooms[i].room_id == room_id){
-				the_room = rooms[i]
-			}
+
+		if(pidRoomMap.has(user.id_person)){
+			the_room = pidRoomMap.get(user.id_person)
 		}
 	
 		if(the_room){
@@ -747,7 +746,7 @@ async function runServer(){
 		//var t1 = Room.Room.Tournament(io, 1, "Test tournament", 6, 50, 250, 2, 1, [100,50,25,0,0,0], pidRoomMap);
 		//tournaments.push(t1)
 
-		tournaments.push(new Tournament.Tournament(io, "tour1", "Test tournament", 6, 6, pidRoomMap, 5, 0, 1000, 3, [111,22,3,0,0,0]))
+		tournaments.push(new Tournament.Tournament(io, "tour1", "Test tournament", 3, 3, pidRoomMap, 5, 0, 1000, 3, [333,0,0]))
 
 		//Starting rooms
 		for(var i in rooms){
