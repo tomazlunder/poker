@@ -31,7 +31,7 @@ class Tournament extends ARoom.AbstractRoom{
                     db.tryIncreaseBalance(player.id_person, this.rewards[i])
 
                     player.balance += this.rewards[i]
-                    player.socket.emit("newBalance", user.balance)
+                    player.socket.emit("newBalance", player.balance)
                      } catch (err){
                         console.log("Tournament reward error")
                         console.log(err)
@@ -40,7 +40,7 @@ class Tournament extends ARoom.AbstractRoom{
                 player.stack = 0;
 
                 //TODO: Change this to some kind of tournament kick (stays on game screen with results)
-                player.socket.emit("roomKick");
+                player.socket.emit("tournamentEnd");
 
                 console.log(this.room_id + ": removed player ("+ player.name+").")
                 this.playerRoomMap.delete(player.id_person)

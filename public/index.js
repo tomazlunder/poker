@@ -842,6 +842,39 @@ socket.on('roomKick', (arg) =>{
     socket.emit("lookingForRooms");
 });
 
+
+socket.on('tournamentEnd', (arg) =>{
+    console.log("Received: Tournament end")
+
+    var table = document.createElement("table")
+    for(var i in arg){
+        var name = arg[i][0]
+        var result = arg[i][1]
+
+        var tr = document.createElement("tr")
+        var td1 = document.createElement("td")
+        var td2 = document.createElement("td")
+        var td3 = document.createElement("td")
+
+        td1.innerHTML = i;
+        td2.innerHTML = name;
+        td3.innerHTML = result;
+
+        tr.append(td1)
+        tr.append(td2)
+        tr.append(td3)
+        table.append(tr)
+    }
+
+    document.getElementById("modalTourResultsContent").innerHTML = ""
+    document.getElementById("modalTourResultsContent").append(table)
+
+    document.getElementById("modalTourResults").style.display = "block";
+
+
+    //TODO: Tournament end modal
+});
+
 socket.on('waitingForNewGame', (arg) => {
     if(playerStacks[0] + playerResults[0] < cur_min_buy_in){
         if(myBalance > 0){
@@ -1311,6 +1344,15 @@ function buttonAdminMode(){
         adminMode = 1;
     }
 
+    socket.emit("lookingForRooms");
+}
+
+function modalTourResultsClicked(){
+    document.getElementById("modalTourResults").style.display = "none";
+    document.getElementById("game").style.display = "none";
+    document.getElementById("home").style.display = "block";
+
+    console.log("Emitted: lookingForRooms")
     socket.emit("lookingForRooms");
 }
 

@@ -722,30 +722,25 @@ async function runServer(){
 		const a = await depositCheck();
 
 		/*
-		rooms.push(new Room.Room(io,1,"Braham's Lodge",6,  1, 40,100,pidRoomMap));
-		rooms.push(new Room.Room(io,2, "Rytlock's Tent", 6, 1, 80,200,  pidRoomMap));
-		rooms.push(new Room.Room(io,3, "Zojja's Lab", 6, 2, 80,200,  pidRoomMap));
-		rooms.push(new Room.Room(io,4, "Lord Fahren's Chamber", 6, 2, 160,400,  pidRoomMap));
+		* Rooms
+		*
 		*/
 		var room1 = new Room.Room(io, "room1", "Braham's Lodge", 6, 2, pidRoomMap,  1, 40, 100)
 		var room2 = new Room.Room(io, "room2", "Rytlock's Tent", 6, 2, pidRoomMap,  1, 80, 200)
 		var room3 = new Room.Room(io, "room3", "Zojja's Lab", 6, 2, pidRoomMap,  2, 80, 200)
 		var room4 = new Room.Room(io, "room4", "Lord Fahren's Chamber", 6, 2, pidRoomMap,  2, 160, 400)
-
 		var tour1 = new Tournament.Tournament(io, "tour1", "Test tournament", 3, 3, pidRoomMap, 5, 0, 1000, 3, [333,0,0])
 
 		rooms.push(room1)
 		rooms.push(room2)
 		rooms.push(room3)
 		rooms.push(room4)
-
 		rooms.push(tour1)
 
 		roomidRoomMap.set("room1", room1);
 		roomidRoomMap.set("room2", room2);
 		roomidRoomMap.set("room3", room3);
 		roomidRoomMap.set("room4", room4);
-
 		roomidRoomMap.set("tour1", tour1);
 
 
@@ -758,7 +753,6 @@ async function runServer(){
 		setInterval(function(){
 			for(var i =0;i<users.length;i++){
 				if(users[i].disconnect & pidRoomMap.has(users[i].id_person)){
-				  //socket.broadcast.to(users[i].room).emit("opponentDisconnect");
 				  users.splice(i,1);
 				  console.log('Number of users: '+users.length);
 				  break;
@@ -774,26 +768,4 @@ async function runServer(){
 }
 
 runServer();
-//api.getGuildLog("4AC19AC4-2A0A-E411-A3F0-AC162DC05865","7FF064DF-44EA-B049-915C-C6E30D559EC3C409B7E7-4CD9-4601-8B3B-40A74C1AC284")
-//GAME LOOP  
-
-/*
-rooms.push(new Room.Room(io,5, 2, 100, 500,6, "Bla", pidRoomMap));
-rooms.push(new Room.Room(io,6, 2, 100, 500,6, "Bla, pidRoomMap"));
-rooms.push(new Room.Room(io,7, 2, 100, 500,6, "Bla", pidRoomMap));
-rooms.push(new Room.Room(io,8, 2, 100, 500,6, "Bla", pidRoomMap));
-rooms.push(new Room.Room(io,9, 2, 100, 500,6, "Bla", pidRoomMap));
-rooms.push(new Room.Room(io,10, 2, 100, 500,6, "Bla", pidRoomMap));
-rooms.push(new Room.Room(io,11, 2, 100, 500,6, "Bla", pidRoomMap));
-/*
-rooms.push(new Room.Room(io,6, 2, 100,6));
-rooms.push(new Room.Room(io,7, 2, 100,6));
-rooms.push(new Room.Room(io,8, 2, 100,6));
-rooms.push(new Room.Room(io,9, 2, 100,6));
-rooms.push(new Room.Room(io,10, 2, 100,6));
-rooms.push(new Room.Room(io,11, 2, 100,6));
-rooms.push(new Room.Room(io,12, 2, 100,6));
-rooms.push(new Room.Room(io,13, 2, 100,6));
-*/
-
 
