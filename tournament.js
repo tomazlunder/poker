@@ -16,22 +16,32 @@ class Tournament extends ARoom.AbstractRoom{
 		this.bustedPlayers = []
     }
 
+    startRoom(){
+        this.bustedPlayers = []
+
+        super.startRoom();
+    }
+
     async endTournament(){
         console.log("End tournament TODO")
         //TODO
         var reversed = this.bustedPlayers.reverse();
 
         //Send tournament end to players
+        var reversedNames = []
+        for(var i in reversed){
+            reversedNames.push(reversed[i].name)
+        }
 
         for(var i in reversed){
                 var player = reversed[i]
             
                 if(this.rewards[i] > 0){
                     try{
-                    db.tryIncreaseBalance(player.id_person, this.rewards[i])
+                        db.tryIncreaseBalance(player.id_person, this.rewards[i])
 
-                    player.balance += this.rewards[i]
-                    player.socket.emit("newBalance", player.balance)
+                        player.balance += this.rewards[i]
+                        player.socket.emit("newBalance", player.balance)
                      } catch (err){
                         console.log("Tournament reward error")
                         console.log(err)
@@ -40,13 +50,13 @@ class Tournament extends ARoom.AbstractRoom{
                 player.stack = 0;
 
                 //TODO: Change this to some kind of tournament kick (stays on game screen with results)
-                player.socket.emit("tournamentEnd");
+                player.socket.emit("tournamentEnd",[reversedNames, this.rewards]);
 
                 console.log(this.room_id + ": removed player ("+ player.name+").")
                 this.playerRoomMap.delete(player.id_person)
 
                 player.socket.emit("listOutdated")
-                this.seats[i] = null;
+                this.seats[this.seats.indexOf(player)] = null;
         }
 
         //TODO: auto restart?
@@ -55,6 +65,8 @@ class Tournament extends ARoom.AbstractRoom{
 
     async postGame(){
         console.log("Resetting game")
+        this.gameState.state = 0;
+
         console.log(this.room_id)
         this.io.to(this.room_id).emit('resetGame');
 
@@ -72,7 +84,6 @@ class Tournament extends ARoom.AbstractRoom{
             return;
         } else {
             this.roomState = 1;
-            this.gameState.state = 0;
             this.updateState();
         }
     
@@ -83,13 +94,11 @@ class Tournament extends ARoom.AbstractRoom{
 
 		if(!this.markedForShutdown){
 			this.roomState = 0;
-            this.gameState.state = 0;
             this.updateState();
             return;
 		} else {
 			console.log(this.room_id + ": has shut down.")
 			this.running = 0;
-			this.markedForShutdown = 0;
             return;
 		}
     }
@@ -113,6 +122,7 @@ class Tournament extends ARoom.AbstractRoom{
 				user.stack = this.chips_per;
 				user.zombie = 0
 				user.alive = 0
+                user.busted = 0
 
                 //Stack in db is set as entry fee for the tournament
                 //In case of server crash entry fee is returned

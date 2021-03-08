@@ -847,16 +847,21 @@ socket.on('tournamentEnd', (arg) =>{
     console.log("Received: Tournament end")
 
     var table = document.createElement("table")
-    for(var i in arg){
-        var name = arg[i][0]
-        var result = arg[i][1]
+    for(var i in arg[0]){
+        var name = arg[0][i]
+        var result = arg[1][i]
 
         var tr = document.createElement("tr")
         var td1 = document.createElement("td")
         var td2 = document.createElement("td")
         var td3 = document.createElement("td")
 
-        td1.innerHTML = i;
+        td1.classList.add("tdResult1")
+        td2.classList.add("tdResult2")
+        td3.classList.add("tdResult3")
+
+
+        td1.innerHTML = parseInt(i) + 1;
         td2.innerHTML = name;
         td3.innerHTML = result;
 
@@ -865,6 +870,8 @@ socket.on('tournamentEnd', (arg) =>{
         tr.append(td3)
         table.append(tr)
     }
+
+    table.classList.add("tableResult")
 
     document.getElementById("modalTourResultsContent").innerHTML = ""
     document.getElementById("modalTourResultsContent").append(table)

@@ -19,6 +19,8 @@ class AbstractRoom{
             this.seats.push(null);
         }
 
+		this.roomState = 0;
+
         this.running = 0;
         this.markedToStop = 0;
 
@@ -34,6 +36,8 @@ class AbstractRoom{
         this.running = 1;
         this.markedToStop = 0;
         this.roomState = 0;
+		this.dealer_prev = null;
+		this.gameState = new gs.GameState(null,null);
 
         this.seats = []
         for(var i = 0; i < this.numPlayers; i++){
@@ -656,7 +660,7 @@ class AbstractRoom{
         var next = currentIndex+1
         while(1){
           if(next == currentIndex){
-              console.err("["+this.room_id+"] next player not found!")
+              console.log("["+this.room_id+"] next player not found!")
           }
     
           if(next >= this.seats.length){

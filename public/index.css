@@ -319,6 +319,18 @@ button:hover:disabled {
   width: 33%;
 }
 
+.tableResult{
+  width: 100%;
+  font-size: 1.5vmax;
+}
+
+.tdResult1{
+  width: 10%;
+}
+.tdResult2{
+  width: 45%;
+}
+
 .tableLeaderboard{
   width: 100%
 }
