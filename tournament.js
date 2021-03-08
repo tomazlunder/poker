@@ -24,12 +24,12 @@ class Tournament extends ARoom.AbstractRoom{
         for(var i in reversed){
                 var player = reversed[i]
             
-                if(rewards[i] > 0){
+                if(this.rewards[i] > 0){
                     try{
                     db.tryIncreaseBalance(player.id_person, this.rewards[i])
 
                     player.balance += this.rewards[i]
-                    user.socket.emit("newBalance", user.balance)
+                    player.socket.emit("newBalance", user.balance)
                      } catch (err){
                         console.log("Tournament reward error")
                         console.log(err)
@@ -59,7 +59,7 @@ class Tournament extends ARoom.AbstractRoom{
             if(this.seats[i]){
                 if(this.seats[i].stack < this.sb_size * 2 && this.seats[i].busted == 0){
                     this.seats[i].busted = 1;
-                    this.bustedPlayers.push(busted);
+                    this.bustedPlayers.push(this.seats[i]);
                 }
             }
         }
@@ -69,6 +69,7 @@ class Tournament extends ARoom.AbstractRoom{
             return;
         } else {
             this.roomState = 1;
+            this.gameState.state = 0;
             this.updateState();
         }
     
