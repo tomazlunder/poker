@@ -20,6 +20,7 @@ class AbstractRoom{
         }
 
 		this.roomState = 0;
+		this.fold_win;
 
         this.running = 0;
         this.markedToStop = 0;
@@ -93,6 +94,8 @@ class AbstractRoom{
 				console.log(this.room_id + ": (state1) round starting.")
 				this.io.to(this.room_id).emit('roundStarted');
 				this.resetPlayers()
+
+				this.fold_win = 1;
 
 				var dealer, sb, fta, bb, lta;
 
@@ -194,6 +197,7 @@ class AbstractRoom{
 
 			case 5:{
 				//Showdown
+				this.fold_win = 0;
 				var hands = [];
 				for(var i in this.seats){
 					if(this.seats[i]){
@@ -520,7 +524,12 @@ class AbstractRoom{
 			if(this.seats[i]){
 				if(this.seats[i].result > 0){
 					this.seats[i].stack+=this.seats[i].result;
-					this.io.to(this.room_id).emit('winner', [this.seats[i].name, this.seats[i].result, userHandMap.get(this.seats[i])]);
+					var desc = userHandMap.get(this.seats[i])
+					if(this.fold_win){
+						desc = "Fold win"
+					}
+
+					this.io.to(this.room_id).emit('winner', [this.seats[i].name, this.seats[i].result, desc]);
 				}
 			}
 		}
