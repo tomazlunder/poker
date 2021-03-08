@@ -724,6 +724,9 @@ input:checked + .slider2:before {
 
 #closeDeposited{
   color: black;
+  position: absolute;
+  top: 0.2vh;
+  right: 0.2vw;
 }
 
 .modalTitle{
