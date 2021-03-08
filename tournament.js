@@ -2,7 +2,7 @@ var ARoom = require('./abstractRoom.js')
 var db = require('./db.js');
 
 class Tournament extends ARoom.AbstractRoom{
-    constructor(io, id, name, numPlayers, minPlayers, playerRoomMap,  sb_size, entry_fee, chips_per, loops_till_increase, rewards){
+    constructor(io, id, name, numPlayers, minPlayers, playerRoomMap,  sb_size, entry_fee, chips_per, loops_till_increase, rewards, continuous){
         super(io, id, name, numPlayers, minPlayers, sb_size, playerRoomMap);
 
         this.type = "tournament"
@@ -12,6 +12,8 @@ class Tournament extends ARoom.AbstractRoom{
 		this.chips_per = chips_per;
 		this.loops_till_increase = loops_till_increase;
 		this.rewards = rewards;
+
+        this.continuous = continuous;
 
 		this.bustedPlayers = []
     }
@@ -59,18 +61,13 @@ class Tournament extends ARoom.AbstractRoom{
                 this.seats[this.seats.indexOf(player)] = null;
         }
 
-        /*
-        if(!this.markedForShutdown){
-			this.roomState = 0;
+        if(this.continuous && !this.markedForShutdown){
+            this.roomState = 0;
             this.updateState();
             return;
-		} else {
-			console.log(this.room_id + ": has shut down.")
-			this.running = 0;
-            return;
-		}*/
-
-        //TODO: auto restart?
+        }
+        
+        this.markedForShutdown = 0;
         this.running = 0;
     }
 
