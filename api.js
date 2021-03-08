@@ -64,14 +64,19 @@ function getGuildLog(key_guild, key_api, since = null){
             // The whole response has been received. Print out the result.
             resp.on('end', () => {
                 //console.log(JSON.parse(data))
-                parsedData = JSON.parse(api_data)
-                if(parsedData.text == "Invalid access token"){
-                    //socket.emit("registrationFailed","Invalid API key")
-                    reject("Invalid API Key")
+                try{
+                    parsedData = JSON.parse(api_data)
+                    if(parsedData.text == "Invalid access token"){
+                        //socket.emit("registrationFailed","Invalid API key")
+                        reject("Invalid API Key")
+                    }
+        
+                    //var nameFromApi = JSON.parse(api_data).name;
+                    resolve(parsedData)
+                } catch(err){
+                    console.log("Parsing error")
+                    console.log(err)
                 }
-    
-                //var nameFromApi = JSON.parse(api_data).name;
-                resolve(parsedData)
             });
     
         }).on("error", (err) => {

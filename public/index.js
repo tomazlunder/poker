@@ -5,6 +5,8 @@ var audio_notify = new Audio('audio/notify.wav');
 var audio_deal = new Audio('audio/deal.wav');
 var audio_bridge = new Audio('audio/bridge.wav');
 
+var depositsFound = 0;
+
 audio_notify.volume = 0.3;
 audio_bridge.volume = 0.5;
 
@@ -129,6 +131,21 @@ span5.onclick = function(){
 span6.onclick = function(){
     modalPassword.style.display = "none";
 }
+
+var spanDeposited = document.getElementById("closeDeposited");
+
+spanDeposited.onclick = function(){
+    depositsFound = 0;
+    document.getElementById("deposited").style.display = 'none';
+}
+
+socket.on("depositComplete", (arg) => {
+    console.log("Received: deposit complete ("+arg[0]+")")
+    depositsFound += arg[0];
+    document.getElementById("depositedLabel").innerHTML = "Deposited: " + depositsFound;
+    document.getElementById("deposited").style.display = 'block';
+});
+
 
 //Messages
 //TODO ADD MANAGER THAT CAN THROW THIS

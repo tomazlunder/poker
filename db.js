@@ -62,7 +62,7 @@ function tryDecreaseBalance(user_id, decrease_by){
             }
             
             console.log(query.sql); 
-			console.log(result);
+			//console.log(result);
 
 			if(result.affectedRows == 1){
 				//Complete room join
@@ -99,6 +99,57 @@ function tryIncreaseBalance(id_person, increase_by){
         });
     });
 }
+
+function increaseDeposited(id_person, increase_by){
+    return new Promise((resolve,reject) => {
+        var query = con.query("UPDATE person SET deposited = deposited + ? WHERE id_person = ?",
+        [increase_by, id_person],
+		function(err, result){
+            if (err){
+                console.log(err)
+                reject();
+                return;
+            }
+            
+            console.log(query.sql); 
+			//console.log(result);
+
+			if(result.affectedRows == 1){
+				//Complete room join
+				resolve()
+			}
+			else{
+				reject()
+			}
+        });
+    });
+}
+
+function resetDeposited(id_person){
+    return new Promise((resolve,reject) => {
+        var query = con.query("UPDATE person SET deposited = 0 WHERE id_person = ?",
+        [id_person],
+		function(err, result){
+            if (err){
+                console.log(err)
+                reject();
+                return;
+            }
+            
+            console.log(query.sql); 
+			//console.log(result);
+
+			if(result.affectedRows == 1){
+				//Complete room join
+				resolve()
+			}
+			else{
+				reject()
+			}
+        });
+    });
+}
+
 function setPersonStack(user_id, new_stack){
     return new Promise((resolve,reject) => {
         var query = con.query("UPDATE person SET stack = ? WHERE id_person = ?",
@@ -446,6 +497,8 @@ module.exports.topTenWinnings = topTenWinnings;
 module.exports.getGuilds = getGuilds;
 module.exports.setGuildSince = setGuildSince;
 module.exports.insertDeposit = insertDeposit;
+module.exports.increaseDeposited = increaseDeposited;
+module.exports.resetDeposited = resetDeposited;
 
 
 

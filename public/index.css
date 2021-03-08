@@ -205,7 +205,7 @@ button {
 #buttonTip, #buttonAdminMode {
   float: right;
 
-  background-color:#32d589;
+  background-color:#4dd377;
   color: #ffffff;
 }
 
@@ -252,6 +252,11 @@ button:hover:disabled {
 }
 
 #buttonTip:hover{
+  background-color: #fdea5a;
+  color:black;
+}
+
+#buttonAdmin:hover{
   background-color: #fdea5a;
   color:black;
 }
@@ -669,7 +674,7 @@ input:checked + .slider2:before {
 
 #success{
   color: white;
-  background-color: #4CAF50;
+  background-color: #4dd377;
   opacity: 1;
 
   font-size: 3vmax;
@@ -686,6 +691,46 @@ input:checked + .slider2:before {
   bottom:15vh;
 
   display: none;
+}
+
+#deposited{
+  color: #3E3E3E;
+  background-color: #4dd377;
+  opacity: 1;
+
+  text-align: center;
+
+  transition: opacity 1.5s; /* 600ms to fade out */
+  border-radius: 0.5vw;
+
+
+  width: 25vw;
+  height: 8vh;
+
+  position: absolute;
+  bottom: 82%;
+  left: 50%;
+
+  transform: translate(-50%, -50%);
+
+
+  display: none;
+}
+
+#depositedLabel{
+  font-size: 3.5vh;
+  color: #ffffff;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+#closeDeposited{
+  color: black;
 }
 
 .modalTitle{

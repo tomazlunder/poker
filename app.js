@@ -29,7 +29,9 @@ const { REPL_MODE_SLOPPY } = require('repl');
 var users = []
 var rooms = []
 
-const tickTime = 2000;
+const removeDisconnectedUsersTime = 5000;
+const checkForDepositTime = 2 * 60 * 1000;
+
 const timeForAction = 25000;
 const timeAtEnd = 10000;
 const showdownTime = 2000;
@@ -348,6 +350,14 @@ io.on('connection', function(socket) {
 				socket.emit("loginOk",[response.account_name, response.balance, response.is_admin]);
 
 				socket.emit("accountStats", [response.balance, response.winnings, response2, response.roundsPlayed, response3, response.email] )
+
+				console.log(response)
+				if(response.deposited > 0){
+					socket.emit("depositComplete", [response.deposited]);
+
+					const response3 = await db.resetDeposited(response.id_person)
+				}
+				
 			}
 			else{
 				console.log("Incorrect login info")
@@ -698,6 +708,22 @@ async function depositCheck(){
 
 						var response2 = await db.insertDeposit(guild.id_guild, person.account_name, filtered[j].count, 1, filtered[j].id)
 
+						//If person is online
+						var online = 0;
+						for(var i in users){
+							if(users[i].id_person == person.id_person){
+								users[i].balance += filtered[j].count;
+								users[i].socket.emit("newBalance", users[i].balance);
+								users[i].socket.emit("depositComplete", [filtered[j].count]);
+								online = 1;
+							}
+						}
+
+						if(!online){
+							var response3 = await db.increaseDeposited(person.id_person, filtered[j].count)
+						}
+
+
 						console.log("[server] Deposit inserted and completed ("+person.account_name+","+filtered[j].count+")")
 					} catch (err) {
 						var response2 = await db.insertDeposit(guild.id_guild, filtered[j].user, filtered[j].count, 0, filtered[j].id)
@@ -764,18 +790,43 @@ async function runServer(){
 		//Removing disconnected users from the user list
 		setInterval(function(){
 			for(var i =0;i<users.length;i++){
-				if(users[i].disconnect & pidRoomMap.has(users[i].id_person)){
+				if(users[i].disconnected & !pidRoomMap.has(users[i].id_person)){
+				  console.log("Removed " + users[i].name + " from user list");
 				  users.splice(i,1);
 				  console.log('Number of users: '+users.length);
 				  break;
 				}
 			}
-		}, tickTime);
+		}, removeDisconnectedUsersTime);
+
+		setInterval(async function(){
+			console.log("Deposit check skipped (no users online)");
+			if(users.length > 0){
+				try{
+					const dc = await depositCheck();
+					console.log("Deposit check succeded.")
+				} catch (err){
+					console.log("Deposit check failed.")
+				}
+			}
+		}, checkForDepositTime)
 
 
 	} catch (err) {
 		console.log("[SERVER] CRITICAL ERROR")
 		console.log(err)
+	}
+}
+
+checkForDeposits = async function(){
+	console.log("Deposit check skipped (no users online)");
+	if(users.length > 0){
+		try{
+			const dc = await depositCheck();
+			console.log("Deposit check succeded.")
+		} catch (err){
+			console.log("Deposit check failed.")
+		}
 	}
 }
 
