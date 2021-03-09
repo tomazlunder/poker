@@ -2,8 +2,8 @@ var ARoom = require('./abstractRoom.js')
 var db = require('./db.js');
 
 class Room extends ARoom.AbstractRoom{
-    constructor(io, id, name, numPlayers, minPlayers, playerRoomMap,  sb_size, min_buy_in, max_buy_in){
-        super(io, id, name, numPlayers, minPlayers, sb_size, playerRoomMap);
+    constructor(io, id, name, numPlayers, playerRoomMap,  sb_size, min_buy_in, max_buy_in){
+        super(io, id, name, numPlayers, 2, sb_size, playerRoomMap);
 
 		this.type = "room"
 
