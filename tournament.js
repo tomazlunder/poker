@@ -66,7 +66,7 @@ class Tournament extends ARoom.AbstractRoom{
             this.updateState();
             return;
         }
-        
+
         this.markedForShutdown = 0;
         this.running = 0;
     }
@@ -79,7 +79,7 @@ class Tournament extends ARoom.AbstractRoom{
 
         for(var i in this.seats){
             if(this.seats[i]){
-                if(this.seats[i].stack < this.sb_size * 2 && this.seats[i].busted == 0){
+                if(this.seats[i].stack == 0 && this.seats[i].busted == 0){
                     this.seats[i].busted = 1;
                     this.bustedPlayers.push(this.seats[i]);
                 }

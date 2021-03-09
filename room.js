@@ -97,7 +97,7 @@ class Room extends ARoom.AbstractRoom{
 		
 		for(var i = 0; i < this.seats.length; i++){
 			if(this.seats[i]){
-				if(this.seats[i].zombie == 1 || this.seats[i].stack < this.sb_size*2 || this.markedForShutdown == 1){
+				if(this.seats[i].zombie == 1 || this.seats[i].stack == 0  || this.markedForShutdown == 1){
 					var user = this.seats[i]
 					
 					promises.push(db.transferStackToBalance(user))

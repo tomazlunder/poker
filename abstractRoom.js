@@ -124,6 +124,7 @@ class AbstractRoom{
 
 				//Compulsory bets
 				console.log(this.room_id + ": (state1) compulsory bets.")
+				/*
 				sb.stack -= this.sb_size;
 				bb.stack -= 2*this.sb_size;
 				
@@ -132,12 +133,32 @@ class AbstractRoom{
 
 				sb.total_bet_size =  this.sb_size;
 				bb.total_bet_size = 2*this.sb_size;
+				*/
+				if(sb.stack >= this.sb_size){
+					sb.bet = this.sb_size;
+				} else {
+					sb.bet = sb.stack;
+					sb.all_in = 1;
+				}
+
+				sb.total_bet_size = sb.bet;
+				sb.stack -= sb.bet;
+
+				if(bb.stack >= this.sb_size * 2){
+					bb.bet = this.sb_size * 2;
+				} else {
+					bb.bet = bb.stack;
+					bb.all_in = 1;
+				}
+
+				bb.total_bet_size = sb.bet;
+				bb.stack -= bb.bet;
 
 				//Create new round 
 				this.gameState = new gs.GameState(dealer,fta)
 
-				this.gameState.pot = 3*this.sb_size;
-				this.gameState.bet_size = 2*this.sb_size;
+				this.gameState. bot = sb.bet + bb.bet;
+				this.gameState.bet_size = Math.max(sb.bet, bb.bet) //In case sb is all in
 
 				this.sendGamestate();
 
