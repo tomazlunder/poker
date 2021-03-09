@@ -283,6 +283,28 @@ function changeWinnings(id_person, change_by){
     });
 }
 
+function changeTourWinnings(id_person, change_by){
+    return new Promise((resolve,reject) => {    
+        var query = con.query("UPDATE person SET tour_winnings = tour_winnings + ?, tour_played = tour_played + 1 WHERE id_person = ?",
+            [change_by, id_person],
+            function(err, result){
+                if (err) {
+                    console.log(err)
+                    reject()
+                }
+                console.log(query.sql); 
+                //console.log(result);
+                if(result.changedRows == 1){
+                    console.log("Changed winnings.")
+                    resolve()
+                }else{
+                    reject()
+                }
+            }
+        );
+    });
+}
+
 function insertWithdraw(id_person, amount){
     return new Promise((resolve,reject) => {    
         var query = con.query("INSERT INTO withdraw(id_person, amount) VALUE (?,?)",
@@ -486,6 +508,8 @@ module.exports.setPersonStack = setPersonStack;
 module.exports.insertPerson = insertPerson;
 module.exports.transferStackToBalance = transferStackToBalance;
 module.exports.changeWinnings = changeWinnings;
+module.exports.changeTourWinnings = changeTourWinnings;
+
 module.exports.insertWithdraw = insertWithdraw;
 module.exports.transferAllPersonStackToBalance = transferAllPersonStackToBalance;
 module.exports.getSumTips = getSumTips;

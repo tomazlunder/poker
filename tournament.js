@@ -39,29 +39,36 @@ class Tournament extends ARoom.AbstractRoom{
         }
 
         for(var i in reversed){
-                var player = reversed[i]
-            
-                if(this.rewards[i] > 0){
-                    try{
-                        db.tryIncreaseBalance(player.id_person, this.rewards[i])
+            var player = reversed[i]
+        
+            if(this.rewards[i] > 0){
+                try{
+                    db.tryIncreaseBalance(player.id_person, this.rewards[i])
+                    db.changeWinnings(player.id_person, this.rewards[i]-this.entry_fee);
+                    db.changeTourWinnings(player.id_person, this.rewards[i]-this.entry_fee);
 
-                        player.balance += this.rewards[i]
-                        player.socket.emit("newBalance", player.balance)
-                     } catch (err){
-                        console.log("Tournament reward error")
-                        console.log(err)
-                    }
+                    player.balance += this.rewards[i]
+                    player.socket.emit("newBalance", player.balance)
+                    } catch (err){
+                    console.log("Tournament reward error")
+                    console.log(err)
                 }
-                player.stack = 0;
+            }
+            else{
+                db.changeWinnings(player.id_person, -this.entry_fee);
+                db.changeTourWinnings(player.id_person, -this.entry_fee);
+            }
 
-                //TODO: Change this to some kind of tournament kick (stays on game screen with results)
-                player.socket.emit("tournamentEnd",[reversedNames, this.rewards]);
+            player.stack = 0;
 
-                console.log(this.room_id + ": removed player ("+ player.name+").")
-                this.playerRoomMap.delete(player.id_person)
+            //TODO: Change this to some kind of tournament kick (stays on game screen with results)
+            player.socket.emit("tournamentEnd",[reversedNames, this.rewards]);
 
-                player.socket.emit("listOutdated")
-                this.seats[this.seats.indexOf(player)] = null;
+            console.log(this.room_id + ": removed player ("+ player.name+").")
+            this.playerRoomMap.delete(player.id_person)
+
+            player.socket.emit("listOutdated")
+            this.seats[this.seats.indexOf(player)] = null;
         }
 
         if(this.continuous && !this.markedForShutdown){
