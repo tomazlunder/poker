@@ -157,7 +157,7 @@ class AbstractRoom{
 				//Create new round 
 				this.gameState = new gs.GameState(dealer,fta)
 
-				this.gameState. bot = sb.bet + bb.bet;
+				this.gameState.pot = sb.bet + bb.bet;
 				this.gameState.bet_size = Math.max(sb.bet, bb.bet) //In case sb is all in
 
 				this.sendGamestate();
