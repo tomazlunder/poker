@@ -2,7 +2,7 @@ var ARoom = require('./abstractRoom.js')
 var db = require('./db.js');
 
 class Tournament extends ARoom.AbstractRoom{
-    constructor(io, id, name, numPlayers, minPlayers, playerRoomMap,  sb_size, entry_fee, chips_per, loops_till_increase, rewards, continuous){
+    constructor(io, id, name, numPlayers, minPlayers, playerRoomMap,  sb_size, entry_fee, chips_per, schedule_time, rewards, continuous){
         super(io, id, name, numPlayers, minPlayers, sb_size, playerRoomMap);
 
         this.type = "tournament"
@@ -10,16 +10,20 @@ class Tournament extends ARoom.AbstractRoom{
         //Room specific 
 		this.entry_fee = entry_fee;
 		this.chips_per = chips_per;
-		this.loops_till_increase = loops_till_increase;
+		this.schedule_time = schedule_time;
+        this.schedule = schedule;
 		this.rewards = rewards;
 
         this.continuous = continuous;
 
 		this.bustedPlayers = []
+
+        this.lastIncreaseTime = null;
     }
 
     startRoom(){
         this.bustedPlayers = []
+        this.lastIncreaseTime = Date.time();
 
         super.startRoom();
     }
@@ -85,11 +89,19 @@ class Tournament extends ARoom.AbstractRoom{
                 }
             }
         }
+
         if(this.numberOfNonBustedPlayers(this.seats) == 1){
             this.bustedPlayers.push(this.getLastPlayer())
             this.endTournament();
             return;
         } else {
+            var deltaTime = Date.now() - this.lastIncreaseTime;
+            if(deltaTime > this.schedule_time){
+                this.lastIncreaseTime = Date.now()
+                this.sb_size = this.sb_size * 2;
+                console.log(this.room_id + " increased small blind size");
+            }
+
             this.roomState = 1;
             this.updateState();
             return;
