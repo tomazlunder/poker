@@ -271,47 +271,60 @@ socket.on('leaderboard', (arg)=>{
     console.log("Received: leaderboard")
     console.log(arg)
     myLeaderboard = arg;
-    var table = document.getElementById("tableLeaderboard");
+    var table = document.getElementById("totalBody");
+    var table2 = document.getElementById("tourBody");
 
     table.innerHTML =  "<tr> <th></th>   <th>Name</th> <th>Winnings</th><th>Rounds played</th></tr>"
+    table2.innerHTML =  "<tr> <th></th>   <th>Name</th> <th>Tournament winnings</th><th>Tournaments played</th></tr>"
 
+    for(var j in arg){
+        for(var i in arg[j]){
+            var row = document.createElement("tr")
+            var td0 = document.createElement("td")
+            var td1 = document.createElement("td")
+            var td2 = document.createElement("td")
+            var td3 = document.createElement("td")
+    
+            row.classList.add("tableLeaderboardRow");
+    
+            td0.classList.add("tdLeaderboardRank")
+            td1.classList.add("tdLeaderboard")
+            td2.classList.add("tdLeaderboard")
+            td3.classList.add("tdLeaderboard")
+    
+            var label_rank = document.createElement("label")
+            var label_name = document.createElement("label")
+            var label_winnings = document.createElement("label")
+            var label_roundsPlayed = document.createElement("label")
+    
+            td0.append(label_rank)
+            td1.append(label_name)
+            td2.append(label_winnings)
+            td3.append(label_roundsPlayed)
+    
+            row.append(td0)
+            row.append(td1)
+            row.append(td2)
+            row.append(td3)
+    
+            if(j == 0){
+                table.append(row)
+                label_rank.innerHTML = (parseInt(i)+1);
+                label_name.innerHTML = arg[j][i].account_name;
+                label_winnings.innerHTML = arg[j][i].winnings;
+                label_roundsPlayed.innerHTML = arg[j][i].roundsPlayed;
+            }
+            if(j == 1){
+                table2.append(row)
+                label_rank.innerHTML = (parseInt(i)+1);
+                label_name.innerHTML = arg[j][i].account_name;
+                label_winnings.innerHTML = arg[j][i].tour_winnings;
+                label_roundsPlayed.innerHTML = arg[j][i].tour_played;
+            }
+        }
 
-    for(var i in arg){
-        var row = document.createElement("tr")
-        var td0 = document.createElement("td")
-        var td1 = document.createElement("td")
-        var td2 = document.createElement("td")
-        var td3 = document.createElement("td")
-
-        row.classList.add("tableLeaderboardRow");
-
-        td0.classList.add("tdLeaderboardRank")
-        td1.classList.add("tdLeaderboard")
-        td2.classList.add("tdLeaderboard")
-        td3.classList.add("tdLeaderboard")
-
-        var label_rank = document.createElement("label")
-        var label_name = document.createElement("label")
-        var label_winnings = document.createElement("label")
-        var label_roundsPlayed = document.createElement("label")
-
-        label_rank.innerHTML = (parseInt(i)+1);
-        label_name.innerHTML = arg[i].account_name;
-        label_winnings.innerHTML = arg[i].winnings;
-        label_roundsPlayed.innerHTML = arg[i].roundsPlayed;
-
-        td0.append(label_rank)
-        td1.append(label_name)
-        td2.append(label_winnings)
-        td3.append(label_roundsPlayed)
-
-        row.append(td0)
-        row.append(td1)
-        row.append(td2)
-        row.append(td3)
-
-        table.append(row)
     }
+    
 });
 
 socket.on('roomList', (arg) =>{
@@ -1072,6 +1085,30 @@ function buttonStopRoomClicked(room_id){
 
 function buttonStartRoomClicked(room_id){
     socket.emit("adminRoomStart", room_id)
+}
+
+function leaderboardTotalButton(){
+    document.getElementById("leaderboardTourButton").disabled = false;
+    document.getElementById("leaderboardTotalButton").disabled = true;
+
+    document.getElementById("tableTourLeaderboard").style.display = 'none';
+    document.getElementById("tableLeaderboard").style.display = 'table';
+
+    document.getElementById("totalBody").style.width = '100%';
+
+
+
+}
+
+function leaderboardTourButton(){
+    document.getElementById("leaderboardTourButton").disabled = true;
+    document.getElementById("leaderboardTotalButton").disabled = false;
+
+    document.getElementById("tableLeaderboard").style.display = 'none';
+    document.getElementById("tableTourLeaderboard").style.display = 'table';
+
+    document.getElementById("tourBody").style.width = '100%';
+
 }
 
 

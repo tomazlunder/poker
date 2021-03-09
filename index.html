@@ -146,9 +146,10 @@
 
       <!-- leaderboard-->
       <div class="containerMain" id="homeLeaderboard" style="display:none;">
-        <label class="labelTitle" >Winnings leaderboard</label><br><br>
-          <table id="tableLeaderboard">
-        </table>
+        <button class="navButton" id="leaderboardTotalButton" onclick="leaderboardTotalButton()" disabled>Total</button><button class = "navButton"  onclick="leaderboardTourButton()" id="leaderboardTourButton"> Tournaments </button>
+        <br><br>
+          <table id="tableLeaderboard" ><tbody id="totalBody"></tbody></table>
+          <table id="tableTourLeaderboard" style="display:none;" ><tbody id="tourBody"></tbody></table>
       </div>      
 
       <div class="containerFoot">

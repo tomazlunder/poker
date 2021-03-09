@@ -142,11 +142,14 @@ io.on('connection', function(socket) {
 
 		try{
 			const result = await db.topTenWinnings();
+
+			const result2 = await db.topTenTourWinnings();
 			
-			socket.emit('leaderboard', result)
+			socket.emit('leaderboard', [result,result2])
 
 		} catch(err) {
-
+			console.log("Get leaderboard error")
+			console.log(err)
 		}
 	}
 

@@ -429,6 +429,23 @@ function topTenWinnings(){
     });
 }
 
+function topTenTourWinnings(){
+    return new Promise((resolve,reject) => {    
+        var query = con.query("SELECT account_name, tour_winnings, tour_played FROM person ORDER BY tour_winnings DESC LIMIT 10;",
+            null,
+            function(err, result){
+                if (err) {
+                    console.log(err)
+                    reject()
+                }
+                console.log(query.sql); 
+                //console.log(result);
+                resolve(result)
+            }
+        );
+    });
+}
+
 function getGuilds(){
     return new Promise((resolve,reject) => {    
         var query = con.query("SELECT * FROM guild;",
@@ -518,6 +535,8 @@ module.exports.insertTip = insertTip;
 module.exports.setPersonPassword = setPersonPassword;
 module.exports.setPersonEmail = setPersonEmail;
 module.exports.topTenWinnings = topTenWinnings;
+module.exports.topTenTourWinnings = topTenTourWinnings;
+
 module.exports.getGuilds = getGuilds;
 module.exports.setGuildSince = setGuildSince;
 module.exports.insertDeposit = insertDeposit;

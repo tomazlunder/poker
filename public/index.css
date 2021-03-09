@@ -300,7 +300,7 @@ button:enabled:hover {
   width: 100%;
 }
 
-#tableLeaderboard{
+#tableLeaderboard,#tableTourLeaderboard{
   background: #cccccc;
   border-radius: 0.5vw;
   width: 100%
@@ -342,8 +342,17 @@ button:enabled:hover {
   width: 30% ;
 }
 
+.tr{
+  width: 100%;
+}
+
+.tbody{
+  width: 100%;
+}
+
 .tableLeaderboardRow{
-  height: 6vh;
+  height: 5.5vh;
+  width: 100%;
 }
 
 th{
@@ -356,6 +365,9 @@ th{
     max-height: 75%;
 }
 
+#leaderboardTourButton{
+  margin-left: 5px;
+}
 
 canvas{
     /*max-width: 1000px;*/
