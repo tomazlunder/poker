@@ -555,7 +555,43 @@ socket.on('tournamentList', (arg) => {
 
         label_room_1.innerHTML = tournamentName;
 
-        label_rewards.innerHTML = "Rewards (TODO)"
+        var rewardsText = "";
+        if(tournamentRewards[0]){
+            if(tournamentRewards[0] > 0){
+                rewardsText += "1ST: "+tournamentRewards[0] +", "
+            }
+        }
+        if(tournamentRewards[1]){
+            if(tournamentRewards[1] > 0){
+                rewardsText += "2ND: "+tournamentRewards[1] +", "
+            }
+        }
+
+        if(tournamentRewards[2]){
+            if(tournamentRewards[2] > 0){
+                rewardsText += "3RD: "+tournamentRewards[2] +", "
+            }
+        }
+
+        if(tournamentRewards[3]){
+            if(tournamentRewards[3] > 0){
+                rewardsText += "4TH: "+tournamentRewards[2] +", "
+            }
+        }
+
+        if(tournamentRewards[4]){
+            if(tournamentRewards[4] > 0){
+                rewardsText += "5TH: "+tournamentRewards[2] +", "
+            }
+        }
+
+        if(tournamentRewards[5]){
+            if(tournamentRewards[5] > 0){
+                rewardsText += "6TH: "+tournamentRewards[2] +", "
+            }
+        }
+
+        label_rewards.innerHTML = rewardsText.slice(0,-2)
         label_players.innerHTML = "Players: "+numplayers+"/"+numseats
 
         tableTd1.append(label_rewards)
