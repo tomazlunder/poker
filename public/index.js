@@ -57,6 +57,8 @@ var buttonTournamentDataMap = new Map()
 var cur_min_buy_in;
 var cur_max_buy_in;
 
+var myLeaderboard;
+
 modalBuyIn = document.getElementById("modalBuyIn");
 modalRebuy = document.getElementById("modalRebuy");
 modalWithdraw = document.getElementById("modalWithdraw")
@@ -268,6 +270,7 @@ socket.on('changePasswordFailed', (arg) => {
 socket.on('leaderboard', (arg)=>{
     console.log("Received: leaderboard")
     console.log(arg)
+    myLeaderboard = arg;
     var table = document.getElementById("tableLeaderboard");
 
     table.innerHTML =  "<tr> <th></th>   <th>Name</th> <th>Winnings</th><th>Rounds played</th></tr>"
@@ -1316,7 +1319,9 @@ function homeAccountButton(){
 }
 
 function homeLeaderboardButton(){
-    socket.emit("getLeaderboard");
+    if(myLeaderboard == null){
+        socket.emit("getLeaderboard");
+    }
 
     document.getElementById("homeRooms").style.display="none"
     document.getElementById("homeAccount").style.display="none"
