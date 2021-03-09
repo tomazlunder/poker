@@ -11,7 +11,6 @@ class Tournament extends ARoom.AbstractRoom{
 		this.entry_fee = entry_fee;
 		this.chips_per = chips_per;
 		this.schedule_time = schedule_time;
-        this.schedule = schedule;
 		this.rewards = rewards;
 
         this.continuous = continuous;
@@ -23,7 +22,7 @@ class Tournament extends ARoom.AbstractRoom{
 
     startRoom(){
         this.bustedPlayers = []
-        this.lastIncreaseTime = Date.time();
+        this.lastIncreaseTime = Date.now();
 
         super.startRoom();
     }
