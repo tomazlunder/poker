@@ -644,6 +644,11 @@ socket.on('listOutdated', (arg) => {
 
 socket.on('drawnCards', (arg) => {
     console.log("Received: Drawn Cards ("+arg+")")
+
+    if(gameType == "tournament"){
+        document.getElementById('homeLeaveRoomButton').style.display = 'none';
+    }
+
     if(!mute){
         audio_deal.play();
     }
@@ -663,12 +668,12 @@ socket.on('roomJoined', (arg) => {
     myBalance = arg[3]
 
     if(type == "room"){
-        gameType = 0;
+        gameType = "room";
         cur_min_buy_in = arg[4]
         cur_max_buy_in = arg[5]
     }
     else if (type == "tournament"){
-        gameType = 1;
+        gameType = "tournament";
     }
 
     document.getElementById("home_label_balance").innerHTML = "Balance: " + arg[3]
@@ -690,9 +695,10 @@ socket.on('roomJoined', (arg) => {
 
     document.getElementById('homeRebuyButton').disabled = true;
 
+    document.getElementById('homeLeaveRoomButton').style.display = 'block';
+
     if(type == "tournament"){
         document.getElementById('homeRebuyButton').style.display = 'none';
-        document.getElementById('homeLeaveRoomButton').style.display = 'none';
     }
 
     var myNode = document.getElementById("containerRooms");
@@ -773,10 +779,10 @@ socket.on('roundStarted', (arg) => {
     document.getElementById("homeRebuyButton").style.display = 'none';
 
     
-    if(gameType == 0){
+    if(gameType == "room"){
         document.getElementById("homeLeaveRoomButton").style.display = 'block';
     }
-    if(gameType == 1){
+    if(gameType == "tournament"){
         document.getElementById("homeLeaveRoomButton").style.display = 'none';
     }
 
@@ -923,7 +929,7 @@ socket.on('tournamentEnd', (arg) =>{
 
 socket.on('waitingForNewGame', (arg) => {
     if(playerStacks[0] + playerResults[0] < cur_min_buy_in){
-        if(myBalance > 0 && gameType == 0){
+        if(myBalance > 0 && gameType == "room"){
             document.getElementById("homeRebuyButton").style.display = 'block';
             document.getElementById("homeRebuyButton").disabled = false;
         }
