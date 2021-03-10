@@ -15,10 +15,16 @@ function getAccountName(api_key){
             // The whole response has been received. Print out the result.
             resp.on('end', () => {
                 //console.log(JSON.parse(data))
-                parsedData = JSON.parse(api_data)
-                if(parsedData.text == "Invalid access token"){
-                    //socket.emit("registrationFailed","Invalid API key")
-                    reject("Invalid API Key")
+                try{
+                    parsedData = JSON.parse(api_data)
+                    if(parsedData.text == "Invalid access token"){
+                        //socket.emit("registrationFailed","Invalid API key")
+                        reject("Invalid API Key")
+                    }
+                } catch (err){
+                    console.log("Parsing error")
+                    console.log(err)
+                    console.log(api_data)
                 }
     
     
@@ -76,6 +82,7 @@ function getGuildLog(key_guild, key_api, since = null){
                 } catch(err){
                     console.log("Parsing error")
                     console.log(err)
+                    console.log(api_data)
                 }
             });
     

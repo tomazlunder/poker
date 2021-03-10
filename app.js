@@ -676,7 +676,7 @@ async function depositCheck(){
 		if(guilds){
 			for(var i in guilds){
 				var guild = guilds[i]
-				console.log("[server] guild1: guild.guild_name")
+				console.log("[server] guild:" +  guild.guild_name)
 
 				var log = await api.getGuildLog(guild.api_id, guild.access_token,guild.since)
 
