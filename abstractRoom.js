@@ -151,7 +151,7 @@ class AbstractRoom{
 					bb.all_in = 1;
 				}
 
-				bb.total_bet_size = sb.bet;
+				bb.total_bet_size = bb.bet;
 				bb.stack -= bb.bet;
 
 				//Create new round 
@@ -508,12 +508,14 @@ class AbstractRoom{
 			}
 
 			var winnerHands = Hand.winners(hands)
+			console.log("["+this.room_id +"] Running pot: " + runningPot + " num_hands+= " + hands.length + " " + "num_win: " + winnerHands.length)
+
 			for(var i in winnerHands){
 				var winningPlayer = handUserMap.get(winnerHands[i])
 
 				winningPlayer.result += Math.floor(runningPot/winnerHands.length)
 
-				console.log("["+this.room_id +"] Winner: " + winningPlayer.name + " result+= " + Math.floor(runningPot/winnerHands.length))
+				console.log("["+this.room_id +"] Winner: " + winningPlayer.name + " result+= " + Math.floor(runningPot/winnerHands.length)) + " Desc: " + winnerHands[i].desc
 
 				userHandMap.set(winningPlayer, winnerHands[i].descr)
 			}
@@ -534,7 +536,7 @@ class AbstractRoom{
 
 			if(players.length == 1){
 				//return uncalled bet
-				console.log("Return uncalled bet "+players[0].name+" "+investment[0])
+				console.log("["+this.room_id +"] Return uncalled bet "+players[0].name+" "+investment[0])
 				players[0].result += investment[0]
 			}
 
