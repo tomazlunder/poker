@@ -80,6 +80,7 @@ rebuyRange = document.getElementById("rebuyRange");
 withdrawRange = document.getElementById("withdrawRange");
 tipRange =  document.getElementById("tipRange")
 
+cardType = ""
 
 
 document.addEventListener("DOMContentLoaded", function(event){
@@ -824,7 +825,7 @@ socket.on('roundStarted', (arg) => {
     console.log("Received: Round started")
     state = 1;
     if(!mute){
-        audio_bridge.play();
+        //audio_bridge.play();
     }
 
     document.getElementById("homeRebuyButton").disabled = true;
@@ -1509,6 +1510,16 @@ function soundCheckboxClicked(){
     }
 }
 
+function cardCheckboxClicked(){
+    if(cardType == ""){
+        cardType = "s_";
+    } else {
+        cardType = ""
+    }
+    drawGame();
+}
+
+
 function homeFoldButton() {
     console.log("Emitted: actionRequest(fold)")
     socket.emit("actionRequest", [room_id,"fold"])
@@ -1690,8 +1701,8 @@ function drawProfile(x,y,id){
     if(id != 0 && playerAlive[id]){
 
         if(showdown[id]){
-            img1 = document.getElementById("img_" + showdown[id][0])
-            img2 = document.getElementById("img_" + showdown[id][1])
+            img1 = document.getElementById(cardType + "img_" + showdown[id][0])
+            img2 = document.getElementById(cardType + "img_" + showdown[id][1])
         }
         else {
             img1 = document.getElementById("img_back")
@@ -1701,8 +1712,8 @@ function drawProfile(x,y,id){
         var cardHeight = height*0.18;
         var cardWidth = cardHeight * 0.65;
 
-        ctx.drawImage(img1,x + border_width/2- cardWidth - width * 0.005, y - height*0.10, cardWidth, cardHeight)
-        ctx.drawImage(img2,x + border_width/2 + width * 0.005, y - height*0.10, cardWidth, cardHeight)
+        ctx.drawImage(img1,x + border_width/2- cardWidth - width * 0.005, y - height*0.11, cardWidth, cardHeight)
+        ctx.drawImage(img2,x + border_width/2 + width * 0.005, y - height*0.11, cardWidth, cardHeight)
     }
 
     var border_img = document.getElementById("img_player_border")
@@ -1819,8 +1830,8 @@ function drawMyCards(){
         var height = canvas.height;
 
         var ctx = canvas.getContext("2d");
-        var img1 = document.getElementById("img_" + myCards[0])
-        var img2 = document.getElementById("img_" + myCards[1])
+        var img1 = document.getElementById(cardType + "img_" + myCards[0])
+        var img2 = document.getElementById(cardType + "img_" + myCards[1])
 
         var cardHeight = height*0.18;
         var cardWidth = cardHeight * 0.65;
@@ -1851,7 +1862,7 @@ function drawRevealedCards(){
         card = revealedCards[i];
         if(!card) continue;
 
-        img1 = document.getElementById("img_" + card)
+        img1 = document.getElementById(cardType + "img_" + card)
         if(i == 0){
             ctx.drawImage(img1,width * 0.5 - 2.5 * cardWidth - width * 0.01 * 2, height * 0.42, cardWidth, cardHeight)
         }

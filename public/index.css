@@ -637,6 +637,22 @@ input:checked + .slider2:before {
 
   right:1vw;
   top:1vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#cardButtonContainer
+{
+  position: absolute; 
+
+  right:1vw;
+  top:7vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 #leaveRoomContainer

@@ -174,9 +174,17 @@
       </div>
 
       <div id="soundButtonContainer">
-        <label>Sound</label>
+        <label style="margin: 2vh;">Sound</label>
         <label class="switch">
           <input id="soundCheckbox" type="checkbox" checked onclick="soundCheckboxClicked()">
+          <span class="slider2"></span>
+        </label>
+      </div>
+
+      <div id="cardButtonContainer">
+        <label style="margin: 2vh;">Card</label>
+        <label class="switch">
+          <input id="cardCheckbox" type="checkbox" checked onclick="cardCheckboxClicked()">
           <span class="slider2"></span>
         </label>
       </div>
@@ -293,6 +301,63 @@
 
 <img class="res" src="images/cards/BACK.png" id="img_back">
 
+<img class="res" src="images/cards/s_2H.png"  id="s_img_2h">
+<img class="res"  src="images/cards/s_3H.png" id="s_img_3h">
+<img class="res" src="images/cards/s_4H.png" id="s_img_4h">
+<img class="res" src="images/cards/s_5H.png" id="s_img_5h">
+<img class="res" src="images/cards/s_6H.png" id="s_img_6h">
+<img class="res" src="images/cards/s_7H.png" id="s_img_7h">
+<img class="res" src="images/cards/s_8H.png" id="s_img_8h">
+<img class="res" src="images/cards/s_9H.png" id="s_img_9h">
+<img class="res" src="images/cards/s_10H.png" id="s_img_Th">
+<img class="res" src="images/cards/s_JH.png" id="s_img_Jh">
+<img class="res" src="images/cards/s_QH.png" id="s_img_Qh">
+<img class="res" src="images/cards/s_KH.png" id="s_img_Kh">
+<img class="res" src="images/cards/s_AH.png" id="s_img_Ah">
+
+<img class="res" src="images/cards/s_2D.png" id="s_img_2d">
+<img class="res" src="images/cards/s_3D.png" id="s_img_3d">
+<img class="res" src="images/cards/s_4D.png" id="s_img_4d">
+<img class="res" src="images/cards/s_5D.png" id="s_img_5d">
+<img class="res" src="images/cards/s_6D.png" id="s_img_6d">
+<img class="res" src="images/cards/s_7D.png" id="s_img_7d">
+<img class="res" src="images/cards/s_8D.png" id="s_img_8d">
+<img class="res" src="images/cards/s_9D.png" id="s_img_9d">
+<img class="res" src="images/cards/s_10D.png" id="s_img_Td">
+<img class="res" src="images/cards/s_JD.png" id="s_img_Jd">
+<img class="res" src="images/cards/s_QD.png" id="s_img_Qd">
+<img class="res" src="images/cards/s_KD.png" id="s_img_Kd">
+<img class="res" src="images/cards/s_AD.png" id="s_img_Ad">
+
+<img class="res"  src="images/cards/s_2S.png" id="s_img_2s">
+<img class="res"  src="images/cards/s_3S.png" id="s_img_3s">
+<img class="res" src="images/cards/s_4S.png" id="s_img_4s">
+<img class="res" src="images/cards/s_5S.png" id="s_img_5s">
+<img class="res" src="images/cards/s_6S.png" id="s_img_6s">
+<img class="res" src="images/cards/s_7S.png" id="s_img_7s">
+<img class="res" src="images/cards/s_8S.png" id="s_img_8s">
+<img class="res" src="images/cards/s_9S.png" id="s_img_9s">
+<img class="res" src="images/cards/s_10S.png" id="s_img_Ts">
+<img class="res" src="images/cards/s_JS.png" id="s_img_Js">
+<img class="res" src="images/cards/s_QS.png" id="s_img_Qs">
+<img class="res" src="images/cards/s_KS.png" id="s_img_Ks">
+<img class="res" src="images/cards/s_AS.png" id="s_img_As">
+
+<img class="res" src="images/cards/s_2C.png" id="s_img_2c">
+<img class="res" src="images/cards/s_3C.png" id="s_img_3c">
+<img class="res" src="images/cards/s_4C.png" id="s_img_4c">
+<img class="res" src="images/cards/s_5C.png" id="s_img_5c">
+<img class="res" src="images/cards/s_6C.png" id="s_img_6c">
+<img class="res" src="images/cards/s_7C.png" id="s_img_7c">
+<img class="res" src="images/cards/s_8C.png" id="s_img_8c">
+<img class="res" src="images/cards/s_9C.png" id="s_img_9c">
+<img class="res" src="images/cards/s_10C.png" id="s_img_Tc">
+<img class="res" src="images/cards/s_JC.png" id="s_img_Jc">
+<img class="res" src="images/cards/s_QC.png" id="s_img_Qc">
+<img class="res" src="images/cards/s_KC.png" id="s_img_Kc">
+<img class="res" src="images/cards/s_AC.png" id="s_img_Ac">
+
+
 <img class="res" src="images/cards/2H.png"  id="img_2h">
 <img class="res"  src="images/cards/3H.png" id="img_3h">
 <img class="res" src="images/cards/4H.png" id="img_4h">
@@ -348,7 +413,6 @@
 <img class="res" src="images/cards/QC.png" id="img_Qc">
 <img class="res" src="images/cards/KC.png" id="img_Kc">
 <img class="res" src="images/cards/AC.png" id="img_Ac">
-
 
 <script src = "/socket.io/socket.io.js"></script>
 <script src = "/index.js"></script>
