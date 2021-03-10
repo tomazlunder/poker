@@ -9,6 +9,8 @@ var depositsFound = 0;
 
 audio_notify.volume = 0.3;
 audio_bridge.volume = 0.5;
+audio_deal.volume = 0.5;
+
 
 var mute = 0;
 
@@ -702,6 +704,9 @@ socket.on('drawnCards', (arg) => {
         document.getElementById('homeLeaveRoomButton').style.display = 'none';
     }
 
+    document.getElementById('homeRebuyButton').style.display = 'none';
+
+
     if(!mute){
         audio_deal.play();
     }
@@ -759,42 +764,6 @@ socket.on('roomJoined', (arg) => {
 
     message = "";
 });
-
-/*
-socket.on('tournamentJoined', (arg) => {
-    console.log("Received: Room Joined ("+arg+")")
-
-
-    var rid = arg[0]
-    var seat_id = arg[1]
-    myBalance = arg[2]
-    cur_min_buy_in = arg[3]
-    cur_max_buy_in = arg[4]
-    document.getElementById("home_label_balance").innerHTML = "Balance: " + arg[2]
-
-    room_id = rid
-
-    mySeat = seat_id;
-
-    document.getElementById("welcome").style.display = "none";
-    document.getElementById("registration").style.display = "none";
-    document.getElementById("home").style.display = "none";
-
-    document.getElementById("game").style.display = "block";
-
-    document.getElementById("raiseRange").disabled = true;
-    document.getElementById('homeRaiseButton').disabled = true;
-    document.getElementById('homeCallButton').disabled = true;
-    document.getElementById('homeFoldButton').disabled = true;
-
-    document.getElementById('homeRebuyButton').disabled = true;
-
-    var myNode = document.getElementById("containerRooms");
-    myNode.innerHTML = '';
-
-    message = "";
-});
-*/
 
 socket.on('reconnectOK', (arg) => {
 });
@@ -1717,7 +1686,13 @@ function drawProfile(x,y,id){
     }
 
     var border_img = document.getElementById("img_player_border")
+
+    if(!playerAlive[id]){
+        ctx.globalAlpha = 0.5;
+    }
     ctx.drawImage(border_img, x, y, border_width, border_height)
+    ctx.globalAlpha = 1; //Reset alpha
+
 
     ctx.font = "32px Tahoma";
     ctx.fillStyle = "white";
@@ -1731,9 +1706,13 @@ function drawProfile(x,y,id){
 
     var radious = border_height/3;
 
+    var percentage = timeToAct/startTime;
+
     if(playerToAct == playerNames[id] & state == 1){
         //drawTimer(x-radious*1.5,y+cardHeight/4,radious);
-        drawTimer(x-(radious),y+(border_height/2),radious, 42);
+        //drawTimer(x-(radious),y+(border_height/2),radious, 42);
+        ctx.fillStyle = getGreenRedPercentage(1-percentage);
+        ctx.fillRect(x + border_width*0.05, y + border_height * 0.8,border_width*0.9 * percentage, border_height *0.1)
     }
 
 
@@ -1750,7 +1729,7 @@ function drawProfile(x,y,id){
 
         var betWidth = ctx.measureText(playerBets[id]).width;
 
-        ctx.strokeText(playerBets[id], x + border_width - 0.01*width - betWidth, y + 0.10*height);
+        //ctx.strokeText(playerBets[id], x + border_width - 0.01*width - betWidth, y + 0.10*height);
         ctx.fillText(playerBets[id], x + border_width  - 0.01*width -  betWidth, y + 0.10*height);
     }
 
@@ -1759,7 +1738,7 @@ function drawProfile(x,y,id){
 
         ctx.fillStyle = "#339966";
 
-        ctx.strokeText("+"+playerResults[id], x + 0.01*width + stackWidth, y + 0.10*height);
+        //ctx.strokeText("+"+playerResults[id], x + 0.01*width + stackWidth, y + 0.10*height);
         ctx.fillText("+"+playerResults[id], x + 0.01*width + stackWidth, y + 0.10*height);
     }
 }
@@ -1802,7 +1781,7 @@ function drawPlayers(){
     //P3
     if(playerNames[3]){
         x = 0.5*width - border_width/2
-        y = 0.16*height - border_height/2
+        y = 0.18*height - border_height/2
         drawProfile(x,y,3)
 
     }
@@ -1836,6 +1815,7 @@ function drawMyCards(){
         var cardHeight = height*0.18;
         var cardWidth = cardHeight * 0.65;
 
+        /*
         if(!playerAlive[0]){
             ctx.globalAlpha = 0.5
         }
@@ -1844,6 +1824,11 @@ function drawMyCards(){
         ctx.drawImage(img2,width * 0.5 + width * 0.005, height * 0.67, cardWidth, cardHeight)
 
         ctx.globalAlpha = 1
+        */
+       if(playerAlive[0]){
+            ctx.drawImage(img1,width * 0.5 - cardWidth - width * 0.005, height * 0.67, cardWidth, cardHeight)
+            ctx.drawImage(img2,width * 0.5 + width * 0.005, height * 0.67, cardWidth, cardHeight)
+       }
     }
 }
 
@@ -1958,7 +1943,7 @@ function drawNumbers(){
     }
 
     if(state == 3){
-        drawTimer(width*0.5, height*0.3, 110, 80)
+        drawTimer(width*0.5, height*0.34, 80, 60)
     }
 
     //Bet sizes
@@ -1980,3 +1965,9 @@ function validateEmail(email) {
     const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(String(email).toLowerCase());
 }
+
+function getGreenRedPercentage(value) {
+    //value from 0 to 1
+    var hue = ((1 - value) * 120).toString(10);
+    return ["hsl(", hue, ",100%,50%)"].join("");
+  }

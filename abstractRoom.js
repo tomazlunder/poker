@@ -492,6 +492,8 @@ class AbstractRoom{
 				if(this.seats[i].alive){
 					var hand = Hand.solve(this.gameState.revealedCards.concat(this.seats[i].cards))
 					handUserMap.set(hand, this.seats[i])
+					userHandMap.set(this.seats[i], hand)
+
 					hands.push(hand)
 				}
 			}
@@ -529,8 +531,12 @@ class AbstractRoom{
 
 			for(var i = remove_ids.length-1; i >= 0; i--){
 
+				if(hands.includes(userHandMap.get(players[remove_ids[i]]))){
+					var index = hands.indexOf(userHandMap.get(players[remove_ids[i]]))
+					hands.splice(index)
+				}
+
 				players.splice(remove_ids[i],1)
-				hands.splice(remove_ids[i],1)
 				investment.splice(remove_ids[i],1)
 			}
 
@@ -547,7 +553,7 @@ class AbstractRoom{
 			if(this.seats[i]){
 				if(this.seats[i].result > 0){
 					this.seats[i].stack+=this.seats[i].result;
-					var desc = userHandMap.get(this.seats[i])
+					var desc = userHandMap.get(this.seats[i]).descr
 					if(this.fold_win){
 						desc = "Fold win"
 					}
