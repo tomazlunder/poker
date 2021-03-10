@@ -160,6 +160,7 @@ function setPersonStack(user_id, new_stack){
                 reject();
                 return;
             }
+            console.log(query.sql)
 
 			if(result.affectedRows == 1){
 				resolve()
@@ -181,6 +182,8 @@ function setPersonPassword(id_person, hash){
                 reject();
                 return;
             }
+            console.log(query.sql)
+
 			if(result.changedRows == 1){
 				resolve()
 			}
@@ -201,6 +204,7 @@ function setPersonEmail(id_person, email){
                 reject();
                 return;
             }
+            console.log(query.sql)
 			if(result.changedRows == 1){
 				resolve()
 			}
@@ -227,6 +231,7 @@ function insertPerson(account_name, password_hash, email){
                     return;
                 }
 
+                console.log(query.sql)
                 if(result.affectedRows == 1){
                     resolve()
                 }
@@ -251,7 +256,7 @@ function transferStackToBalance(user){
                 console.log(query.sql); 
                 //console.log(result);
                 if(result.affectedRows == 1){
-                    console.log("Transfered stack to balance.")
+                    //console.log("Transfered stack to balance.")
                     resolve()
                 }else{
                     reject()
@@ -273,7 +278,7 @@ function changeWinnings(id_person, change_by){
                 console.log(query.sql); 
                 //console.log(result);
                 if(result.changedRows == 1){
-                    console.log("Changed winnings.")
+                    //console.log("Changed winnings.")
                     resolve()
                 }else{
                     reject()
@@ -295,7 +300,7 @@ function changeTourWinnings(id_person, change_by){
                 console.log(query.sql); 
                 //console.log(result);
                 if(result.changedRows == 1){
-                    console.log("Changed winnings.")
+                    //(console.log("Changed winnings.")
                     resolve()
                 }else{
                     reject()
@@ -317,7 +322,7 @@ function insertWithdraw(id_person, amount){
                 console.log(query.sql); 
                 //console.log(result);
                 if(result.affectedRows == 1){
-                    console.log("Created withdraw.")
+                    //console.log("Created withdraw.")
                     resolve()
                 }else{
                     reject()
@@ -504,6 +509,8 @@ function insertDeposit(id_guild, acc_name, amount, completed, api_id){
                     reject();
                     return;
                 }
+
+                console.log(query.sql)
 
                 if(result.affectedRows == 1){
                     resolve()
