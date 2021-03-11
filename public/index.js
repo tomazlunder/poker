@@ -69,7 +69,6 @@ modalEmail = document.getElementById("modalEmail")
 modalPassword = document.getElementById("modalPassword")
 
 
-
 span1 = document.getElementById("closeBuyIn");
 span2 = document.getElementById("closeRebuy");
 span3 = document.getElementById("closeWithdraw");
@@ -343,6 +342,8 @@ socket.on('roomList', (arg) =>{
     if(alreadyInRoom){
         document.getElementById("labelRoomMessage").innerHTML= "&#160&#160&#160&#160 Waiting for previous round to finish."
     }
+
+    document.getElementById("usersOnline").innerHTML = "Users connected: " + arg[2]
 
     buttonRoomdataMap = new Map()
 

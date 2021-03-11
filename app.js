@@ -278,7 +278,7 @@ io.on('connection', function(socket) {
 
 		}
 
-		socket.emit("roomList",[alreadyInRoom, roomList]);
+		socket.emit("roomList",[alreadyInRoom, roomList, users.length]);
 
 		socket.emit("tournamentList",[alreadyInRoom, tournamentList])
 	}

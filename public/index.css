@@ -615,6 +615,10 @@ input:checked + .slider2:before {
   cursor: pointer;
 }
 
+#usersOnline{
+  position: absolute;
+  left: 0;
+}
 
 #roomListTitleRow{
   vertical-align: middle;

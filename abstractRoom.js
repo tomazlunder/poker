@@ -31,6 +31,8 @@ class AbstractRoom{
 
         this.roomState = 0; //0 - waiting for players, 1 - game started, 2 - game finished
         this.dealer_prev = null
+
+		this.splitTip = 0;
     }
 
     startRoom(){
@@ -511,6 +513,11 @@ class AbstractRoom{
 
 			var winnerHands = Hand.winners(hands)
 			console.log("["+this.room_id +"] Running pot: " + runningPot + " num_hands+= " + hands.length + " " + "num_win: " + winnerHands.length)
+
+			this.splitTip += runningPot%winnerHands.length; //In case multiple winners but not divisible by number of players, this counts as a tip for the house;
+			if(runningPot%winnerHands.length > 0){
+				console.log("["+this.room_id +"] Split tip " + runningPot%winnerHands.length);
+			}
 
 			for(var i in winnerHands){
 				var winningPlayer = handUserMap.get(winnerHands[i])
