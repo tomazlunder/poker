@@ -4,7 +4,7 @@ var con;
 
 function connectDatabase() {
     if (!con) {
-        con = mysql.createConnection({
+        con = mysql.createPool({
             host: "localhost",
             port: 3307,
             user: "appUser1",
@@ -13,13 +13,14 @@ function connectDatabase() {
             insecureAuth : true
         });
 
+        /*
         con.connect(function(err){
             if(!err) {
                 console.log('Database is connected!');
             } else {
                 console.log('Error connecting database!');
             }
-        });
+        });*/
     }
 
     return con;
@@ -525,6 +526,7 @@ function insertDeposit(id_guild, acc_name, amount, completed, api_id){
 }
 
 module.exports = connectDatabase();
+
 module.exports.getPerson = getPerson;
 module.exports.tryDecreaseBalance = tryDecreaseBalance;
 module.exports.tryIncreaseBalance = tryIncreaseBalance;

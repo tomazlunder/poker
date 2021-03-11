@@ -1937,7 +1937,7 @@ function drawNumbers(){
     //Pot
     if(pot > 0 & state == 1){
         ctx.font = "Bold 80px Tahoma";
-        ctx.fillStyle =  "#832e7c";
+        ctx.fillStyle =  "black";
 
         var textWidth = ctx.measureText("POT: " + pot).width;
         ctx.fillText("POT: " + pot, width*0.5 - textWidth/2, height * 0.4);
