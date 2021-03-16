@@ -156,6 +156,14 @@ class AbstractRoom{
 				bb.total_bet_size = bb.bet;
 				bb.stack -= bb.bet;
 
+				//If after obligatory bets one of the blinds has 0 chips remaining, all in
+				if(sb.stack == 0){
+					sb.all_in = 1;
+				}
+				if(bb.stack == 0){
+					bb.all_in = 1;
+				}
+
 				//Create new round 
 				this.gameState = new gs.GameState(dealer,fta)
 
@@ -305,7 +313,7 @@ class AbstractRoom{
 					this.betting();
 					return
 				}else{
-					console.log(this.room_id + ": " + this.gameState.to_act.name + "tried to raise but doensn't have enough money.");
+					console.log(this.room_id + ": " + this.gameState.to_act.name + "tried to raise but doesn't have enough chips.");
 					this.acted = 0; //Can try to send a new action (this should not happen)
 				}
 			}

@@ -1026,8 +1026,10 @@ socket.on('actionRequired', (arg) => {
             audio_notify.play();
         }
 
+        var callsize = curBetSize-playerBets[0]
         var max = playerStacks[0]-(curBetSize-playerBets[0])
         var min = curBetSize;
+
         if(min == 0){
             min = 1;
         }
@@ -1039,15 +1041,21 @@ socket.on('actionRequired', (arg) => {
             document.getElementById('raiseRange').max = max;
             document.getElementById("raiseRange").disabled = false;
             document.getElementById("homeRaiseButton").disabled = false;
-
         }
 
         document.getElementById('raiseRange').min = min;
         document.getElementById('raiseRange').value = min;
         document.getElementById("homeRaiseButton").innerHTML =  "Raise ("+min+")";
 
-
-        var callsize = curBetSize-playerBets[0]
+        //Needs to call/raise, but minimum raise is bigger than players stack. He does an ALL IN raise
+        if(min > max && max > 0){
+            document.getElementById('raiseRange').min = max;
+            document.getElementById('raiseRange').value = max;
+            document.getElementById('raiseRange').max = max;
+            document.getElementById("raiseRange").disabled = true;
+            document.getElementById("homeRaiseButton").disabled = false;
+            document.getElementById("homeRaiseButton").innerHTML =  "Raise (ALL IN)";
+        }
 
         document.getElementById('homeCallButton').innerHTML = "Check";
 
@@ -1756,7 +1764,8 @@ function drawProfile(x,y,id){
     if(state >= 2 & playerResults[id]>0){
         ctx.font = "60px Tahoma";
 
-        ctx.fillStyle = "#339966";
+        //ctx.fillStyle = "#339966";
+        ctx.fillStyle = "#17FF00";
 
         //ctx.strokeText("+"+playerResults[id], x + 0.01*width + stackWidth, y + 0.10*height);
         ctx.fillText("+"+playerResults[id], x + 0.01*width + stackWidth, y + 0.10*height);

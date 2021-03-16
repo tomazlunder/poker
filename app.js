@@ -770,7 +770,8 @@ async function runServer(){
 		var room2 = new Room.Room(io, "room2", "Rytlock's Tent", 6, pidRoomMap,  1, 80, 200)
 		var room3 = new Room.Room(io, "room3", "Zojja's Lab", 6, pidRoomMap,  2, 80, 200)
 		var room4 = new Room.Room(io, "room4", "Lord Fahren's Chamber", 6, pidRoomMap,  2, 160, 400)
-		var tour1 = new Tournament.Tournament(io, "tour1", "Small auto tournament", 3, pidRoomMap, 5, 50, 1000, 1000 * 60 * 2, [100,50,0], 1)
+
+		var tour1 = new Tournament.Tournament(io, "tour1", "Small auto tournament", 3, pidRoomMap, 5, 50, 500, 1000 * 60 * 2, [100,50,0], 1)
 
 		rooms.push(room1)
 		rooms.push(room2)
