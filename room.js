@@ -28,6 +28,10 @@ class Room extends ARoom.AbstractRoom{
 			}
 		}
 
+		if(this.splitTip > 0){
+			//TODO: Do something
+		}
+
         console.log("Resetting game")
         console.log(this.room_id)
         this.io.to(this.room_id).emit('resetGame');

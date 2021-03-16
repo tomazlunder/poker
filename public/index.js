@@ -61,6 +61,8 @@ var cur_max_buy_in;
 
 var myLeaderboard;
 
+var winnerCards = new Set()
+
 modalBuyIn = document.getElementById("modalBuyIn");
 modalRebuy = document.getElementById("modalRebuy");
 modalWithdraw = document.getElementById("modalWithdraw")
@@ -149,6 +151,16 @@ socket.on("depositComplete", (arg) => {
     document.getElementById("depositedLabel").innerHTML = "Deposited: " + depositsFound;
     document.getElementById("deposited").style.display = 'block';
 });
+
+socket.on("winnerCards", (arg) => {
+    console.log("Received: winner cards ("+arg+")")
+    console.log(arg)
+
+    if(arg){
+        arg.forEach(item => winnerCards.add(item))
+    }
+
+})
 
 
 //Messages
@@ -819,8 +831,9 @@ socket.on('resetGame', (arg) => {
     revealedCards = []
     playerResults = [0,0,0,0,0,0]
     playerResults = [null,null,null,null,null,null]
+    winnerCards = new Set();
 
-    this.showdown = []
+    showdown = []
 
     drawGame();
 });
@@ -1669,21 +1682,27 @@ function drawProfile(x,y,id){
 
     var img1,img2
     if(id != 0 && playerAlive[id]){
-
-        if(showdown[id]){
-            img1 = document.getElementById(cardType + "img_" + showdown[id][0])
-            img2 = document.getElementById(cardType + "img_" + showdown[id][1])
-        }
-        else {
-            img1 = document.getElementById("img_back")
-            img2 = img1
-        }
-
         var cardHeight = height*0.18;
         var cardWidth = cardHeight * 0.65;
 
-        ctx.drawImage(img1,x + border_width/2- cardWidth - width * 0.005, y - height*0.11, cardWidth, cardHeight)
-        ctx.drawImage(img2,x + border_width/2 + width * 0.005, y - height*0.11, cardWidth, cardHeight)
+        if(showdown[id]){
+            //img1 = document.getElementById(cardType + "img_" + showdown[id][0])
+            //img2 = document.getElementById(cardType + "img_" + showdown[id][1])
+            drawCard(showdown[id][0], x + border_width/2- cardWidth - width * 0.005, y - height*0.11, cardWidth, cardHeight)
+            drawCard(showdown[id][1], x + border_width/2 + width * 0.005, y - height*0.11, cardWidth, cardHeight)
+        }
+        else {
+            //img1 = document.getElementById("img_back")
+            //img2 = img1
+            drawCard(null, x + border_width/2- cardWidth - width * 0.005, y - height*0.11, cardWidth, cardHeight)
+            drawCard(null, x + border_width/2 + width * 0.005, y - height*0.11, cardWidth, cardHeight)
+        }
+
+        //ctx.drawImage(img1,x + border_width/2- cardWidth - width * 0.005, y - height*0.11, cardWidth, cardHeight)
+        //ctx.drawImage(img2,x + border_width/2 + width * 0.005, y - height*0.11, cardWidth, cardHeight)
+
+        //drawCard(showdown[id][0], x + border_width/2- cardWidth - width * 0.005, y - height*0.11, cardWidth, cardHeight)
+        //drawCard(showdown[id][1], x + border_width/2 + width * 0.005, y - height*0.11, cardWidth, cardHeight)
     }
 
     var border_img = document.getElementById("img_player_border")
@@ -1805,6 +1824,7 @@ function drawPlayers(){
 
 function drawMyCards(){
     if(myCards.length > 0){
+        /*
         var canvas = document.getElementById("canvas");
         var width = canvas.width;
         var height = canvas.height;
@@ -1825,12 +1845,44 @@ function drawMyCards(){
         ctx.drawImage(img2,width * 0.5 + width * 0.005, height * 0.67, cardWidth, cardHeight)
 
         ctx.globalAlpha = 1
-        */
+        
        if(playerAlive[0]){
             ctx.drawImage(img1,width * 0.5 - cardWidth - width * 0.005, height * 0.67, cardWidth, cardHeight)
             ctx.drawImage(img2,width * 0.5 + width * 0.005, height * 0.67, cardWidth, cardHeight)
        }
+       */
+       
+        if(playerAlive[0]){
+            var canvas = document.getElementById("canvas");
+            var width = canvas.width;
+            var height = canvas.height;
+
+            var cardHeight = height*0.18;
+            var cardWidth = cardHeight * 0.65;
+
+            drawCard(myCards[0], width * 0.5 - cardWidth - width * 0.005, height * 0.67, cardWidth, cardHeight)
+            drawCard(myCards[1], width * 0.5 + width * 0.005, height * 0.67, cardWidth, cardHeight)
+        }
     }
+}
+
+function drawCard(name, x, y, width, height){
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext("2d");
+    var img;
+
+    if(name){
+        img = document.getElementById(cardType + "img_" + name)
+
+        if(winnerCards.has(name)){
+            ctx.fillStyle = "yellow"
+            ctx.fillRect(x-3,y-3,width+6,height+6)
+        }
+    }
+    else{
+        img = document.getElementById("img_back")
+    }
+    ctx.drawImage(img,x, y, width, height)
 }
 
 function drawRevealedCards(){
@@ -1848,22 +1900,29 @@ function drawRevealedCards(){
         card = revealedCards[i];
         if(!card) continue;
 
-        img1 = document.getElementById(cardType + "img_" + card)
+        //img1 = document.getElementById(cardType + "img_" + card)
         if(i == 0){
-            ctx.drawImage(img1,width * 0.5 - 2.5 * cardWidth - width * 0.01 * 2, height * 0.42, cardWidth, cardHeight)
+            //ctx.drawImage(img1,width * 0.5 - 2.5 * cardWidth - width * 0.01 * 2, height * 0.42, cardWidth, cardHeight)
+            drawCard(card, width * 0.5 - 2.5 * cardWidth - width * 0.01 * 2, height * 0.42, cardWidth, cardHeight)
+
         }
         if(i == 1){
-            ctx.drawImage(img1,width * 0.5 - 1.5 * cardWidth - width * 0.01 * 1, height * 0.42, cardWidth, cardHeight)
+        //    ctx.drawImage(img1,width * 0.5 - 1.5 * cardWidth - width * 0.01 * 1, height * 0.42, cardWidth, cardHeight)
+            drawCard(card,width * 0.5 - 1.5 * cardWidth - width * 0.01 * 1, height * 0.42, cardWidth, cardHeight)
         }
         if(i == 2){
-            ctx.drawImage(img1,width * 0.5 - 0.5 * cardWidth - width * 0.01 * 0, height * 0.42, cardWidth, cardHeight)
+        //    ctx.drawImage(img1,width * 0.5 - 0.5 * cardWidth - width * 0.01 * 0, height * 0.42, cardWidth, cardHeight)
+            drawCard(card,width * 0.5 - 0.5 * cardWidth - width * 0.01 * 0, height * 0.42, cardWidth, cardHeight)
         }
         if(i == 3){
-            ctx.drawImage(img1,width * 0.5 + 0.5 * cardWidth + width * 0.01 * 1, height * 0.42, cardWidth, cardHeight)
+        //    ctx.drawImage(img1,width * 0.5 + 0.5 * cardWidth + width * 0.01 * 1, height * 0.42, cardWidth, cardHeight)
+            drawCard(card,width * 0.5 + 0.5 * cardWidth + width * 0.01 * 1, height * 0.42, cardWidth, cardHeight)
         }
         if(i == 4){
-            ctx.drawImage(img1,width * 0.5 + 1.5 * cardWidth + width * 0.01 * 2, height * 0.42, cardWidth, cardHeight)
+        //    ctx.drawImage(img1,width * 0.5 + 1.5 * cardWidth + width * 0.01 * 2, height * 0.42, cardWidth, cardHeight)
+            drawCard(card,width * 0.5 + 1.5 * cardWidth + width * 0.01 * 2, height * 0.42, cardWidth, cardHeight)
         }
+
     }
 }
 

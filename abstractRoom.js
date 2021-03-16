@@ -503,6 +503,8 @@ class AbstractRoom{
 
 		var min_stack;
 		var runningPot = 0;
+
+		var winnerCards = []
 		while(players.length > 1){
 			min_stack = Math.min(...investment)
 			runningPot += players.length * min_stack;
@@ -523,6 +525,11 @@ class AbstractRoom{
 				var winningPlayer = handUserMap.get(winnerHands[i])
 
 				winningPlayer.result += Math.floor(runningPot/winnerHands.length)
+
+				var allCards = winnerHands[i].cards
+				for(var j in allCards){
+					winnerCards.push(allCards[j])
+				}
 
 				console.log("["+this.room_id +"] Winner: " + winningPlayer.name + " result+= " + Math.floor(runningPot/winnerHands.length)) + " Desc: " + winnerHands[i].desc
 
@@ -569,9 +576,29 @@ class AbstractRoom{
 				}
 			}
 		}
+
+		if(!this.fold_win){
+			this.sendWinnerCards(winnerCards);
+		}
 		
 		this.roomState++;
 		this.updateState();
+	}
+
+	sendWinnerCards(winnerCards){
+		var toSend = []
+
+		winnerCards.forEach(item => {
+			if(item.toString().substr(0,2) == "10"){
+				toSend.push(("T") + item.toString().substr(2,1));
+			}
+			else{
+				toSend.push(item.toString());
+			}
+		})
+
+
+		this.io.to(this.room_id).emit("winnerCards", toSend);
 	}
 
     /* Functions for sending data */
