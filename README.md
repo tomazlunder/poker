@@ -1,3 +1,3 @@
-#poker [wip]
+# Poker(WIP)
 <br />
 A web poker platform.<br />
